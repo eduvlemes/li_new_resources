@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo Simples - Barra de Cupom com Starter</title>
+</head>
+<body>
+    <h1>Exemplo: Barra de Cupom Condicional</h1>
+    <p>Este exemplo mostra como carregar a barra de cupom apenas em condições específicas.</p>
+
+    <!-- PASSO 1: Carrega o starter -->
+    <script src="starter.js"></script>
+    
+    <!-- PASSO 2: Define recursos e condições -->
+    <script>
+        // Recursos a serem carregados condicionalmente
+        window.StarterResources = [
+            // Configuração da barra para desktop
+            {
+                name: "Config Barra Desktop",
+                type: "inline",
+                code: `
+                    window.CouponBarConfig = {
+                        title: "🖥️ Oferta especial desktop - Frete grátis! 🖥️",
+                        couponCode: "DESKTOP50",
+                        timerEndDate: "2025-12-31 23:59:59",
+                        colors: {
+                            background: "#2c3e50",
+                            titleColor: "#f39c12",
+                            couponBackground: "#e74c3c"
+                        }
+                    };
+                `,
+                condition: {
+                    type: "device.desktop"
+                }
+            },
+            
+            // Configuração da barra para mobile
+            {
+                name: "Config Barra Mobile", 
+                type: "inline",
+                code: `
+                    window.CouponBarConfig = {
+                        title: "📱 Desconto mobile - 30% OFF! 📱",
+                        couponCode: "MOBILE30",
+                        timerEndDate: "2025-12-31 23:59:59",
+                        colors: {
+                            background: "#8e44ad",
+                            titleColor: "#ffffff",
+                            couponBackground: "#f39c12"
+                        }
+                    };
+                `,
+                condition: {
+                    type: "device.mobile"
+                }
+            },
+            
+            // Carrega a barra apenas se estiver no período de promoção
+            {
+                name: "Barra de Cupom",
+                type: "script",
+                url: "barra_cupom.js",
+                condition: {
+                    conditions: [
+                        { type: "time.after", value: "2025-11-01 00:00:00" },
+                        { type: "time.before", value: "2025-12-31 23:59:59" }
+                    ],
+                    operator: "and"
+                }
+            }
+        ];
+    </script>
+
+    <!-- Conteúdo da página -->
+    <div style="margin-top: 100px; padding: 20px;">
+        <h2>Como Usar no Seu E-commerce</h2>
+        
+        <h3>1. Inserir o Starter na Loja:</h3>
+        <pre><code>&lt;script src="https://seusite.com/starter.js"&gt;&lt;/script&gt;</code></pre>
+        
+        <h3>2. Configurar Recursos:</h3>
+        <pre><code>&lt;script&gt;
+window.StarterResources = [
+    // Configuração específica para mobile
+    {
+        name: "Config Mobile",
+        type: "inline", 
+        code: \`window.CouponBarConfig = {
+            title: "📱 Oferta Mobile! 📱",
+            couponCode: "MOBILE20"
+        };\`,
+        condition: { type: "device.mobile" }
+    },
+    
+    // Carrega barra apenas em páginas de produto
+    {
+        name: "Barra de Cupom",
+        type: "script",
+        url: "https://seusite.com/barra_cupom.js",
+        condition: { 
+            type: "page.pathname.contains", 
+            value: "/produto" 
+        }
+    }
+];
+&lt;/script&gt;</code></pre>
+
+        <h3>3. Exemplos de Condições Práticas:</h3>
+        
+        <h4>Carregar apenas em páginas específicas:</h4>
+        <pre><code>condition: { type: "page.pathname.contains", value: "/checkout" }</code></pre>
+        
+        <h4>Carregar apenas em dispositivos móveis:</h4>
+        <pre><code>condition: { type: "device.mobile" }</code></pre>
+        
+        <h4>Carregar apenas durante uma promoção:</h4>
+        <pre><code>condition: {
+    conditions: [
+        { type: "time.after", value: "2025-11-25 00:00:00" },
+        { type: "time.before", value: "2025-11-30 23:59:59" }
+    ],
+    operator: "and"
+}</code></pre>
+        
+        <h4>Carregar para usuários que já compraram:</h4>
+        <pre><code>condition: { type: "storage.local.exists", value: "customer_id" }</code></pre>
+        
+        <h4>Carregar apenas se carrinho tem itens:</h4>
+        <pre><code>condition: { type: "dom.element.exists", value: ".cart-items" }</code></pre>
+
+        <h3>4. Vantagens:</h3>
+        <ul>
+            <li>✅ <strong>Performance:</strong> Carrega recursos apenas quando necessário</li>
+            <li>✅ <strong>Segmentação:</strong> Diferentes recursos para diferentes usuários</li>
+            <li>✅ <strong>Flexibilidade:</strong> Múltiplas condições combinadas</li>
+            <li>✅ <strong>Manutenção:</strong> Um único script starter para todos os clientes</li>
+            <li>✅ <strong>Controle:</strong> Cliente configura suas próprias condições</li>
+        </ul>
+    </div>
+
+    <!-- Simulação de ambiente -->
+    <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h4>🔍 Status Atual (abra o console para ver):</h4>
+        <p><strong>Dispositivo:</strong> <span id="device-type"></span></p>
+        <p><strong>Largura da tela:</strong> <span id="screen-width"></span>px</p>
+        <p><strong>URL atual:</strong> <span id="current-url"></span></p>
+    </div>
+
+    <script>
+        // Atualiza informações na página
+        document.getElementById('device-type').textContent = 
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+            ? 'Mobile' : 'Desktop';
+        
+        document.getElementById('screen-width').textContent = window.innerWidth;
+        document.getElementById('current-url').textContent = window.location.href;
+    </script>
+</body>
+</html>
