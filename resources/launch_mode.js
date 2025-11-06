@@ -92,6 +92,7 @@
             }
 
             .access-modal {
+                box-sizing: border-box;
                 background: ${CONFIG.colors.cardBackground};
                 border: 1px solid ${CONFIG.colors.cardBorder};
                 border-radius: 12px;
