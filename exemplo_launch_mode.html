@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo - Launch Mode</title>
+</head>
+<body>
+    <h1>🚀 Sistema Launch Mode - Exemplo de Implementação</h1>
+    <p>Este é o conteúdo protegido da página. Só aparece após inserir a senha correta.</p>
+
+    <!-- ============================================ -->
+    <!-- IMPLEMENTAÇÃO DO LAUNCH MODE -->
+    <!-- ============================================ -->
+    
+    <!-- 1. CONFIGURAÇÃO (ANTES de carregar o script) -->
+    <script>
+        // Configuração personalizada do Launch Mode
+        window.LaunchModeConfig = {
+            overlayActive: true, // true = ativa proteção, false = desativa
+            overlayTitle: "🔥 BLACK FRIDAY - Acesso VIP",
+            overlayText: `🚧 Lançamento exclusivo para clientes VIP! 🚧<br><br>📦 Produtos com até 80% OFF<br><br>💎 Para receber sua senha VIP:<br><br><a href="https://wa.me/5511999999999?text=Quero%20acesso%20VIP%20Black%20Friday"><strong>📱 CHAMAR NO WHATSAPP</strong></a><br><br><b>Vagas limitadas! 🔥</b>`,
+            buttonText: "Liberar Acesso VIP",
+            correctPassword: "BLACKVIP2025",
+            errorMessage: "Senha incorreta! Solicite sua senha VIP.",
+            placeholder: "Digite sua senha VIP",
+            storageKey: "black_friday_vip_access",
+            useLocalStorage: true, // Mantém desbloqueado entre sessões
+            
+            // Personalização de cores
+            colors: {
+                background: "#000000", // Fundo escuro
+                cardBackground: "#1a1a1a", 
+                cardBorder: "#333333",
+                titleColor: "#ff6600", // Laranja
+                textColor: "#cccccc", // Cinza claro
+                linkColor: "#ff6600", // Laranja para links
+                buttonBackground: "#ff6600",
+                buttonText: "#000000",
+                buttonHover: "#e55a00",
+                inputBackground: "#2a2a2a",
+                inputBorder: "#444444",
+                inputText: "#ffffff",
+                errorColor: "#ff4444"
+            }
+        };
+    </script>
+    
+    <!-- 2. CARREGA O SCRIPT (DEPOIS da configuração) -->
+    <script src="https://cdn.jsdelivr.net/gh/eduvlemes/li_new_resources/resources/launch_mode.js"></script>
+
+    <!-- Conteúdo da página -->
+    <div style="margin-top: 50px; padding: 20px;">
+        <h2>🛠️ Como Implementar no Seu Site:</h2>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>📋 Implementação Básica:</h3>
+            <pre style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>&lt;!-- 1. Configure ANTES de carregar o script --&gt;
+&lt;script&gt;
+window.LaunchModeConfig = {
+    overlayActive: true,
+    overlayTitle: "🚀 Site em Lançamento",
+    overlayText: "Em breve estaremos online!",
+    buttonText: "Desbloquear",
+    correctPassword: "PREVIEW2024",
+    errorMessage: "Senha incorreta!",
+    placeholder: "Digite a senha"
+};
+&lt;/script&gt;
+
+&lt;!-- 2. Carregue o script --&gt;
+&lt;script src="https://cdn.jsdelivr.net/gh/eduvlemes/li_new_resources/resources/launch_mode.js"&gt;&lt;/script&gt;</code></pre>
+        </div>
+
+        <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>✅ Configurações Disponíveis:</h3>
+            <ul>
+                <li><strong>overlayActive:</strong> true/false - Ativa/desativa proteção</li>
+                <li><strong>overlayTitle:</strong> Título do modal</li>
+                <li><strong>overlayText:</strong> Texto explicativo (aceita HTML)</li>
+                <li><strong>buttonText:</strong> Texto do botão</li>
+                <li><strong>correctPassword:</strong> Senha de acesso</li>
+                <li><strong>errorMessage:</strong> Mensagem de erro</li>
+                <li><strong>placeholder:</strong> Placeholder do input</li>
+                <li><strong>storageKey:</strong> Chave do localStorage</li>
+                <li><strong>useLocalStorage:</strong> true = persiste, false = apenas sessão</li>
+                <li><strong>colors:</strong> Objeto com cores personalizadas</li>
+            </ul>
+        </div>
+
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>🎨 Personalização de Cores:</h3>
+            <pre style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>colors: {
+    background: "#000000",        // Fundo da overlay
+    cardBackground: "#ffffff",    // Fundo do modal
+    cardBorder: "#e5e7eb",       // Borda do modal
+    titleColor: "#1f2937",       // Cor do título
+    textColor: "#6b7280",        // Cor do texto
+    linkColor: "#3b82f6",        // Cor dos links
+    buttonBackground: "#3b82f6", // Fundo do botão
+    buttonText: "#ffffff",       // Texto do botão
+    buttonHover: "#2563eb",      // Botão no hover
+    inputBackground: "#f9fafb",  // Fundo do input
+    inputBorder: "#d1d5db",      // Borda do input
+    inputText: "#1f2937",        // Texto do input
+    errorColor: "#ef4444"        // Cor do erro
+}</code></pre>
+        </div>
+
+        <div style="background: #d1ecf1; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>🔧 Casos de Uso:</h3>
+            <ul>
+                <li>🚀 <strong>Pré-lançamento:</strong> Site em desenvolvimento</li>
+                <li>🔒 <strong>Acesso VIP:</strong> Conteúdo exclusivo para clientes</li>
+                <li>🎯 <strong>Landing Pages:</strong> Captura de leads com senha</li>
+                <li>📅 <strong>Eventos:</strong> Acesso restrito por período</li>
+                <li>💎 <strong>Área Premium:</strong> Conteúdo pago</li>
+                <li>🛠️ <strong>Manutenção:</strong> Página temporária</li>
+            </ul>
+        </div>
+
+        <div style="background: #f8d7da; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>⚠️ Importante:</h3>
+            <ul>
+                <li>A configuração deve vir <strong>ANTES</strong> do script</li>
+                <li>Para desativar, use <code>overlayActive: false</code></li>
+                <li>Senha é case-sensitive (diferencia maiúsculas/minúsculas)</li>
+                <li>LocalStorage persiste entre sessões do navegador</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Simulação de conteúdo protegido -->
+    <div style="margin: 40px 20px; padding: 20px; background: #e7f3ff; border-radius: 8px;">
+        <h2>🎉 Parabéns!</h2>
+        <p>Você conseguiu acessar o conteúdo protegido! Este é apenas um exemplo do que pode ser protegido:</p>
+        <ul>
+            <li>✅ Produtos em pré-venda</li>
+            <li>✅ Conteúdo exclusivo</li>
+            <li>✅ Área de membros</li>
+            <li>✅ Landing pages especiais</li>
+        </ul>
+        
+        <p><strong>Senha atual do exemplo:</strong> <code>BLACKVIP2025</code></p>
+    </div>
+</body>
+</html>
