@@ -11,9 +11,13 @@
     // ========================================
     const DEFAULT_CONFIG = {
         active: true,
-        triggerSelectors: ['.pagina-inicial', '.pagina-produto'], // Exibe somente se uma dessas classes existir
-        insertSelector: 'body', // Classe ou ID onde o componente será inserido
-        insertMethod: 'prepend', // 'append' ou 'prepend'
+        displayRules: [
+            {
+                triggerSelectors: ['.pagina-inicial', '.pagina-produto'],
+                insertSelector: 'body',
+                insertMethod: 'prepend'
+            }
+        ],
         showCloseButton: true,
         maxCoupons: 3,
         coupons: [
@@ -81,6 +85,33 @@
         if (Array.isArray(window.CouponMultiTierConfig.coupons)) {
             CONFIG.coupons = window.CouponMultiTierConfig.coupons.slice(0, CONFIG.maxCoupons || 3);
         }
+
+        let customRules = [];
+
+        if (Array.isArray(window.CouponMultiTierConfig.displayRules)) {
+            customRules = window.CouponMultiTierConfig.displayRules;
+        } else if (window.CouponMultiTierConfig.triggerSelectors || window.CouponMultiTierConfig.insertSelector || window.CouponMultiTierConfig.insertMethod) {
+            const legacySelectors = window.CouponMultiTierConfig.triggerSelectors;
+            customRules = [
+                {
+                    triggerSelectors: Array.isArray(legacySelectors)
+                        ? legacySelectors
+                        : (typeof legacySelectors === 'string' ? [legacySelectors] : []),
+                    insertSelector: window.CouponMultiTierConfig.insertSelector || 'body',
+                    insertMethod: window.CouponMultiTierConfig.insertMethod || 'prepend'
+                }
+            ];
+        }
+
+        if (customRules.length > 0) {
+            CONFIG.displayRules = customRules.map(rule => ({
+                triggerSelectors: Array.isArray(rule.triggerSelectors) ? rule.triggerSelectors : [],
+                insertSelector: rule.insertSelector || 'body',
+                insertMethod: rule.insertMethod || 'prepend'
+            }));
+        } else if (!Array.isArray(CONFIG.displayRules) || CONFIG.displayRules.length === 0) {
+            CONFIG.displayRules = DEFAULT_CONFIG.displayRules.slice();
+        }
     }
 
     // ========================================
@@ -88,6 +119,8 @@
     // ========================================
     const CSS_STYLES = `
         <style id="coupon-multi-tier-styles">
+          .container .multi-tier-wrapper,
+            .conteiner .multi-tier-wrapper{width:100%}
             .multi-tier-wrapper {
                 position: relative;
                 width: 90%;
@@ -260,12 +293,14 @@
             this.wrapper = null;
             this.timerInterval = null;
             this.isHidden = this.loadHiddenState();
+            this.activeRule = null;
             this.init();
         }
 
         init() {
             if (!CONFIG.active) return;
-            if (!this.shouldDisplay()) return;
+            this.activeRule = this.getMatchingRule();
+            if (!this.activeRule) return;
 
             this.injectStyles();
             this.injectHTML();
@@ -276,12 +311,12 @@
             this.checkVisibility();
         }
 
-        shouldDisplay() {
-            if (!Array.isArray(CONFIG.triggerSelectors) || CONFIG.triggerSelectors.length === 0) {
+        matchesSelectors(selectors) {
+            if (!Array.isArray(selectors) || selectors.length === 0) {
                 return true;
             }
 
-            return CONFIG.triggerSelectors.some(selector => {
+            return selectors.some(selector => {
                 if (!selector) return false;
                 try {
                     return document.querySelector(selector.trim()) !== null;
@@ -290,6 +325,20 @@
                     return false;
                 }
             });
+        }
+
+        getMatchingRule() {
+            if (Array.isArray(CONFIG.displayRules) && CONFIG.displayRules.length > 0) {
+                const matchedRule = CONFIG.displayRules.find(rule => this.matchesSelectors(rule.triggerSelectors));
+                if (matchedRule) {
+                    return {
+                        triggerSelectors: matchedRule.triggerSelectors || [],
+                        insertSelector: matchedRule.insertSelector || 'body',
+                        insertMethod: matchedRule.insertMethod || 'prepend'
+                    };
+                }
+            }
+            return null;
         }
 
         injectStyles() {
@@ -304,13 +353,24 @@
                 existing.remove();
             }
 
-            const target = document.querySelector(CONFIG.insertSelector || 'body');
+            const rule = this.activeRule || { insertSelector: 'body', insertMethod: 'prepend' };
+            let target = null;
+            try {
+                target = document.querySelector(rule.insertSelector || 'body');
+            } catch (err) {
+                console.warn('Selector de inserção inválido para coupon_multi_tier:', rule.insertSelector, err);
+            }
+
             if (!target) {
-                console.warn('Elemento alvo para o coupon_multi_tier não encontrado:', CONFIG.insertSelector);
+                console.warn('Elemento alvo para o coupon_multi_tier não encontrado, usando <body> como fallback:', rule.insertSelector);
+                target = document.body;
+            }
+
+            if (!target) {
                 return;
             }
 
-            const method = (CONFIG.insertMethod || 'prepend').toLowerCase();
+            const method = (rule.insertMethod || 'prepend').toLowerCase();
             if (method === 'append') {
                 target.insertAdjacentHTML('beforeend', HTML_TEMPLATE);
             } else {
