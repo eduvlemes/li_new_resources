@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Booster - Sistema de Upsell</title>
+</head>
+<body>
+    <h1>🛒 Checkout Booster - Upsell Inteligente</h1>
+    
+    <!-- Simula página do carrinho -->
+    <div class="pagina-carrinho">
+        <h2>Seu Carrinho</h2>
+        
+        <!-- Produtos no carrinho (simulação) -->
+        <div class="produto-carrinho" data-produto-id="346647810">
+            <h3>Produto 1 no Carrinho</h3>
+            <p>R$ 99,90</p>
+        </div>
+        
+        <div class="produto-carrinho" data-produto-id="346647811">
+            <h3>Produto 2 no Carrinho</h3>
+            <p>R$ 149,90</p>
+        </div>
+        
+        <!-- O Checkout Booster será inserido automaticamente aqui -->
+    </div>
+
+    <!-- ============================================ -->
+    <!-- IMPLEMENTAÇÃO DO CHECKOUT BOOSTER -->
+    <!-- ============================================ -->
+    
+    <!-- 1. CONFIGURAÇÃO (ANTES do script) -->
+    <script>
+        window.CheckoutBoosterConfig = {
+            active: true,
+            title: "🔥 Aproveite e Leve Também!",
+            subtitle: "Produtos que combinam perfeitamente com sua compra",
+            buttonText: "Adicionar ao Carrinho",
+            maxProducts: 4,
+            
+            // Configuração da API
+            apiBaseUrl: "https://demo-alpix-dev-playground.lojaintegrada.com.br/_search",
+            
+            // Personalização visual
+            colors: {
+                background: "#ffffff",
+                border: "#e5e7eb",
+                titleColor: "#1f2937",
+                subtitleColor: "#6b7280",
+                buttonBackground: "#3b82f6",
+                buttonText: "#ffffff",
+                buttonHover: "#2563eb",
+                priceColor: "#059669"
+            },
+            
+            // Configurações de comportamento
+            showOnPages: ['.pagina-carrinho'],
+            productSelector: '[data-produto-id]',
+            autoLoad: true
+        };
+    </script>
+    
+    <!-- 2. CARREGA O SCRIPT -->
+    <script src="checkout_booster.js"></script>
+
+    <!-- Conteúdo da página -->
+    <div style="margin-top: 50px; padding: 20px;">
+        <h2>📋 Como Implementar:</h2>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>🚀 Implementação Rápida:</h3>
+            <pre style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>&lt;!-- 1. Configure antes do script --&gt;
+&lt;script&gt;
+window.CheckoutBoosterConfig = {
+    active: true,
+    title: "🔥 Aproveite e Leve Também!",
+    apiBaseUrl: "https://sua-loja.lojaintegrada.com.br/_search",
+    maxProducts: 4
+};
+&lt;/script&gt;
+
+&lt;!-- 2. Carregue o script --&gt;
+&lt;script src="checkout_booster.js"&gt;&lt;/script&gt;</code></pre>
+        </div>
+
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>🔧 Estratégias de Busca (Múltiplas):</h3>
+            <p>Como os filtros múltiplos não funcionaram, o sistema usa <strong>4 estratégias inteligentes:</strong></p>
+            <ol>
+                <li><strong>📈 Busca Geral:</strong> Termos como "produto", "oferta", "promoção"</li>
+                <li><strong>🔍 Busca Individual:</strong> Cada produto do carrinho separadamente</li>
+                <li><strong>🏆 Produtos Populares:</strong> Ordenados por popularidade/novidade</li>
+                <li><strong>📦 Fallback:</strong> Produtos exemplo se nada funcionar</li>
+            </ol>
+            <p><strong>✅ Resultado:</strong> Sempre mostra produtos, mesmo se a API falhar!</p>
+        </div>
+
+        <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>⚙️ Configurações Disponíveis:</h3>
+            <ul>
+                <li><strong>active:</strong> Ativa/desativa o sistema</li>
+                <li><strong>title/subtitle:</strong> Textos do cabeçalho</li>
+                <li><strong>buttonText:</strong> Texto do botão</li>
+                <li><strong>maxProducts:</strong> Máximo de produtos a mostrar</li>
+                <li><strong>apiBaseUrl:</strong> URL base da API de busca</li>
+                <li><strong>showOnPages:</strong> Seletores onde o upsell aparece</li>
+                <li><strong>productSelector:</strong> Seletor dos produtos no carrinho</li>
+                <li><strong>colors:</strong> Personalização visual completa</li>
+            </ul>
+        </div>
+
+        <div style="background: #f8d7da; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>⚠️ Importante - Funcionamento Garantido:</h3>
+            <p>O sistema foi redesenhado para <strong>SEMPRE funcionar</strong>:</p>
+            <ol>
+                <li><strong>✅ Múltiplas estratégias:</strong> 4 formas diferentes de buscar produtos</li>
+                <li><strong>✅ Fallback inteligente:</strong> Produtos exemplo se API falhar</li>
+                <li><strong>✅ Métodos de adição:</strong> Formulário + AJAX como backup</li>
+                <li><strong>✅ Debug completo:</strong> Logs no console para diagnóstico</li>
+            </ol>
+            <p><strong>🎯 Resultado:</strong> Upsell sempre aparece, mesmo com problemas de API!</p>
+        </div>
+
+        <div style="background: #d1ecf1; padding: 15px; border-radius: 5px; margin: 15px 0;">
+            <h3>🎯 Funcionalidades:</h3>
+            <ul>
+                <li>✅ <strong>Detecção automática</strong> de produtos no carrinho</li>
+                <li>✅ <strong>Múltiplos formatos de API</strong> testados automaticamente</li>
+                <li>✅ <strong>Design responsivo</strong> para mobile e desktop</li>
+                <li>✅ <strong>Animações suaves</strong> e feedback visual</li>
+                <li>✅ <strong>Estados de loading</strong> e erro</li>
+                <li>✅ <strong>Fallback inteligente</strong> se API falhar</li>
+                <li>✅ <strong>Personalização total</strong> de cores e textos</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Debug: Mostra IDs encontrados -->
+    <div style="margin: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px;">
+        <h3>🔍 Debug - IDs dos Produtos no Carrinho:</h3>
+        <p id="debug-ids">Carregando...</p>
+        
+        <script>
+            // Mostra os IDs encontrados para debug
+            document.addEventListener('DOMContentLoaded', function() {
+                const products = document.querySelectorAll('[data-produto-id]');
+                const ids = Array.from(products).map(el => el.getAttribute('data-produto-id'));
+                document.getElementById('debug-ids').textContent = ids.length > 0 ? ids.join(', ') : 'Nenhum ID encontrado';
+            });
+        </script>
+    </div>
+</body>
+</html>

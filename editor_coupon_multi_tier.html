@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Editor Coupon Multi Tier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #111827;
+            background: #f1f5f9;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 32px;
+            box-sizing: border-box;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        form {
+            display: grid;
+            gap: 24px;
+        }
+        fieldset {
+            border: 1px solid #cbd5f5;
+            border-radius: 12px;
+            padding: 20px;
+            background: #ffffff;
+        }
+        legend {
+            font-weight: 600;
+            padding: 0 8px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5f5;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        input[type="color"] {
+            height: 40px;
+            cursor: pointer;
+        }
+        .coupon-card {
+            border: 1px dashed #cbd5f5;
+            border-radius: 10px;
+            padding: 16px;
+            background: #f8fafc;
+            display: grid;
+            gap: 12px;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button.primary {
+            background: #1d4ed8;
+            color: #ffffff;
+        }
+        button.secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+        #output {
+            width: 100%;
+            min-height: 220px;
+            font-family: "Fira Code", "Consolas", monospace;
+        }
+        .note {
+            font-size: 13px;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <h1>Editor visual – Coupon Multi Tier</h1>
+    <p class="note">Preencha os campos abaixo e gere automaticamente o objeto <code>window.CouponMultiTierConfig</code> pronto para uso.</p>
+
+    <form id="configForm">
+        <fieldset>
+            <legend>Configuração geral</legend>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label><input type="checkbox" id="active" checked /> Componente ativo</label>
+                </div>
+                <div class="input-group">
+                    <label><input type="checkbox" id="showCloseButton" checked /> Mostrar botão fechar</label>
+                </div>
+                <div class="input-group">
+                    <label><input type="checkbox" id="useLocalStorage" /> Salvar estado no localStorage</label>
+                </div>
+                <div class="input-group">
+                    <label><input type="checkbox" id="autoHide" /> Ocultar quando timer zerar</label>
+                </div>
+                <div class="input-group">
+                    <label for="triggerSelectors">Selectores de disparo (separar por vírgula)</label>
+                    <input type="text" id="triggerSelectors" placeholder=".pagina-inicial, .pagina-produto" value=".pagina-inicial, .pagina-produto" />
+                </div>
+                <div class="input-group">
+                    <label for="insertSelector">Selector de inserção</label>
+                    <input type="text" id="insertSelector" value="body" />
+                </div>
+                <div class="input-group">
+                    <label for="insertMethod">Método de inserção</label>
+                    <select id="insertMethod">
+                        <option value="prepend">prepend</option>
+                        <option value="append">append</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="storageKey">Chave de armazenamento</label>
+                    <input type="text" id="storageKey" value="multi_tier_coupon_hidden" />
+                </div>
+                <div class="input-group">
+                    <label for="buttonCloseText">Texto botão fechar</label>
+                    <input type="text" id="buttonCloseText" value="✕" />
+                </div>
+                <div class="input-group">
+                    <label for="copiedMessage">Mensagem de cópia</label>
+                    <input type="text" id="copiedMessage" value="Cupom copiado!" />
+                </div>
+                <div class="input-group">
+                    <label for="maxCoupons">Máximo de cupons (1-3)</label>
+                    <input type="number" id="maxCoupons" min="1" max="3" value="3" />
+                </div>
+                <div class="input-group">
+                    <label for="animationDuration">Duração animação (ms)</label>
+                    <input type="number" id="animationDuration" min="0" value="200" />
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Cupons (até 3)</legend>
+            <div class="grid-2" id="couponsContainer"></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Timer</legend>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label><input type="checkbox" id="timerEnabled" checked /> Ativar timer</label>
+                </div>
+                <div class="input-group">
+                    <label for="timerLabel">Rótulo</label>
+                    <input type="text" id="timerLabel" value="Oferta acaba em:" />
+                </div>
+                <div class="input-group">
+                    <label for="endDate">Data término</label>
+                    <input type="datetime-local" id="endDate" />
+                </div>
+                <div class="input-group">
+                    <label for="eventTitle">Título do evento</label>
+                    <input type="text" id="eventTitle" value="BLACK FRIDAY JÁ ESTÁ VALENDO!" />
+                </div>
+                <div class="input-group" style="grid-column: span 2;">
+                    <label for="timerHelper">Texto auxiliar</label>
+                    <textarea id="timerHelper">Aplique o cupom no carrinho para garantir o desconto.</textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Cores</legend>
+            <div class="grid-2" id="colorsContainer"></div>
+        </fieldset>
+
+        <div class="actions">
+            <button type="button" class="primary" id="generateConfig">Gerar configuração</button>
+            <button type="button" class="secondary" id="copyConfig">Copiar texto</button>
+            <button type="button" class="secondary" id="resetForm">Restaurar padrões</button>
+        </div>
+    </form>
+
+    <h2>Resultado</h2>
+    <textarea id="output" readonly></textarea>
+    <p class="note">Cole o resultado antes de carregar <code>resources/coupon_multi_tier.js</code>, por exemplo dentro de <code>&lt;script&gt;</code> no <em>head</em>.</p>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            active: true,
+            triggerSelectors: ['.pagina-inicial', '.pagina-produto'],
+            insertSelector: 'body',
+            insertMethod: 'prepend',
+            showCloseButton: true,
+            maxCoupons: 3,
+            coupons: [
+                { title: 'GANHE R$ 50,00 OFF', subtitle: 'ACIMA DE R$ 1.200', helperText: 'Aplique o cupom no carrinho:', code: 'BLACK50' },
+                { title: 'GANHE R$ 100,00 OFF', subtitle: 'ACIMA DE R$ 2.000', helperText: 'Aplique o cupom no carrinho:', code: 'BLACK100' },
+                { title: 'GANHE R$ 150,00 OFF', subtitle: 'ACIMA DE R$ 3.000', helperText: 'Aplique o cupom no carrinho:', code: 'BLACK150' }
+            ],
+            timer: {
+                enabled: true,
+                label: 'Oferta acaba em:',
+                endDate: '2025-11-30T23:59',
+                eventTitle: 'BLACK FRIDAY JÁ ESTÁ VALENDO!',
+                helperText: 'Aplique o cupom no carrinho para garantir o desconto.'
+            },
+            buttonCloseText: '✕',
+            copiedMessage: 'Cupom copiado!',
+            storageKey: 'multi_tier_coupon_hidden',
+            useLocalStorage: false,
+            autoHide: false,
+            animationDuration: 200,
+            colors: {
+                background: '#050505',
+                cardBackground: '#141414',
+                cardBorder: '#1f1f1f',
+                cardTitle: '#ffffff',
+                cardHighlight: '#d19315ff',
+                cardText: '#cbd5f5',
+                codeBackground: '#4ade80',
+                codeText: '#000000',
+                codeHover: '#22c55e',
+                timerText: '#ffffff',
+                timerHighlight: '#4ade80',
+                closeButtonText: '#888888',
+                closeButtonHover: '#ffffff',
+                copiedBackground: '#22c55e',
+                copiedText: '#ffffff'
+            }
+        };
+
+        const COLOR_FIELDS = [
+            ['background', 'Plano de fundo'],
+            ['cardBackground', 'Card background'],
+            ['cardBorder', 'Borda cards'],
+            ['cardTitle', 'Título do card'],
+            ['cardHighlight', 'Destaque valores'],
+            ['cardText', 'Texto card'],
+            ['codeBackground', 'Botão código'],
+            ['codeText', 'Texto botão código'],
+            ['codeHover', 'Botão código (hover)'],
+            ['timerText', 'Texto timer'],
+            ['timerHighlight', 'Destaque timer'],
+            ['closeButtonText', 'Texto botão fechar'],
+            ['closeButtonHover', 'Texto botão fechar (hover)'],
+            ['copiedBackground', 'Fundo estado copiado'],
+            ['copiedText', 'Texto estado copiado']
+        ];
+
+        const couponsContainer = document.getElementById('couponsContainer');
+        const colorsContainer = document.getElementById('colorsContainer');
+        const output = document.getElementById('output');
+
+        function createCouponCard(index, coupon) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'coupon-card';
+            wrapper.innerHTML = `
+                <h4>Cupom ${index + 1}</h4>
+                <div class="input-group">
+                    <label>Título</label>
+                    <input type="text" data-field="title" value="${coupon.title || ''}" />
+                </div>
+                <div class="input-group">
+                    <label>Subtítulo</label>
+                    <input type="text" data-field="subtitle" value="${coupon.subtitle || ''}" />
+                </div>
+                <div class="input-group">
+                    <label>Texto auxiliar</label>
+                    <input type="text" data-field="helperText" value="${coupon.helperText || ''}" />
+                </div>
+                <div class="input-group">
+                    <label>Código</label>
+                    <input type="text" data-field="code" value="${coupon.code || ''}" />
+                </div>
+            `;
+            wrapper.dataset.index = index.toString();
+            return wrapper;
+        }
+
+        function createColorInput(key, label) {
+            const value = DEFAULT_CONFIG.colors[key] || '#ffffff';
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            group.innerHTML = `
+                <label for="color-${key}">${label}</label>
+                <input type="color" id="color-${key}" value="${value}" data-color-key="${key}" />
+            `;
+            return group;
+        }
+
+        function hydrateForm() {
+            document.getElementById('active').checked = DEFAULT_CONFIG.active;
+            document.getElementById('showCloseButton').checked = DEFAULT_CONFIG.showCloseButton;
+            document.getElementById('useLocalStorage').checked = DEFAULT_CONFIG.useLocalStorage;
+            document.getElementById('autoHide').checked = DEFAULT_CONFIG.autoHide;
+            document.getElementById('triggerSelectors').value = DEFAULT_CONFIG.triggerSelectors.join(', ');
+            document.getElementById('insertSelector').value = DEFAULT_CONFIG.insertSelector;
+            document.getElementById('insertMethod').value = DEFAULT_CONFIG.insertMethod;
+            document.getElementById('storageKey').value = DEFAULT_CONFIG.storageKey;
+            document.getElementById('buttonCloseText').value = DEFAULT_CONFIG.buttonCloseText;
+            document.getElementById('copiedMessage').value = DEFAULT_CONFIG.copiedMessage;
+            document.getElementById('maxCoupons').value = DEFAULT_CONFIG.maxCoupons;
+            document.getElementById('animationDuration').value = DEFAULT_CONFIG.animationDuration;
+
+            couponsContainer.innerHTML = '';
+            DEFAULT_CONFIG.coupons.forEach((coupon, index) => {
+                couponsContainer.appendChild(createCouponCard(index, coupon));
+            });
+
+            colorsContainer.innerHTML = '';
+            COLOR_FIELDS.forEach(([key, label]) => {
+                colorsContainer.appendChild(createColorInput(key, label));
+            });
+
+            document.getElementById('timerEnabled').checked = DEFAULT_CONFIG.timer.enabled;
+            document.getElementById('timerLabel').value = DEFAULT_CONFIG.timer.label;
+            document.getElementById('endDate').value = DEFAULT_CONFIG.timer.endDate;
+            document.getElementById('eventTitle').value = DEFAULT_CONFIG.timer.eventTitle;
+            document.getElementById('timerHelper').value = DEFAULT_CONFIG.timer.helperText;
+        }
+
+        function collectCoupons(max) {
+            const items = [];
+            couponsContainer.querySelectorAll('.coupon-card').forEach((card, index) => {
+                if (index >= max) return;
+                const coupon = {};
+                card.querySelectorAll('input[data-field]').forEach(input => {
+                    coupon[input.dataset.field] = input.value.trim();
+                });
+                if (Object.values(coupon).some(Boolean)) {
+                    items.push(coupon);
+                }
+            });
+            return items;
+        }
+
+        function collectColors() {
+            const colors = {};
+            colorsContainer.querySelectorAll('input[type="color"]').forEach(input => {
+                colors[input.dataset.colorKey] = input.value;
+            });
+            return colors;
+        }
+
+        function buildConfig() {
+            const maxCoupons = Math.min(3, Math.max(1, Number(document.getElementById('maxCoupons').value) || 3));
+            return {
+                active: document.getElementById('active').checked,
+                triggerSelectors: document.getElementById('triggerSelectors').value
+                    .split(',')
+                    .map(str => str.trim())
+                    .filter(Boolean),
+                insertSelector: document.getElementById('insertSelector').value.trim() || 'body',
+                insertMethod: document.getElementById('insertMethod').value,
+                showCloseButton: document.getElementById('showCloseButton').checked,
+                maxCoupons,
+                coupons: collectCoupons(maxCoupons),
+                timer: {
+                    enabled: document.getElementById('timerEnabled').checked,
+                    label: document.getElementById('timerLabel').value.trim(),
+                    endDate: document.getElementById('endDate').value,
+                    eventTitle: document.getElementById('eventTitle').value.trim(),
+                    helperText: document.getElementById('timerHelper').value.trim()
+                },
+                buttonCloseText: document.getElementById('buttonCloseText').value || '✕',
+                copiedMessage: document.getElementById('copiedMessage').value || 'Cupom copiado!',
+                storageKey: document.getElementById('storageKey').value || 'multi_tier_coupon_hidden',
+                useLocalStorage: document.getElementById('useLocalStorage').checked,
+                autoHide: document.getElementById('autoHide').checked,
+                animationDuration: Number(document.getElementById('animationDuration').value) || 200,
+                colors: collectColors()
+            };
+        }
+
+        function updateOutput() {
+            const config = buildConfig();
+            const snippet = 'window.CouponMultiTierConfig = ' + JSON.stringify(config, null, 2) + ';';
+            output.value = snippet;
+        }
+
+        document.getElementById('generateConfig').addEventListener('click', updateOutput);
+        document.getElementById('copyConfig').addEventListener('click', () => {
+            if (!output.value) updateOutput();
+            navigator.clipboard?.writeText(output.value).then(() => {
+                alert('Configuração copiada!');
+            }).catch(() => {
+                alert('Copie manualmente o texto.');
+            });
+        });
+        document.getElementById('resetForm').addEventListener('click', () => {
+            hydrateForm();
+            output.value = '';
+        });
+
+        hydrateForm();
+        updateOutput();
+    </script>
+</body>
+</html>
