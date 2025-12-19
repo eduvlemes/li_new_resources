@@ -336,16 +336,22 @@
 
             // Verifica quantidade máxima de exibições
             if (popupConfig.maxDisplays > 0 && data.displayCount >= popupConfig.maxDisplays) {
-                return false;
-            }
-
-            // Verifica cooldown (tempo desde o último fechamento)
-            if (data.lastClosedAt) {
-                const now = new Date().getTime();
-                const lastClosed = new Date(data.lastClosedAt).getTime();
-                const cooldownMs = popupConfig.cooldownHours * 60 * 60 * 1000;
-                
-                if (now - lastClosed < cooldownMs) {
+                // Atingiu o limite - verifica cooldown para resetar
+                if (data.lastClosedAt) {
+                    const now = new Date().getTime();
+                    const lastClosed = new Date(data.lastClosedAt).getTime();
+                    const cooldownMs = popupConfig.cooldownHours * 60 * 60 * 1000;
+                    
+                    if (now - lastClosed >= cooldownMs) {
+                        // Cooldown expirou, reseta o contador
+                        data.displayCount = 0;
+                        data.lastClosedAt = null;
+                        // Continua para verificar a regra
+                    } else {
+                        // Ainda em cooldown
+                        return false;
+                    }
+                } else {
                     return false;
                 }
             }
