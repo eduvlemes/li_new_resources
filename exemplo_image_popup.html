@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Popup - Exemplo de Uso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .demo-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .demo-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .demo-section p {
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        .content {
+            margin: 40px 0;
+        }
+
+        .content h3 {
+            color: #333;
+            margin: 30px 0 15px 0;
+        }
+
+        .content p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: #f8f9fa;
+            margin-top: 60px;
+            color: #666;
+        }
+
+        #scrollProgress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            z-index: 999998;
+            transition: width 0.1s ease;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="scrollProgress"></div>
+
+    <header>
+        <h1>🖼️ Image Popup</h1>
+        <p>Sistema de Popups de Imagens com Regras Personalizáveis</p>
+    </header>
+
+    <div class="container">
+        <!-- Seção: Demonstração -->
+        <div class="demo-section">
+            <h2>🎯 Demonstração Interativa</h2>
+            <p>Use os botões abaixo para testar os diferentes popups configurados nesta página.</p>
+
+            <div class="info-box">
+                <strong>💡 Dica:</strong> Esta página está configurada com 3 popups diferentes:
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Welcome:</strong> Popup de boas-vindas (exibe 1x, cooldown de 1 hora)</li>
+                    <li><strong>Promoção:</strong> Popup promocional após scroll de 500px (exibe 3x, cooldown de 12h)</li>
+                    <li><strong>Newsletter:</strong> Popup de newsletter após 10 segundos (exibe 5x, cooldown de 24h)</li>
+                </ul>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="showWelcome()">
+                    👋 Mostrar Welcome
+                </button>
+                <button class="btn btn-primary" onclick="showPromo()">
+                    🎉 Mostrar Promoção
+                </button>
+                <button class="btn btn-primary" onclick="showNewsletter()">
+                    📧 Mostrar Newsletter
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção: Controles -->
+        <div class="demo-section">
+            <h2>🎮 Controles</h2>
+            <p>Gerencie o comportamento dos popups em tempo real.</p>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="closePopup()">
+                    ✖️ Fechar Popup Atual
+                </button>
+                <button class="btn btn-success" onclick="resetAll()">
+                    🔄 Resetar Todos Dados
+                </button>
+                <button class="btn btn-danger" onclick="resetWelcome()">
+                    🔄 Resetar Welcome
+                </button>
+                <button class="btn btn-secondary" onclick="showStats()">
+                    📊 Ver Estatísticas
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção: Estatísticas -->
+        <div class="demo-section">
+            <h2>📊 Estatísticas em Tempo Real</h2>
+            <div class="stats-grid" id="statsContainer">
+                <!-- Estatísticas serão inseridas aqui via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Seção: Configuração -->
+        <div class="demo-section">
+            <h2>⚙️ Configuração Desta Página</h2>
+            <p>Veja o código de configuração usado neste exemplo:</p>
+
+            <pre><code>window.ImagePopupConfig = {
+    popups: [
+        {
+            id: "welcome",
+            imageUrl: "https://via.placeholder.com/600x400/667eea/ffffff?text=Bem-vindo!",
+            maxDisplays: 1,
+            cooldownHours: 1,
+            displayRule: "true",
+            enabled: true
+        },
+        {
+            id: "promocao",
+            imageUrl: "https://via.placeholder.com/600x400/28a745/ffffff?text=Promoção+50%+OFF",
+            maxDisplays: 3,
+            cooldownHours: 12,
+            displayRule: "window.scrollY > 500",
+            enabled: true
+        },
+        {
+            id: "newsletter",
+            imageUrl: "https://via.placeholder.com/600x400/dc3545/ffffff?text=Assine+Nossa+Newsletter",
+            maxDisplays: 5,
+            cooldownHours: 24,
+            displayRule: "(Date.now() - window.pageLoadTime) > 10000",
+            enabled: true
+        }
+    ],
+    useLocalStorage: false, // Session storage para facilitar testes
+    checkInterval: 1000,
+    colors: {
+        overlayBackground: "rgba(0, 0, 0, 0.85)",
+        closeButtonBackground: "#dc3545",
+        closeButtonHover: "#c82333"
+    }
+};</code></pre>
+        </div>
+
+        <!-- Conteúdo para scroll -->
+        <div class="content">
+            <h2>📖 Sobre o Plugin</h2>
+            
+            <h3>Características Principais</h3>
+            <p>
+                O <strong>Image Popup</strong> é um plugin JavaScript moderno e leve que permite exibir popups de imagens
+                com controle total sobre quando e como eles aparecem. Desenvolvido seguindo as melhores práticas de
+                desenvolvimento web, o plugin oferece uma API completa e configuração flexível.
+            </p>
+
+            <h3>Funcionalidades</h3>
+            <p>
+                ✅ <strong>Múltiplos Popups:</strong> Configure quantos popups quiser, cada um com suas próprias regras<br>
+                ✅ <strong>Regras Personalizáveis:</strong> Use JavaScript para definir quando cada popup deve aparecer<br>
+                ✅ <strong>Controle de Frequência:</strong> Defina quantas vezes e com que intervalo os popups aparecem<br>
+                ✅ <strong>Persistência Configurável:</strong> Escolha entre sessionStorage ou localStorage<br>
+                ✅ <strong>API Completa:</strong> Controle programático total via JavaScript<br>
+                ✅ <strong>Responsivo:</strong> Funciona perfeitamente em dispositivos móveis<br>
+                ✅ <strong>Acessível:</strong> Suporta navegação por teclado e leitores de tela
+            </p>
+
+            <h3>Casos de Uso</h3>
+            <p>
+                <strong>E-commerce:</strong> Promover ofertas especiais, cupons de desconto ou produtos em destaque.<br><br>
+                <strong>Blogs:</strong> Incentivar assinatura de newsletter ou download de materiais.<br><br>
+                <strong>Landing Pages:</strong> Capturar atenção com calls-to-action visuais.<br><br>
+                <strong>Eventos:</strong> Divulgar eventos, webinars ou lançamentos.<br><br>
+                <strong>Sites Institucionais:</strong> Comunicados importantes ou avisos.
+            </p>
+
+            <h3>Performance</h3>
+            <p>
+                O plugin é otimizado para não impactar a performance da página. As verificações de regras são feitas
+                em intervalos configuráveis (padrão: 2 segundos), e o código é executado de forma assíncrona para não
+                bloquear o carregamento da página.
+            </p>
+
+            <h3>Continue Rolando...</h3>
+            <p>
+                Role para baixo e observe o popup de "Promoção" aparecer quando você passar de 500px de rolagem!
+                Este é um exemplo de como as regras de exibição baseadas em comportamento do usuário funcionam.
+            </p>
+
+            <p style="height: 400px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); border-radius: 12px; font-size: 1.5em; color: #667eea;">
+                ⬇️ Continue rolando... ⬇️
+            </p>
+
+            <h3>Você passou de 500px!</h3>
+            <p>
+                Se o popup de promoção ainda não apareceu, aguarde alguns segundos. O sistema verifica as regras
+                a cada segundo (configurado via <code>checkInterval</code>). Se você já viu o popup 3 vezes,
+                ele não aparecerá novamente até o cooldown expirar.
+            </p>
+
+            <p style="height: 400px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #28a74520 0%, #20c99720 100%); border-radius: 12px; font-size: 1.5em; color: #28a745;">
+                ✅ Popup de Promoção deve ter aparecido!
+            </p>
+
+            <h3>Como Funciona</h3>
+            <p>
+                O plugin utiliza um sistema inteligente de verificação periódica. A cada intervalo configurado
+                (padrão: 2 segundos), o sistema verifica todos os popups na ordem de configuração e exibe o
+                primeiro que atende a todos os critérios:
+            </p>
+            <ul style="margin-left: 20px;">
+                <li>Popup está habilitado (<code>enabled: true</code>)</li>
+                <li>Não atingiu o limite de exibições (<code>maxDisplays</code>)</li>
+                <li>Está fora do período de cooldown (<code>cooldownHours</code>)</li>
+                <li>A regra JavaScript retorna <code>true</code> (<code>displayRule</code>)</li>
+            </ul>
+
+            <p style="height: 300px;"></p>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>Image Popup Plugin</strong> - Desenvolvido seguindo as melhores práticas</p>
+        <p>Documentação completa disponível em <code>docs/image_popup_documentacao.md</code></p>
+    </footer>
+
+    <!-- CONFIGURAÇÃO DO PLUGIN -->
+    <script>
+        // Marca o tempo de carregamento da página para a regra de tempo
+        window.pageLoadTime = Date.now();
+
+        // Configuração dos popups
+        window.ImagePopupConfig = {
+            popups: [
+                {
+                    id: "welcome",
+                    imageUrl: "https://via.placeholder.com/600x400/667eea/ffffff?text=Bem-vindo+ao+Image+Popup!",
+                    maxDisplays: 1,
+                    cooldownHours: 1,
+                    displayRule: "true", // Sempre tenta exibir
+                    enabled: true
+                },
+                {
+                    id: "promocao",
+                    imageUrl: "https://via.placeholder.com/600x400/28a745/ffffff?text=Promocao+50%25+OFF+-+Aproveite!",
+                    maxDisplays: 3,
+                    cooldownHours: 12,
+                    displayRule: "window.scrollY > 500", // Após rolar 500px
+                    enabled: true
+                },
+                {
+                    id: "newsletter",
+                    imageUrl: "https://via.placeholder.com/600x400/dc3545/ffffff?text=Assine+Nossa+Newsletter",
+                    maxDisplays: 5,
+                    cooldownHours: 24,
+                    displayRule: "(Date.now() - window.pageLoadTime) > 10000", // Após 10 segundos
+                    enabled: true
+                }
+            ],
+            useLocalStorage: false, // Usa sessionStorage para facilitar testes
+            checkInterval: 1000, // Verifica a cada 1 segundo (mais rápido para demo)
+            colors: {
+                overlayBackground: "rgba(0, 0, 0, 0.85)",
+                closeButtonBackground: "#dc3545",
+                closeButtonHover: "#c82333"
+            }
+        };
+    </script>
+
+    <!-- CARREGAMENTO DO PLUGIN -->
+    <script src="../resources/image_popup.js"></script>
+
+    <!-- FUNÇÕES DE DEMONSTRAÇÃO -->
+    <script>
+        // Funções para os botões
+        function showWelcome() {
+            window.ImagePopup.forceShowPopup("welcome");
+        }
+
+        function showPromo() {
+            window.ImagePopup.forceShowPopup("promocao");
+        }
+
+        function showNewsletter() {
+            window.ImagePopup.forceShowPopup("newsletter");
+        }
+
+        function closePopup() {
+            window.ImagePopup.close();
+            alert("Popup fechado!");
+        }
+
+        function resetAll() {
+            window.ImagePopup.resetPopupData();
+            alert("Todos os dados foram resetados! Os popups voltarão a aparecer.");
+            updateStats();
+        }
+
+        function resetWelcome() {
+            window.ImagePopup.resetPopupData("welcome");
+            alert("Dados do popup Welcome resetados!");
+            updateStats();
+        }
+
+        function showStats() {
+            updateStats();
+            document.getElementById('statsContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Atualiza as estatísticas na página
+        function updateStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            const popupIds = ['welcome', 'promocao', 'newsletter'];
+            
+            let html = '';
+            
+            popupIds.forEach(id => {
+                const stats = window.ImagePopup.getPopupStats(id);
+                if (stats) {
+                    html += `
+                        <div class="stat-card">
+                            <h3>${id.charAt(0).toUpperCase() + id.slice(1)}</h3>
+                            <p><strong>Exibições:</strong> ${stats.displayCount} / ${stats.maxDisplays === 0 ? '∞' : stats.maxDisplays}</p>
+                            <p><strong>Último fechamento:</strong> ${stats.lastClosedAt ? new Date(stats.lastClosedAt).toLocaleString('pt-BR') : 'Nunca'}</p>
+                            <p><strong>Pode exibir:</strong> ${stats.canShow ? '✅ Sim' : '❌ Não'}</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            statsContainer.innerHTML = html;
+        }
+
+        // Atualiza estatísticas a cada 3 segundos
+        setInterval(updateStats, 3000);
+        
+        // Atualiza na carga inicial
+        setTimeout(updateStats, 1000);
+
+        // Barra de progresso de scroll
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+        });
+    </script>
+</body>
+</html>
