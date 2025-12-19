@@ -17,6 +17,8 @@
             {
                 id: "popup1",
                 imageUrl: "https://via.placeholder.com/600x400?text=Popup+1",
+                linkUrl: "", // URL para onde a imagem redireciona ao clicar (vazio = sem link)
+                linkTarget: "_blank", // _blank = nova aba, _self = mesma aba
                 maxDisplays: 3, // Quantidade de vezes que aparece na sessão (0 = ilimitado)
                 cooldownHours: 24, // Tempo em horas após fechar para reaparecer
                 displayRule: "true", // Regra JavaScript para exibir (ex: "$('body').length > 0")
@@ -112,6 +114,18 @@
                 transform: scale(1);
             }
 
+            .image-popup-link {
+                display: block;
+                cursor: pointer;
+                text-decoration: none;
+                line-height: 0;
+            }
+
+            .image-popup-link:focus {
+                outline: 2px solid ${CONFIG.colors.closeButtonBackground};
+                outline-offset: 2px;
+            }
+
             .image-popup-image {
                 display: block;
                 max-width: 100%;
@@ -119,6 +133,11 @@
                 width: auto;
                 height: auto;
                 margin: 0 auto;
+                transition: opacity 0.2s ease;
+            }
+
+            .image-popup-link:hover .image-popup-image {
+                opacity: 0.95;
             }
 
             .image-popup-close {
@@ -226,11 +245,26 @@
                         >
                             ${CONFIG.closeButtonText}
                         </button>
+                        <a 
+                            class="image-popup-link" 
+                            id="imagePopupLink"
+                            href="#"
+                            target="_blank"
+                            style="display: none;"
+                        >
+                            <img 
+                                class="image-popup-image" 
+                                id="imagePopupImage" 
+                                src="" 
+                                alt="Popup"
+                            >
+                        </a>
                         <img 
-                            class="image-popup-image" 
-                            id="imagePopupImage" 
+                            class="image-popup-image image-popup-image-no-link" 
+                            id="imagePopupImageNoLink" 
                             src="" 
                             alt="Popup"
+                            style="display: none;"
                         >
                     </div>
                 </div>
@@ -241,7 +275,9 @@
             // Armazena referências aos elementos
             this.overlay = document.getElementById('imagePopupOverlay');
             this.container = this.overlay.querySelector('.image-popup-container');
+            this.link = document.getElementById('imagePopupLink');
             this.image = document.getElementById('imagePopupImage');
+            this.imageNoLink = document.getElementById('imagePopupImageNoLink');
             this.closeButton = document.getElementById('imagePopupClose');
         }
 
@@ -386,9 +422,24 @@
 
         // Exibe um popup específico
         showPopup(popupConfig) {
-            // Define a imagem
-            this.image.src = popupConfig.imageUrl;
-            this.image.alt = popupConfig.id;
+            // Verifica se tem link
+            const hasLink = popupConfig.linkUrl && popupConfig.linkUrl.trim() !== '';
+            
+            if (hasLink) {
+                // Configura a imagem com link
+                this.link.href = popupConfig.linkUrl;
+                this.link.target = popupConfig.linkTarget || '_blank';
+                this.link.style.display = 'block';
+                this.image.src = popupConfig.imageUrl;
+                this.image.alt = popupConfig.id;
+                this.imageNoLink.style.display = 'none';
+            } else {
+                // Configura a imagem sem link
+                this.link.style.display = 'none';
+                this.imageNoLink.src = popupConfig.imageUrl;
+                this.imageNoLink.alt = popupConfig.id;
+                this.imageNoLink.style.display = 'block';
+            }
             
             // Armazena o ID do popup atual
             this.currentPopupId = popupConfig.id;
@@ -422,9 +473,11 @@
             this.overlay.classList.remove('active');
             document.body.classList.remove('image-popup-no-scroll');
             
-            // Limpa a imagem e ID atual
+            // Limpa as imagens e ID atual
             setTimeout(() => {
                 this.image.src = '';
+                this.imageNoLink.src = '';
+                this.link.href = '#';
                 this.currentPopupId = null;
             }, 300);
         }
@@ -493,6 +546,8 @@
             const defaultPopup = {
                 id: `popup_${Date.now()}`,
                 imageUrl: "",
+                linkUrl: "",
+                linkTarget: "_blank",
                 maxDisplays: 3,
                 cooldownHours: 24,
                 displayRule: "true",
