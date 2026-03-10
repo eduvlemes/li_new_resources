@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Variation Validator v2 - InfoBoxes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f3f4f6;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #111827;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        /* Badge destaque */
+        .badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            color: #1e3a8a;
+            font-size: 14px;
+        }
+
+        /* ─── Carrinho ─── */
+        .pagina-carrinho {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+            margin-bottom: 30px;
+        }
+
+        .tabela-carrinho { width: 100%; margin-bottom: 30px; }
+
+        .produto-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #fafafa;
+        }
+
+        .produto-imagem {
+            width: 72px;
+            height: 72px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            margin-right: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .produto-info a {
+            color: #1f2937;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .produto-info a:hover { color: #3b82f6; }
+
+        .produto-variacao {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .produto-preco {
+            margin-left: auto;
+            font-size: 18px;
+            font-weight: 700;
+            color: #059669;
+            white-space: nowrap;
+        }
+
+        .carrinho-total {
+            text-align: right;
+            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .carrinho-total span { color: #059669; }
+
+        .carrinho-botoes {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .botao {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 200ms;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .botao-continuar { background: #6b7280; color: white; }
+        .botao-continuar:hover { background: #4b5563; }
+
+        .finalizar-compra .acao-editar .botao.principal.grande {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .finalizar-compra .acao-editar .botao.principal.grande:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        }
+
+        /* ─── Config panel ─── */
+        .config-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+            margin-bottom: 30px;
+        }
+
+        .config-panel h2 { color: #111827; margin-bottom: 20px; font-size: 20px; }
+
+        .config-section { margin-bottom: 24px; }
+        .config-section h3 { color: #374151; font-size: 15px; margin-bottom: 10px; font-weight: 600; }
+
+        .config-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .config-code .comment { color: #94a3b8; }
+        .config-code .key { color: #7dd3fc; }
+        .config-code .string { color: #86efac; }
+        .config-code .keyword { color: #f472b6; }
+        .config-code .bool { color: #fb923c; }
+
+        .config-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn-action {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 200ms;
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-action:hover { background: #e5e7eb; }
+
+        .btn-action.primary { background: #3b82f6; color: white; }
+        .btn-action.primary:hover { background: #2563eb; }
+
+        .btn-action.warning { background: #f59e0b; color: white; }
+        .btn-action.warning:hover { background: #d97706; }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 14px 16px;
+            background: #f9fafb;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            display: none;
+            font-size: 14px;
+        }
+
+        .result-box.show { display: block; }
+        .result-box pre { margin: 4px 0 0; font-size: 13px; color: #374151; }
+
+        /* ─── infoBox demo cards ─── */
+        .infobox-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .infobox-card {
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: #fffbeb;
+        }
+
+        .infobox-card h4 {
+            color: #92400e;
+            font-size: 14px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .infobox-card p {
+            color: #78350f;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .infobox-card strong { color: #451a03; }
+
+        @media (max-width: 768px) {
+            .produto-item { flex-wrap: wrap; gap: 10px; }
+            .produto-preco { margin-left: 0; }
+            .carrinho-botoes { flex-direction: column; }
+            .botao { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🛒 Checkout Variation Validator v2 <span class="badge">infoBoxes</span></h1>
+    <p class="subtitle">Demonstração da funcionalidade de popups informativos vinculados a variações detectadas no carrinho.</p>
+
+    <div class="info-box">
+        <h3>ℹ️ Como funciona o infoBoxes</h3>
+        <p>Ao clicar em <strong>Finalizar Compra</strong>, o plugin detecta os modelos no carrinho. Se algum deles contiver qualquer palavra de <code>triggerWords</code> configurada, um botão informativo aparece no rodapé do modal de validação. Ao clicar nesse botão, um popup secundário exibe o conteúdo HTML definido em <code>content</code>.</p>
+    </div>
+
+    <!-- ─── Simulação do carrinho ─── -->
+    <div class="pagina-carrinho">
+        <h2 style="margin-bottom: 20px; color: #111827;">Seu Carrinho</h2>
+
+        <div class="tabela-carrinho">
+
+            <div class="produto-item" data-produto-id="1001">
+                <div class="produto-imagem">📱</div>
+                <div class="produto-info">
+                    <a href="#">Capinha Anti-Impacto para iPhone 17 Pro</a>
+                    <div class="produto-variacao">Cor: Preto Fosco</div>
+                </div>
+                <div class="produto-preco">R$ 89,90</div>
+            </div>
+
+            <div class="produto-item" data-produto-id="1002">
+                <div class="produto-imagem">🛡️</div>
+                <div class="produto-info">
+                    <a href="#">Película 9H Anti-Reflexo Samsung S24 Ultra</a>
+                    <div class="produto-variacao">Proteção: Cobertura Total</div>
+                </div>
+                <div class="produto-preco">R$ 49,90</div>
+            </div>
+
+            <div class="produto-item" data-produto-id="1003">
+                <div class="produto-imagem">🔋</div>
+                <div class="produto-info">
+                    <a href="#">Carregador MagSafe 15W para iPhone Air</a>
+                    <div class="produto-variacao">Cabo: USB-C 1m incluso</div>
+                </div>
+                <div class="produto-preco">R$ 149,90</div>
+            </div>
+
+            <div class="produto-item" data-produto-id="1004">
+                <div class="produto-imagem">📱</div>
+                <div class="produto-info">
+                    <a href="#">Capa Carteira Couro iPhone 15 Plus</a>
+                    <div class="produto-variacao">Cor: Marrom Caramelo</div>
+                </div>
+                <div class="produto-preco">R$ 119,90</div>
+            </div>
+
+            <div class="produto-item" data-produto-id="1005">
+                <div class="produto-imagem">🎧</div>
+                <div class="produto-info">
+                    <a href="#">Suporte Veicular Magnético — Universal</a>
+                    <div class="produto-variacao">Fixação: Grade de Ar</div>
+                </div>
+                <div class="produto-preco">R$ 79,90</div>
+            </div>
+
+        </div>
+
+        <div class="carrinho-total">Total: <span>R$ 489,50</span></div>
+
+        <div class="carrinho-botoes">
+            <a href="#" class="botao botao-continuar">Continuar Comprando</a>
+            <div class="finalizar-compra">
+                <div class="acao-editar">
+                    <a href="#checkout" class="botao principal grande">Finalizar Compra</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Painel de informação sobre a config ─── -->
+    <div class="config-panel">
+        <h2>⚙️ Configuração Utilizada Nesse Exemplo</h2>
+
+        <div class="config-section">
+            <h3>infoBoxes ativos</h3>
+            <div class="infobox-cards">
+                <div class="infobox-card">
+                    <h4>infoBox #1 — iPhone / Apple</h4>
+                    <p><strong>triggerWords:</strong> ['IPHONE', 'APPLE']</p>
+                    <p><strong>actionText:</strong> "Ver guia de compatibilidade iPhone"</p>
+                    <p><strong>title:</strong> "Compatibilidade — Linha iPhone"</p>
+                    <p>Aparece quando qualquer variação detectada contiver "IPHONE" ou "APPLE".</p>
+                </div>
+                <div class="infobox-card">
+                    <h4>infoBox #2 — Samsung / Galaxy</h4>
+                    <p><strong>triggerWords:</strong> ['SAMSUNG', 'GALAXY']</p>
+                    <p><strong>actionText:</strong> "Ver guia de compatibilidade Samsung"</p>
+                    <p><strong>title:</strong> "Compatibilidade — Linha Samsung"</p>
+                    <p>Aparece quando qualquer variação detectada contiver "SAMSUNG" ou "GALAXY".</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <h3>Código de Configuração</h3>
+            <div class="config-code"><span class="keyword">window</span>.<span class="key">CheckoutVariationValidatorConfig</span> = {
+    <span class="key">active</span>: <span class="bool">true</span>,
+    <span class="key">pageSelector</span>: <span class="string">'.pagina-carrinho'</span>,
+    <span class="key">productSelector</span>: <span class="string">'.tabela-carrinho [data-produto-id] .produto-info > a'</span>,
+    <span class="key">buttonSelector</span>: <span class="string">'.finalizar-compra .acao-editar .botao.principal.grande'</span>,
+
+    <span class="key">variations</span>: [
+        <span class="string">'IPHONE AIR'</span>, <span class="string">'IPHONE 17 PRO'</span>, <span class="string">'IPHONE 15'</span>, <span class="string">'SAMSUNG S24'</span>
+    ],
+
+    <span class="comment">// ─── NOVO: infoBoxes ───────────────────────────────────────</span>
+    <span class="key">infoBoxes</span>: [
+        {
+            <span class="key">active</span>: <span class="bool">true</span>,
+            <span class="key">triggerWords</span>: [<span class="string">'IPHONE'</span>, <span class="string">'APPLE'</span>],       <span class="comment">// array de palavras-gatilho</span>
+            <span class="key">title</span>: <span class="string">'Compatibilidade — Linha iPhone'</span>,
+            <span class="key">actionText</span>: <span class="string">'Ver guia de compatibilidade iPhone'</span>,
+            <span class="key">content</span>: <span class="string">`&lt;p&gt;...seu HTML informativo...&lt;/p&gt;`</span>
+        },
+        {
+            <span class="key">active</span>: <span class="bool">true</span>,
+            <span class="key">triggerWords</span>: [<span class="string">'SAMSUNG'</span>, <span class="string">'GALAXY'</span>],
+            <span class="key">title</span>: <span class="string">'Compatibilidade — Linha Samsung'</span>,
+            <span class="key">actionText</span>: <span class="string">'Ver guia de compatibilidade Samsung'</span>,
+            <span class="key">content</span>: <span class="string">`&lt;p&gt;...seu HTML informativo...&lt;/p&gt;`</span>
+        }
+    ],
+    <span class="comment">// ──────────────────────────────────────────────────────────</span>
+
+    <span class="key">messages</span>: {
+        <span class="key">single</span>:   <span class="string">'Você está comprando um item para:{models}&lt;br&gt;Deseja prosseguir?'</span>,
+        <span class="key">multiple</span>: <span class="string">'Você está comprando itens para:{models}&lt;br&gt;Deseja prosseguir?'</span>,
+        <span class="key">title</span>:    <span class="string">'Confirmar Modelos'</span>,
+        <span class="key">confirmButton</span>: <span class="string">'Sim, está correto'</span>,
+        <span class="key">cancelButton</span>:  <span class="string">'Vou revisar'</span>
+    },
+    <span class="key">debug</span>: <span class="bool">true</span>
+};</div>
+        </div>
+
+        <div class="config-section">
+            <h3>Ações Rápidas</h3>
+            <div class="config-actions">
+                <button class="btn-action primary" onclick="testDetect()">Detectar Variações</button>
+                <button class="btn-action warning" onclick="toggleInfoBox()">Ativar/Desativar infoBoxes</button>
+                <button class="btn-action" onclick="showConfig()">Ver Configuração Completa</button>
+                <button class="btn-action" onclick="toggleDebug()">Toggle Debug</button>
+            </div>
+            <div id="resultBox" class="result-box"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─── CONFIGURAÇÃO ─── -->
+<script>
+    window.CheckoutVariationValidatorConfig = {
+        active: true,
+        pageSelector: '.pagina-carrinho',
+        productSelector: '.tabela-carrinho [data-produto-id] .produto-info > a',
+        buttonSelector: '.finalizar-compra .acao-editar .botao.principal.grande',
+
+        variations: [
+            'IPHONE AIR',
+            'IPHONE 17 PRO',
+            'IPHONE 15',
+            'SAMSUNG S24'
+        ],
+
+        // ─── infoBoxes ───────────────────────────────────────────────────
+        infoBoxes: [
+            {
+                active: true,
+                triggerWords: ['IPHONE', 'APPLE'],
+                title: 'Consultar Modelo — iPhone',
+                actionText: 'Não sabe o modelo do seu iPhone? Clique aqui',
+                content: `
+                    <p style="margin-bottom:14px;color:#374151;">Antes de finalizar, confira a tabela de compatibilidade dos nossos produtos com a linha iPhone:</p>
+                    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                        <thead>
+                            <tr style="background:#f59e0b;color:#fff;">
+                                <th style="padding:10px 12px;text-align:left;border-radius:4px 0 0 0;">Modelo</th>
+                                <th style="padding:10px 12px;text-align:left;">Capinha</th>
+                                <th style="padding:10px 12px;text-align:left;">Película</th>
+                                <th style="padding:10px 12px;text-align:left;border-radius:0 4px 0 0;">MagSafe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid #e5e7eb;">
+                                <td style="padding:10px 12px;font-weight:600;">iPhone 17 Pro</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid #e5e7eb;background:#fafafa;">
+                                <td style="padding:10px 12px;font-weight:600;">iPhone Air</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">⚠️ Verificar tamanho</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid #e5e7eb;">
+                                <td style="padding:10px 12px;font-weight:600;">iPhone 15 Plus</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                            </tr>
+                            <tr style="background:#fafafa;">
+                                <td style="padding:10px 12px;font-weight:600;">iPhone 15</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:16px;font-size:13px;color:#6b7280;">⚠️ Em caso de dúvida entre em contato com nosso suporte antes de finalizar.</p>
+                `
+            },
+            {
+                active: true,
+                triggerWords: ['SAMSUNG', 'GALAXY'],
+                title: 'Consultar Modelo — Android',
+                actionText: 'Não sabe o modelo do seu Android? Clique aqui',
+                content: `
+                    <p style="margin-bottom:14px;color:#374151;">Verifique a compatibilidade dos produtos com a linha Samsung Galaxy:</p>
+                    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                        <thead>
+                            <tr style="background:#3b82f6;color:#fff;">
+                                <th style="padding:10px 12px;text-align:left;border-radius:4px 0 0 0;">Modelo</th>
+                                <th style="padding:10px 12px;text-align:left;">Capinha</th>
+                                <th style="padding:10px 12px;text-align:left;">Película</th>
+                                <th style="padding:10px 12px;text-align:left;border-radius:0 4px 0 0;">Carregador</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid #e5e7eb;">
+                                <td style="padding:10px 12px;font-weight:600;">Samsung S24 Ultra</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid #e5e7eb;background:#fafafa;">
+                                <td style="padding:10px 12px;font-weight:600;">Samsung S24+</td>
+                                <td style="padding:10px 12px;">⚠️ Verificar tamanho</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                            </tr>
+                            <tr style="background:#fafafa;">
+                                <td style="padding:10px 12px;font-weight:600;">Samsung S24 FE</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">✅ Compatível</td>
+                                <td style="padding:10px 12px;">⚠️ Verificar voltagem</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:16px;font-size:13px;color:#6b7280;">⚠️ Modelos S24 FE possuem dimensões ligeiramente diferentes. Confira o SKU antes de confirmar.</p>
+                `
+            }
+        ],
+
+        messages: {
+            single:   'Você está comprando um item para:{models}<br>Deseja prosseguir?',
+            multiple: 'Você está comprando itens para:{models}<br>Deseja prosseguir?',
+            title:    'Confirmar Modelos',
+            confirmButton: 'Sim, está correto',
+            cancelButton:  'Vou revisar'
+        },
+        colors: {
+            confirmButton: '#10b981',
+            confirmButtonHover: '#059669',
+            warningAccent: '#f59e0b'
+        },
+        debug: true
+    };
+</script>
+
+<!-- ─── PLUGIN v2 ─── -->
+<script src="resources/checkout_variation_validator_v2.js"></script>
+
+<!-- ─── UTILITÁRIOS DE TESTE ─── -->
+<script>
+    function showResult(title, content) {
+        const box = document.getElementById('resultBox');
+        box.innerHTML = `<strong>${title}</strong><pre>${content}</pre>`;
+        box.classList.add('show');
+        setTimeout(() => box.classList.remove('show'), 6000);
+    }
+
+    function testDetect() {
+        const vars = window.CheckoutVariationValidator.getCurrentVariations();
+        showResult('Variações Detectadas:', vars.length
+            ? JSON.stringify(vars, null, 2)
+            : '(nenhuma variação encontrada nos produtos do carrinho)');
+    }
+
+    function showConfig() {
+        const cfg = window.CheckoutVariationValidator.getConfig();
+        showResult('Configuração Atual (resumida):', JSON.stringify({
+            active: cfg.active,
+            variations: cfg.variations,
+            infoBoxes: cfg.infoBoxes.map(b => ({
+                active: b.active,
+                triggerWords: b.triggerWords,
+                actionText: b.actionText
+            })),
+            debug: cfg.debug
+        }, null, 2));
+    }
+
+    let infoBoxesEnabled = true;
+    function toggleInfoBox() {
+        infoBoxesEnabled = !infoBoxesEnabled;
+        window.CheckoutVariationValidator.updateConfig({
+            infoBoxes: window.CheckoutVariationValidator.getConfig().infoBoxes.map(b => ({
+                ...b,
+                active: infoBoxesEnabled
+            }))
+        });
+        showResult('infoBoxes', `Todos os infoBoxes foram ${infoBoxesEnabled ? 'ATIVADOS ✅' : 'DESATIVADOS ❌'}`);
+    }
+
+    function toggleDebug() {
+        const cfg = window.CheckoutVariationValidator.getConfig();
+        const next = !cfg.debug;
+        window.CheckoutVariationValidator.updateConfig({ debug: next });
+        showResult('Debug Mode', `Debug ${next ? 'ATIVADO ✅' : 'DESATIVADO ❌'} — verifique o console.`);
+    }
+
+    // Simular redirecionamento ao confirmar
+    window.addEventListener('hashchange', () => {
+        if (window.location.hash === '#checkout') {
+            alert('✅ Compra finalizada! (simulação)\n\nEm produção o usuário seria redirecionado ao checkout real.');
+            history.replaceState(null, null, ' ');
+        }
+    });
+</script>
+</body>
+</html>
