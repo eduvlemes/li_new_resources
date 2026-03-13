@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonials Slider - Exemplo de Uso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+
+        /* ---- Página de exemplo ---- */
+        .page-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.75;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .demo-area {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .demo-area h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #111;
+        }
+
+        .demo-area p {
+            color: #555;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #1e1e2e;
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.82rem;
+            line-height: 1.65;
+            color: #cdd6f4;
+            white-space: pre;
+        }
+
+        .code-block .comment { color: #6c7086; }
+        .code-block .key     { color: #89b4fa; }
+        .code-block .string  { color: #a6e3a1; }
+        .code-block .number  { color: #fab387; }
+        .code-block .bool    { color: #f38ba8; }
+
+        .badge {
+            display: inline-block;
+            background: #f0f4ff;
+            color: #3b5bdb;
+            border: 1px solid #c5d0fc;
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 60px 0;
+        }
+
+        .page-footer {
+            background: #f5f5f5;
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho da página de demonstração -->
+    <div class="page-header">
+        <h1>Testimonials Slider</h1>
+        <p>Plugin de depoimentos responsivo com slider em Vanilla JS — sem dependências externas.</p>
+    </div>
+
+    <!-- =============================================
+         DEMO 1: Uso mínimo (configuração padrão)
+    ============================================= -->
+    <!--
+        O plugin é inserido automaticamente no <body> ao carregar o script.
+        Para personalizá-lo, defina window.TestimonialsSliderConfig ANTES do script.
+    -->
+
+    <!-- =============================================
+         Área de documentação inline
+    ============================================= -->
+    <div class="demo-area">
+
+        <h2>Como usar (uso básico)</h2>
+        <p>
+            Carregue o script na página. O widget é inserido automaticamente no final do
+            <code>&lt;body&gt;</code>. Nenhuma dependência — zero jQuery, zero bibliotecas externas.
+        </p>
+        <div class="code-block">
+<pre><span class="comment">&lt;!-- Basta incluir o script --&gt;</span>
+&lt;script src="resources/testimonials_slider.js"&gt;&lt;/script&gt;</pre>
+        </div>
+
+        <hr class="divider" style="margin: 40px 0">
+
+        <h2>Personalização completa via <code>window.TestimonialsSliderConfig</code></h2>
+        <p>
+            Defina o objeto de configuração <strong>antes</strong> do script. Você pode sobrescrever
+            apenas as propriedades que quiser — o restante usa os valores padrão.
+        </p>
+
+        <div class="badge">Exemplo com depoimentos reais e tema escuro</div>
+        <div class="code-block">
+<pre><span class="comment">// Definir ANTES de carregar o script</span>
+window.TestimonialsSliderConfig = {
+    <span class="key">title</span>: <span class="string">"BEM-ESTAR NÃO É META. É ESTADO."</span>,
+    <span class="key">subtitle</span>: <span class="string">"Veja o que nossos clientes e especialistas dizem"</span>,
+    <span class="key">insertSelector</span>: <span class="string">"#secao-depoimentos"</span>,
+    <span class="key">insertMethod</span>: <span class="string">"afterbegin"</span>,
+
+    <span class="key">autoplay</span>: <span class="bool">true</span>,
+    <span class="key">autoplayDelay</span>: <span class="number">5000</span>,
+    <span class="key">loop</span>: <span class="bool">true</span>,
+    <span class="key">showArrows</span>: <span class="bool">true</span>,
+    <span class="key">showDots</span>: <span class="bool">true</span>,
+
+    <span class="key">visibleCards</span>: {
+        <span class="key">desktop</span>: <span class="number">3</span>,
+        <span class="key">tablet</span>: <span class="number">2</span>,
+        <span class="key">mobile</span>: <span class="number">1</span>
+    },
+
+    <span class="key">testimonials</span>: [
+        {
+            <span class="key">quote</span>: <span class="string">"O produto me ajuda a repor o que preciso em um único ritual matinal."</span>,
+            <span class="key">author</span>: <span class="string">"Carlos Silva"</span>,
+            <span class="key">role</span>: <span class="string">"Empresário"</span>,
+            <span class="key">photo</span>: <span class="string">"https://exemplo.com/foto-carlos.jpg"</span>
+        },
+        <span class="comment">// ... mais depoimentos</span>
+    ],
+
+    <span class="comment">// Tema escuro</span>
+    <span class="key">colors</span>: {
+        <span class="key">sectionBackground</span>: <span class="string">"#0d0d0d"</span>,
+        <span class="key">titleColor</span>: <span class="string">"#ffffff"</span>,
+        <span class="key">quoteBoxBackground</span>: <span class="string">"#1c1c1c"</span>,
+        <span class="key">quoteBoxBorder</span>: <span class="string">"#2a2a2a"</span>,
+        <span class="key">quoteTextColor</span>: <span class="string">"#cccccc"</span>,
+        <span class="key">photoOverlayGradient</span>: <span class="string">"rgba(0,0,0,0.0), rgba(0,0,0,0.9)"</span>,
+        <span class="key">authorNameColor</span>: <span class="string">"#ffffff"</span>,
+        <span class="key">dotActive</span>: <span class="string">"#ffffff"</span>
+    }
+};</pre>
+        </div>
+
+        <hr class="divider" style="margin: 40px 0">
+
+        <h2>API pública</h2>
+        <p>O plugin fica disponível em <code>window.TestimonialsSlider</code> após inicialização.</p>
+        <div class="code-block">
+<pre><span class="comment">// Ir para um slide específico (0-indexed)</span>
+window.TestimonialsSlider.goTo(<span class="number">2</span>);
+
+<span class="comment">// Navegar manualmente</span>
+window.TestimonialsSlider.next();
+window.TestimonialsSlider.prev();
+
+<span class="comment">// Controlar o autoplay</span>
+window.TestimonialsSlider.stopAutoplay();
+window.TestimonialsSlider.startAutoplay();
+
+<span class="comment">// Remover o widget da página</span>
+window.TestimonialsSlider.destroy();</pre>
+        </div>
+
+    </div>
+
+    <!-- =============================================
+         DEMO AO VIVO — Tema claro (padrão)
+    ============================================= -->
+    <script>
+        window.TestimonialsSliderConfig = {
+            title: 'DEPOIMENTOS REAIS',
+            subtitle: 'O que nossos clientes e especialistas dizem',
+            showTitle: true,
+            autoplay: true,
+            autoplayDelay: 5000,
+            loop: true,
+            showArrows: true,
+            showDots: true,
+            visibleCards: { desktop: 3, tablet: 2, mobile: 1 },
+            cardGap: 24,
+            quoteMaxLines: {
+                desktop: 6,
+                tablet: 7,
+                mobile: 8
+            },
+            testimonials: [
+                {
+                    quote: 'Aqui em casa a Lua e a Mirabel são apaixonadas pelos mordedores da Biobone desde filhotinhas. Quando chega um novo é sempre uma festa: elas correm, disputam e ficam roendo por horas. Depois de tanta dedicação, acabam até capotando de sono. Eu vejo claramente como o enriquecimento ambiental faz bem para elas. A Mirabel tem uma mordida MUITO forte e destrói quase tudo. Mas o Biobone Extra Forte (preto) é o único que realmente dura bastante e com segurança aqui em casa.',
+                    role: 'Santo André / SP',
+                    photo: 'https://cdn.awsli.com.br/2765/2765814/arquivos/dwmvpg.jpeg'
+                },
+                {
+                    quote: 'Recebi meus produtos e fiquei encantada! Que loja caprichosa e atenciosa. A entrega foi super rápida e ainda vieram vários mimos que eu amei 💖😍. Estão de parabéns pelo cuidado em cada detalhe!',
+                    author: 'Érika Lamim, Toddy e Milly',
+                    role: 'São José dos Campos / SP',
+                    photo: 'https://cdn.awsli.com.br/2765/2765814/arquivos/9g4r78.jpeg'
+                },
+                {
+                    quote: 'Niko e Ollie usam os mordedores da Biobone há mais de um ano e a nossa experiência tem sido muito positiva. Os produtos são de extrema qualidade, duram bastante e nunca mais tivemos problemas com eles roendo móveis ou chinelos. É uma marca que transmite confiança e cuidado nos detalhes, o que faz diferença no uso contínuo. O modelo asterisco é o preferido deles, eles amam e eu recomendo para todos nossos amigos.',
+                    author: 'Lauanda Santos',
+                    role: 'Florianópolis / SC',
+                    photo: 'https://cdn.awsli.com.br/2765/2765814/arquivos/lymx2.jpeg'
+                },
+                {
+                    quote: 'Biobone é o nosso preferido, faça sol ou chuva! O Judá ama, e eu fico tranquila porque é um mordedor seguro e natural. 💚',
+                    author: 'Priscila e Judá',
+                    role: 'Guarulhos / SP',
+                    photo: 'https://cdn.awsli.com.br/2765/2765814/arquivos/rphbng.jpeg'
+                },
+                {
+                    quote: 'Aqui em casa a Biobone virou a distração favorita. Meu cachorro ama e fica um tempão roendo. O que eu gosto é que dura bastante e não vira aquela bagunça de pedaços pela casa. Além disso é natural, então fico bem mais tranquilo deixando ele roer. Já testamos vários mordedores e a Biobone foi a que mais deu certo pra gente.',
+                    author: 'Alynne Araujo',
+                    role: 'João Pessoa / PB',
+                    photo: 'https://cdn.awsli.com.br/2765/2765814/arquivos/13xcmc.jpeg'
+                },
+                {
+                    quote: 'Tenho 2 doguinhos - Berenice (SRD) e Lineuzinho (Cocker Spaniel) - que sempre adoraram passear e roer coisas para desestressar. Desde que o Lineuzinho foi diagnosticado com uma doença autoimune, tive que procurar outras opções de mordedores para substituir os cascos e chifres naturais, uma vez que poderiam machucar as gengivas e conter algum microorganismo agressivo. Foi então que me indicaram o Biobone e comprei os primeiros asteriscos de mordida moderada para testar. Foi um sucesso com todos eles e ajudam demais nos dias de chuva.',
+                    author: 'Henrique Mesquita',
+                    role: 'São Paulo / SP',
+                    photo: 'https://cdn.awsli.com.br/2765/2765814/arquivos/0symk.jpeg'
+                }
+                ,
+                {
+                    quote: 'Essa é a Breja. Ela ama de paixão os Biobone dela. Tanto que ela tem vários, de diversas formas. O ossinho de cana e bagaço ficam nas coisas dela para ela pegar quando quiser. E oferecemos o asterisco em momentos especiais, pois é o que ela mais ama. Quando saímos de casa ou chega visita aqui, oferecemos ele e ela passa horas roendo. O que me deixa tranquilo é que não solta lascas grandes e também pode ser engolido por ser um produto natural.',
+                    author: 'Camila Lima',
+                    role: 'Conselheiro Lafaiete / MG',
+                    photo: 'https://cdn.awsli.com.br/2765/2765814/arquivos/j043te.jpeg'
+                }
+            ],
+            colors: {
+                sectionBackground: '#fff',
+                titleColor: '#111111',
+                subtitleColor: '#666666',
+                quoteBoxBackground: '#0c2928',
+                quoteBoxBorder: 'transparent',
+                quoteBoxShadow: 'rgba(0,0,0,0.04)',
+                quoteMarkColor: '#aaaaaa',
+                quoteTextColor: '#fff',
+                photoBoxBackground: '#1a1a1a',
+                photoOverlayGradient: 'rgba(0,0,0,0.0), rgba(0,0,0,0.85)',
+                authorNameColor: '#ffffff',
+                authorRoleColor: 'rgba(255,255,255,0.72)',
+                authorInitialsColor: '#555555',
+                arrowBackground: '#ffffff',
+                arrowBorder: '#e0e0e0',
+                arrowIcon: '#333333',
+                arrowHover: '#f5f5f5',
+                dotActive: '#111111',
+                dotInactive: '#cccccc'
+            }
+        };
+    </script>
+    <script src="resources/testimonials_slider.js"></script>
+
+    <!-- =============================================
+         DEMO AO VIVO — Tema escuro
+    ============================================= -->
+    <div style="max-width:900px;margin:60px auto 0;padding:0 20px">
+        <div class="badge">Tema escuro — configuração override</div>
+        <p style="color:#555;font-size:0.95rem;margin-top:4px;margin-bottom:0">
+            O exemplo abaixo é carregado manualmente via API pública após a inicialização,
+            demonstrando como usar <code>goTo()</code> e controlar o autoplay programaticamente.
+        </p>
+    </div>
+
+    <div id="dark-demo" style="background:#0d0d0d;padding:72px 20px;margin-top:32px">
+        <div style="max-width:1200px;margin:0 auto">
+            <h2 style="color:#fff;font-size:clamp(1.2rem,3vw,1.8rem);font-weight:800;text-transform:uppercase;letter-spacing:0.04em;text-align:center;margin-bottom:48px">
+                Versão Tema Escuro
+            </h2>
+            <!-- O slider abaixo é inicializado via script inline com configuração diferente -->
+            <div id="dark-slider-host"></div>
+        </div>
+    </div>
+
+    <script>
+        // Instância manual com configuração própria para o tema escuro
+        (function () {
+            window.TestimonialsSliderConfig = {
+                insertSelector: '#dark-slider-host',
+                insertMethod: 'afterbegin',
+                showTitle: true,
+                autoplay: true,
+                autoplayDelay: 4500,
+                loop: true,
+                visibleCards: { desktop: 3, tablet: 2, mobile: 1 },
+                testimonials: window.TestimonialsSliderConfig.testimonials,
+                colors: {
+                    sectionBackground: 'transparent',
+                    quoteBoxBackground: '#1c1c1c',
+                    quoteBoxBorder: '#2a2a2a',
+                    quoteBoxShadow: 'rgba(0,0,0,0.4)',
+                    quoteMarkColor: '#444444',
+                    quoteTextColor: '#bbbbbb',
+                    photoBoxBackground: '#111111',
+                    photoOverlayGradient: 'rgba(0,0,0,0.0), rgba(0,0,0,0.9)',
+                    authorNameColor: '#ffffff',
+                    authorRoleColor: 'rgba(255,255,255,0.65)',
+                    authorInitialsColor: '#444444',
+                    arrowBackground: '#1a1a1a',
+                    arrowBorder: '#333333',
+                    arrowIcon: '#cccccc',
+                    arrowHover: '#252525',
+                    dotActive: '#ffffff',
+                    dotInactive: '#444444'
+                },
+                sectionPadding: '0',
+                containerClass: 'ts-dark-instance'
+            };
+
+            // Cria segunda instância reutilizando a classe interna
+            // (como a IIFE não exporta a classe, usamos o mesmo padrão de config + reload)
+            var s = document.createElement('script');
+            s.src = 'resources/testimonials_slider.js';
+            document.body.appendChild(s);
+        })();
+    </script>
+
+    <div class="demo-area" style="margin-top:60px">
+        <h2>Referência completa de opções</h2>
+        <p>Todas as propriedades disponíveis em <code>window.TestimonialsSliderConfig</code>:</p>
+
+        <div class="code-block">
+<pre>window.TestimonialsSliderConfig = {
+    <span class="key">active</span>: <span class="bool">true</span>,                  <span class="comment">// false desativa o plugin completamente</span>
+
+    <span class="comment">// Inserção no DOM</span>
+    <span class="key">insertSelector</span>: <span class="string">"body"</span>,         <span class="comment">// Seletor CSS do elemento pai</span>
+    <span class="key">insertMethod</span>: <span class="string">"beforeend"</span>,     <span class="comment">// beforeend | afterbegin | beforebegin | afterend</span>
+
+    <span class="comment">// Título</span>
+    <span class="key">showTitle</span>: <span class="bool">true</span>,
+    <span class="key">title</span>: <span class="string">"O QUE NOSSOS CLIENTES DIZEM"</span>,
+    <span class="key">subtitle</span>: <span class="string">""</span>,                  <span class="comment">// Opcional</span>
+
+    <span class="comment">// Depoimentos</span>
+    <span class="key">testimonials</span>: [
+        {
+            <span class="key">quote</span>: <span class="string">"Texto do depoimento..."</span>,
+            <span class="key">author</span>: <span class="string">"Nome Sobrenome"</span>,
+            <span class="key">role</span>: <span class="string">"Cargo ou título"</span>,
+            <span class="key">photo</span>: <span class="string">"https://..."</span>       <span class="comment">// URL da foto (opcional)</span>
+        }
+    ],
+
+    <span class="comment">// Slider</span>
+    <span class="key">autoplay</span>: <span class="bool">true</span>,
+    <span class="key">autoplayDelay</span>: <span class="number">5000</span>,           <span class="comment">// ms entre slides automáticos</span>
+    <span class="key">loop</span>: <span class="bool">true</span>,
+    <span class="key">showArrows</span>: <span class="bool">true</span>,
+    <span class="key">showDots</span>: <span class="bool">true</span>,
+    <span class="key">visibleCards</span>: {
+        <span class="key">desktop</span>: <span class="number">3</span>,              <span class="comment">// >= 1024px</span>
+        <span class="key">tablet</span>: <span class="number">2</span>,               <span class="comment">// >= 600px</span>
+        <span class="key">mobile</span>: <span class="number">1</span>                <span class="comment">// &lt; 600px</span>
+    },
+    <span class="key">cardGap</span>: <span class="number">24</span>,                  <span class="comment">// px entre os cards</span>
+
+    <span class="comment">// Cores (sobrescreva apenas as que quiser)</span>
+    <span class="key">colors</span>: {
+        <span class="key">sectionBackground</span>: <span class="string">"#f5f5f5"</span>,
+        <span class="key">titleColor</span>: <span class="string">"#111111"</span>,
+        <span class="key">subtitleColor</span>: <span class="string">"#666666"</span>,
+        <span class="key">quoteBoxBackground</span>: <span class="string">"#ece9e3"</span>,
+        <span class="key">quoteBoxBorder</span>: <span class="string">"transparent"</span>,
+        <span class="key">quoteBoxShadow</span>: <span class="string">"rgba(0,0,0,0.04)"</span>,
+        <span class="key">quoteMarkColor</span>: <span class="string">"#aaaaaa"</span>,
+        <span class="key">quoteTextColor</span>: <span class="string">"#2a2a2a"</span>,
+        <span class="key">photoBoxBackground</span>: <span class="string">"#1a1a1a"</span>,
+        <span class="key">photoBoxBorder</span>: <span class="string">"transparent"</span>,
+        <span class="key">photoOverlayGradient</span>: <span class="string">"rgba(0,0,0,0.0), rgba(0,0,0,0.85)"</span>,
+        <span class="key">authorNameColor</span>: <span class="string">"#ffffff"</span>,
+        <span class="key">authorRoleColor</span>: <span class="string">"rgba(255,255,255,0.72)"</span>,
+        <span class="key">authorInitialsColor</span>: <span class="string">"#555555"</span>,
+        <span class="key">arrowBackground</span>: <span class="string">"#ffffff"</span>,
+        <span class="key">arrowBorder</span>: <span class="string">"#e0e0e0"</span>,
+        <span class="key">arrowIcon</span>: <span class="string">"#333333"</span>,
+        <span class="key">arrowHover</span>: <span class="string">"#f0f0f0"</span>,
+        <span class="key">dotActive</span>: <span class="string">"#111111"</span>,
+        <span class="key">dotInactive</span>: <span class="string">"#cccccc"</span>
+    },
+
+    <span class="comment">// Dimensões e espaçamentos</span>
+    <span class="key">sectionPadding</span>: <span class="string">"72px 20px"</span>,
+    <span class="key">cardBorderRadius</span>: <span class="string">"16px"</span>,
+    <span class="key">photoAspectRatio</span>: <span class="string">"3/4"</span>,
+
+    <span class="comment">// Classe CSS extra na &lt;section&gt; para customização externa</span>
+    <span class="key">containerClass</span>: <span class="string">""</span>
+};</pre>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>Testimonials Slider Plugin &mdash; Vanilla JS, zero dependências.</p>
+    </footer>
+
+</body>
+</html>
