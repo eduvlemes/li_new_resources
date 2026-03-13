@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ Accordion - Exemplo de Uso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #0c2928 0%, #208d58 100%);
+            color: white;
+            padding: 70px 20px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            font-size: 1.05rem;
+            opacity: 0.8;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .demo-section {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .demo-section h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0c2928;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #208d58;
+        }
+
+        .demo-code {
+            background: #0c1f1e;
+            color: #a8d5b5;
+            border-radius: 12px;
+            padding: 24px;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin-bottom: 40px;
+        }
+
+        .demo-code code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        .demo-code .kw  { color: #7dd3a8; }
+        .demo-code .st  { color: #f9c97c; }
+        .demo-code .cm  { color: #5d8a6e; font-style: italic; }
+
+        .api-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+        }
+
+        .api-table th {
+            background: #0c2928;
+            color: #fff;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .api-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+
+        .api-table tr:nth-child(even) td {
+            background: #f9f9f9;
+        }
+
+        .api-table code {
+            background: #e8f5ee;
+            color: #0c2928;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #208d58;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .page-footer {
+            background: #0c2928;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho da página de demo -->
+    <div class="page-header">
+        <h1>FAQ Accordion</h1>
+        <p>Plugin de perguntas frequentes com accordion animado e layout de duas colunas.</p>
+    </div>
+
+    <!-- =============================================
+         EXEMPLO 1 — Configuração padrão (demo ao vivo)
+    ============================================== -->
+
+    <!-- O plugin será inserido aqui automaticamente -->
+    <div id="faq-demo-target"></div>
+
+    <!-- =============================================
+         DOCUMENTAÇÃO E EXEMPLOS DE USO
+    ============================================== -->
+    <div class="demo-section">
+
+        <h2>Inclusão básica</h2>
+        <div class="demo-code"><code>
+<span class="cm">&lt;!-- Apenas inclua o script. O plugin se insere automaticamente. --&gt;</span>
+&lt;<span class="kw">script</span> src=<span class="st">"resources/faq_accordion.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;
+        </code></div>
+
+        <h2>Personalização (antes do script)</h2>
+        <div class="demo-code"><code>
+&lt;<span class="kw">script</span>&gt;
+  <span class="kw">window</span>.FaqAccordionConfig = {
+    title: <span class="st">'Dúvidas?'</span>,
+    description: <span class="st">'Estamos aqui para ajudar!'</span>,
+    openFirstItem: <span class="kw">true</span>,
+    allowMultipleOpen: <span class="kw">false</span>,
+    items: [
+      { question: <span class="st">'Pergunta 1'</span>, answer: <span class="st">'Resposta 1'</span> },
+      { question: <span class="st">'Pergunta 2'</span>, answer: <span class="st">'Resposta 2'</span> }
+    ],
+    colors: {
+      titleColor: <span class="st">'#0c2928'</span>,
+      itemBorderColor: <span class="st">'#208d58'</span>,
+      buttonBackground: <span class="st">'#208d58'</span>,
+      buttonHoverBackground: <span class="st">'#0c2928'</span>
+    }
+  };
+&lt;/<span class="kw">script</span>&gt;
+&lt;<span class="kw">script</span> src=<span class="st">"resources/faq_accordion.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;
+        </code></div>
+
+        <h2>API pública</h2>
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>window.FaqAccordion.openItem(index)</code></td>
+                    <td>Abre o item de índice <code>index</code> (começa em 0).</td>
+                </tr>
+                <tr>
+                    <td><code>window.FaqAccordion.closeItem(index)</code></td>
+                    <td>Fecha o item de índice <code>index</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>window.FaqAccordion.closeAll()</code></td>
+                    <td>Fecha todos os itens do accordion.</td>
+                </tr>
+                <tr>
+                    <td><code>window.FaqAccordion.updateConfig(obj)</code></td>
+                    <td>Atualiza a configuração e reinicializa o plugin.</td>
+                </tr>
+                <tr>
+                    <td><code>window.FaqAccordion.reinit()</code></td>
+                    <td>Reinicializa o plugin do zero.</td>
+                </tr>
+                <tr>
+                    <td><code>window.FaqAccordion.destroy()</code></td>
+                    <td>Remove completamente o plugin e seus estilos do DOM.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Opções de configuração (<code>DEFAULT_CONFIG</code>)</h2>
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Propriedade</th>
+                    <th>Padrão</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>active</code></td>
+                    <td><code>true</code></td>
+                    <td>Ativa ou desativa o plugin.</td>
+                </tr>
+                <tr>
+                    <td><code>insertSelector</code></td>
+                    <td><code>'body'</code></td>
+                    <td>Seletor CSS do elemento onde a seção será inserida.</td>
+                </tr>
+                <tr>
+                    <td><code>insertMethod</code></td>
+                    <td><code>'beforeend'</code></td>
+                    <td>Posição de inserção: <code>beforeend</code>, <code>afterbegin</code>, <code>beforebegin</code>, <code>afterend</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>title</code></td>
+                    <td><code>'Perguntas frequentes'</code></td>
+                    <td>Título da seção (coluna esquerda).</td>
+                </tr>
+                <tr>
+                    <td><code>titleDot</code></td>
+                    <td><code>true</code></td>
+                    <td>Exibe o ponto colorido após o título.</td>
+                </tr>
+                <tr>
+                    <td><code>description</code></td>
+                    <td>Texto padrão</td>
+                    <td>Parágrafo descritivo abaixo do título.</td>
+                </tr>
+                <tr>
+                    <td><code>allowMultipleOpen</code></td>
+                    <td><code>false</code></td>
+                    <td>Se <code>true</code>, permite múltiplos itens abertos ao mesmo tempo.</td>
+                </tr>
+                <tr>
+                    <td><code>openFirstItem</code></td>
+                    <td><code>false</code></td>
+                    <td>Se <code>true</code>, o primeiro item começa aberto.</td>
+                </tr>
+                <tr>
+                    <td><code>animationDuration</code></td>
+                    <td><code>320</code></td>
+                    <td>Duração da animação de abertura/fechamento em milissegundos.</td>
+                </tr>
+                <tr>
+                    <td><code>items</code></td>
+                    <td>Array de 6 exemplos</td>
+                    <td>Array de objetos <code>{ question, answer }</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>colors</code></td>
+                    <td>Paleta verde/escura</td>
+                    <td>Objeto com as cores do plugin (ver abaixo).</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="page-footer">
+        FAQ Accordion Plugin &mdash; Vanilla JS
+    </div>
+
+    <!-- Plugin sendo carregado — inserido no alvo da demo -->
+    <script>
+        window.FaqAccordionConfig = {
+            insertSelector: '#faq-demo-target',
+            insertMethod: 'afterbegin',
+            title: 'Perguntas frequentes',
+            description: 'Tudo o que você precisa saber sobre o Biobone. Caso tenha mais alguma dúvida, entre em contato com a gente!',
+            items: [
+                {
+                    question: 'O que é Biobone?',
+                    answer: 'Biobone é um mordedor para cães feito com composto vegetal, desenvolvido para o cachorro roer, se entreter e ajudar na saúde bucal.'
+                },
+                {
+                    question: 'Biobone tem plástico?',
+                    answer: 'Não. Biobone é produzido com matéria-prima de origem vegetal, sem plástico tradicional.'
+                },
+                {
+                    question: 'Biobone é seguro para os cães?',
+                    answer: 'Sim. Ela foi desenvolvida para ser segura e resistente, além de ser mais segura caso pequenos fragmentos sejam ingeridos.'
+                },
+                {
+                    question: 'O cachorro pode engolir pedaços?',
+                    answer: 'Pequenos fragmentos podem ser ingeridos sem problemas. Ainda assim, recomendamos sempre supervisão durante o uso.'
+                },
+                {
+                    question: 'Biobone quebra?',
+                    answer: 'Biobone foi feito para ser roído, então com o tempo é normal que haja desgaste ou pequenas lascas.'
+                },
+                {
+                    question: 'Biobone ajuda na saúde dos dentes?',
+                    answer: 'Sim. Roer ajuda a reduzir tártaro, estimular a gengiva e manter os dentes mais limpos.'
+                },
+                {
+                    question: 'Filhotes podem usar Biobone?',
+                    answer: 'Sim. Existem versões de densidade mais leve, ideais para filhotes. A Biobone também possui o Kit Filhote, pensado para os primeiros meses do cão. Ele ajuda a aliviar o desconforto da troca de dentes, estimular o instinto de roer e iniciar o hábito de mastigação de forma segura.'
+                },
+                {
+                    question: 'Como escolher o tamanho correto?',
+                    answer: 'Escolha sempre baseado no peso e no porte do cachorro. Se estiver em dúvida, prefira um tamanho maior.'
+                },
+                {
+                    question: 'Quais densidades existem?',
+                    answer: '• Leve – ideal para filhotes ou cães com mordida suave<br>• Moderada – para a maioria dos cães<br>• Forte – para cães com mordida mais forte<br>• Extra Forte – para cães muito destruidores'
+                },
+                {
+                    question: 'Quanto tempo dura um Biobone?',
+                    answer: 'Depende da força da mordida do cachorro. Pode durar semanas ou até meses.'
+                },
+                {
+                    question: 'Biobone tem sabor?',
+                    answer: 'Sim. Alguns modelos possuem ingredientes naturais que ajudam a deixar o mordedor mais atrativo para o cão.'
+                },
+                {
+                    question: 'Pode usar todos os dias?',
+                    answer: 'Sim. Biobone pode ser usada diariamente como forma de estimular, acalmar e entreter o cão.'
+                },
+                {
+                    question: 'Quando devo substituir meu Biobone?',
+                    answer: 'Quando estiver muito pequeno ou desgastado, para evitar que o cão engula um pedaço grande.'
+                },
+                {
+                    question: 'Biobone é feito no Brasil?',
+                    answer: 'Sim. Biobone é desenvolvida e produzida no Brasil.'
+                }
+            ]
+        };
+    </script>
+    <script src="resources/faq_accordion.js"></script>
+
+</body>
+</html>
