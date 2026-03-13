@@ -80,8 +80,14 @@
         // Espaço entre os cards (em px)
         cardGap: 24,
 
-        // Número máximo de linhas no texto do depoimento antes do ellipsis (0 = sem limite)
-        quoteMaxLines: 0,
+        // Número máximo de linhas no texto do depoimento antes do ellipsis
+        // Pode ser um número único ou um objeto por breakpoint { desktop, tablet, mobile }
+        // 0 = sem limite
+        quoteMaxLines: {
+            desktop: 0,
+            tablet:  0,
+            mobile:  0
+        },
 
         // CORES E ESTILOS
         colors: {
@@ -130,6 +136,15 @@
             CONFIG.visibleCards = Object.assign({}, DEFAULT_CONFIG.visibleCards, window.TestimonialsSliderConfig.visibleCards);
         }
 
+        if (window.TestimonialsSliderConfig.quoteMaxLines !== undefined) {
+            const qml = window.TestimonialsSliderConfig.quoteMaxLines;
+            if (typeof qml === 'number') {
+                CONFIG.quoteMaxLines = { desktop: qml, tablet: qml, mobile: qml };
+            } else if (typeof qml === 'object') {
+                CONFIG.quoteMaxLines = Object.assign({}, DEFAULT_CONFIG.quoteMaxLines, qml);
+            }
+        }
+
         if (!window.TestimonialsSliderConfig.testimonials) {
             CONFIG.testimonials = DEFAULT_CONFIG.testimonials;
         }
@@ -139,8 +154,13 @@
     // NÃO ALTERAR DAQUI PRA BAIXO
     // ======
 
+    // ID único por instância — evita conflito quando o script é carregado mais de uma vez na página
+    const _instanceId = (window.__tsInstanceCount = (window.__tsInstanceCount || 0) + 1);
+    const SECTION_ID = 'testimonials-slider-section-' + _instanceId;
+    const STYLES_ID  = 'testimonials-slider-styles-'  + _instanceId;
+
     const CSS_STYLES = `
-        <style id="testimonials-slider-styles">
+        <style id="${STYLES_ID}">
             .ts-section {
                 background: ${CONFIG.colors.sectionBackground};
                 padding: ${CONFIG.sectionPadding};
@@ -271,9 +291,9 @@
                 color: ${CONFIG.colors.quoteTextColor};
                 margin: 0;
                 text-align: center;
-                ${CONFIG.quoteMaxLines > 0 ? `
+                ${CONFIG.quoteMaxLines.desktop > 0 ? `
                 display: -webkit-box;
-                -webkit-line-clamp: ${CONFIG.quoteMaxLines};
+                -webkit-line-clamp: ${CONFIG.quoteMaxLines.desktop};
                 -webkit-box-orient: vertical;
                 overflow: hidden;` : ''}
             }
@@ -426,6 +446,17 @@
                 .ts-section {
                     padding: 52px 16px;
                 }
+                ${CONFIG.quoteMaxLines.tablet !== CONFIG.quoteMaxLines.desktop ? `
+                .ts-quote-text {
+                    ${CONFIG.quoteMaxLines.tablet > 0 ? `
+                    display: -webkit-box;
+                    -webkit-line-clamp: ${CONFIG.quoteMaxLines.tablet};
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;` : `
+                    display: block;
+                    -webkit-line-clamp: unset;
+                    overflow: visible;`}
+                }` : ''}
             }
 
             @media (max-width: 599px) {
@@ -441,6 +472,17 @@
                 .ts-header {
                     margin-bottom: 32px;
                 }
+                ${CONFIG.quoteMaxLines.mobile !== CONFIG.quoteMaxLines.tablet ? `
+                .ts-quote-text {
+                    ${CONFIG.quoteMaxLines.mobile > 0 ? `
+                    display: -webkit-box;
+                    -webkit-line-clamp: ${CONFIG.quoteMaxLines.mobile};
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;` : `
+                    display: block;
+                    -webkit-line-clamp: unset;
+                    overflow: visible;`}
+                }` : ''}
             }
         </style>
     `;
@@ -482,7 +524,7 @@
         }
 
         injectStyles() {
-            if (!document.getElementById('testimonials-slider-styles')) {
+            if (!document.getElementById(STYLES_ID)) {
                 document.head.insertAdjacentHTML('beforeend', CSS_STYLES);
             }
         }
@@ -563,9 +605,8 @@
         }
 
         render() {
-            const existing = document.getElementById('testimonials-slider-section');
+            const existing = document.getElementById(SECTION_ID);
             if (existing) existing.remove();
-            console.log(CONFIG)
             const titleHTML = CONFIG.showTitle ? `
                 <div class="ts-header">
                     <h2 class="ts-title">${this.escHtml(CONFIG.title)}</h2>
@@ -590,7 +631,7 @@
             const extraClass = CONFIG.containerClass ? ` ${CONFIG.containerClass}` : '';
 
             const html = `
-                <section id="testimonials-slider-section" class="ts-section${extraClass}" aria-label="Depoimentos de clientes">
+                <section id="${SECTION_ID}" class="ts-section${extraClass}" aria-label="Depoimentos de clientes">
                     <div class="ts-inner">
                         ${titleHTML}
                         <div class="ts-viewport" role="region" tabindex="0" aria-live="polite">
@@ -606,7 +647,7 @@
         }
 
         setupElements() {
-            this.section = document.getElementById('testimonials-slider-section');
+            this.section = document.getElementById(SECTION_ID);
             this.track = this.section.querySelector('.ts-track');
             this.viewport = this.section.querySelector('.ts-viewport');
             this.btnPrev = this.section.querySelector('.ts-arrow-prev');
@@ -846,7 +887,7 @@
             this.stopAutoplay();
             clearTimeout(this.resizeTimer);
             if (this.section) this.section.remove();
-            const styles = document.getElementById('testimonials-slider-styles');
+            const styles = document.getElementById(STYLES_ID);
             if (styles) styles.remove();
         }
     }
