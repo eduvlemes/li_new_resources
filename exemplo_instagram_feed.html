@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo — Instagram Feed (Behold.so)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        /* ---- Cabeçalho da página ---- */
+        .page-header {
+            background: linear-gradient(135deg, #405de6 0%, #833ab4 50%, #fd1d1d 100%);
+            color: #fff;
+            padding: 60px 24px 48px;
+            text-align: center;
+        }
+        .page-header h1  { font-size: 2em; font-weight: 700; margin-bottom: 10px; }
+        .page-header p   { font-size: 1em; opacity: .85; max-width: 540px; margin: 0 auto; }
+
+        /* ---- Conteúdo ---- */
+        .page-content { max-width: 960px; margin: 0 auto; padding: 40px 20px 60px; }
+
+        /* ---- Seção de demo ---- */
+        .demo-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        }
+        .demo-section h2 { font-size: 1.1em; font-weight: 700; color: #111; margin-bottom: 6px; }
+        .demo-section p  { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6; }
+        .demo-section p code, .demo-section li code {
+            background: #f0f0f0;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        /* ---- Snippet de código ---- */
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px 22px;
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        pre .cmt { color: #6a9955; }
+        pre .kw  { color: #569cd6; }
+        pre .id  { color: #9cdcfe; }
+        pre .str { color: #ce9178; }
+        pre .num { color: #b5cea8; }
+        pre .fn  { color: #dcdcaa; }
+
+        /* ---- Lista de opções ---- */
+        .options-list { list-style: none; display: grid; gap: 6px; margin-top: 12px; }
+        .options-list li {
+            font-size: 13px;
+            color: #444;
+            padding: 6px 10px;
+            background: #fafafa;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+        }
+        .options-list li strong { color: #111; }
+
+        /* ---- Botões de controle ---- */
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity .15s;
+        }
+        .btn:hover { opacity: .8; }
+        .btn-primary  { background: #405de6; color: #fff; }
+        .btn-secondary { background: #efefef; color: #333; }
+        .btn-danger   { background: #ed4956; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- ================================================
+         CABEÇALHO
+         ================================================ -->
+    <header class="page-header">
+        <h1>Instagram Feed Plugin</h1>
+        <p>Exibe o feed do Instagram com header de perfil, grid responsivo e lightbox — powered by Behold.so.</p>
+    </header>
+
+    <div class="page-content">
+
+        <!-- ================================================
+             DEMO PRINCIPAL — feed ao vivo
+             ================================================ -->
+        <div class="demo-section">
+            <h2>Demo ao vivo</h2>
+            <p>
+                O feed abaixo é carregado em tempo real via <strong>Behold.so</strong>.
+                Clique em qualquer post para abrir o lightbox.
+            </p>
+
+            <!-- O plugin injeta o feed aqui (insertSelector: '#ig-feed-demo') -->
+            <div id="ig-feed-demo"></div>
+        </div>
+
+        <!-- ================================================
+             CONTROLES DA API PÚBLICA
+             ================================================ -->
+        <div class="demo-section">
+            <h2>API Pública</h2>
+            <p>Use <code>window.InstagramFeed</code> para controlar o plugin via JavaScript:</p>
+
+            <div class="controls">
+                <button class="btn btn-primary"    onclick="window.InstagramFeed.reload()">reload()</button>
+                <button class="btn btn-secondary"  onclick="window.InstagramFeed.reinit()">reinit()</button>
+                <button class="btn btn-danger"     onclick="window.InstagramFeed.destroy()">destroy()</button>
+            </div>
+
+            <pre>
+<span class="cmt">// Recarrega o feed (útil em SPAs ou após longa inatividade)</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">reload</span>();
+
+<span class="cmt">// Atualiza config e reinicializa</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">updateConfig</span>({
+    columns: { desktop: <span class="num">3</span>, tablet: <span class="num">2</span>, mobile: <span class="num">1</span> }
+});
+
+<span class="cmt">// Reinicializa sem alterar a config</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">reinit</span>();
+
+<span class="cmt">// Remove completamente do DOM</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">destroy</span>();</pre>
+        </div>
+
+        <!-- ================================================
+             GUIA DE CONFIGURAÇÃO
+             ================================================ -->
+        <div class="demo-section">
+            <h2>Como obter o feedUrl (Behold.so)</h2>
+            <p>
+                1. Acesse <strong>behold.so</strong> e conecte sua conta do Instagram.<br>
+                2. Crie um Feed e abra as configurações dele.<br>
+                3. Copie a <strong>Feed URL</strong> (ex: <code>https://feeds.behold.so/SEU-ID</code>).<br>
+                4. Cole na propriedade <code>feedUrl</code> do config abaixo.
+            </p>
+        </div>
+
+        <!-- ================================================
+             REFERÊNCIA DE CONFIGURAÇÃO
+             ================================================ -->
+        <div class="demo-section">
+            <h2>Todas as opções disponíveis</h2>
+            <p>Defina <code>window.InstagramFeedConfig</code> antes de carregar o script:</p>
+
+            <pre>
+<span class="id">window</span>.<span class="id">InstagramFeedConfig</span> = {
+
+    <span class="cmt">// ── OBRIGATÓRIO ─────────────────────────────────────────</span>
+    <span class="id">feedUrl</span>: <span class="str">'https://feeds.behold.so/SEU-FEED-ID'</span>,
+
+    <span class="cmt">// ── INSERÇÃO ────────────────────────────────────────────</span>
+    <span class="id">insertSelector</span>: <span class="str">'body'</span>,           <span class="cmt">// seletor CSS do container</span>
+    <span class="id">insertMethod</span>:   <span class="str">'beforeend'</span>,       <span class="cmt">// beforeend | afterbegin | etc.</span>
+
+    <span class="cmt">// ── HEADER DE PERFIL ────────────────────────────────────</span>
+    <span class="id">showHeader</span>:       <span class="kw">true</span>,
+    <span class="id">profile</span>: {
+        <span class="id">displayName</span>:     <span class="str">''</span>,              <span class="cmt">// sobrescreve username do Behold</span>
+        <span class="id">showStats</span>:       <span class="kw">true</span>,           <span class="cmt">// publicações / seguidores / seguindo</span>
+        <span class="id">postsLabel</span>:      <span class="str">'publicações'</span>,
+        <span class="id">followersLabel</span>:  <span class="str">'seguidores'</span>,
+        <span class="id">followingLabel</span>:  <span class="str">'seguindo'</span>,
+    },
+    <span class="id">followButtonText</span>: <span class="str">'Seguir'</span>,
+    <span class="id">followButtonUrl</span>:  <span class="str">''</span>,              <span class="cmt">// ex: 'https://instagram.com/seu_usuario'</span>
+
+    <span class="cmt">// ── GRID ────────────────────────────────────────────────</span>
+    <span class="id">columns</span>: { <span class="id">desktop</span>: <span class="num">4</span>, <span class="id">tablet</span>: <span class="num">3</span>, <span class="id">mobile</span>: <span class="num">2</span> },
+    <span class="id">gap</span>:        <span class="str">'3px'</span>,
+    <span class="id">imageSize</span>:  <span class="str">'medium'</span>,            <span class="cmt">// 'small' | 'medium' | 'large' | 'full'</span>
+
+    <span class="cmt">// ── ÍCONES E OVERLAY ────────────────────────────────────</span>
+    <span class="id">showVideoIcon</span>:    <span class="kw">true</span>,
+    <span class="id">showCarouselIcon</span>: <span class="kw">true</span>,
+    <span class="id">showHoverOverlay</span>: <span class="kw">true</span>,
+
+    <span class="cmt">// ── LIGHTBOX ────────────────────────────────────────────</span>
+    <span class="id">showLightbox</span>:      <span class="kw">true</span>,
+    <span class="id">lightboxImageSize</span>: <span class="str">'large'</span>,
+    <span class="id">lightboxLinkText</span>:  <span class="str">'Ver no Instagram'</span>,
+
+    <span class="cmt">// ── TEXTOS ──────────────────────────────────────────────</span>
+    <span class="id">loadingText</span>: <span class="str">'Carregando feed...'</span>,
+    <span class="id">errorText</span>:   <span class="str">'Não foi possível carregar o feed.'</span>,
+    <span class="id">emptyText</span>:   <span class="str">'Nenhum post encontrado.'</span>,
+
+    <span class="cmt">// ── CORES (todas opcionais — há padrões definidos) ───────</span>
+    <span class="id">colors</span>: {
+        <span class="id">sectionBackground</span>: <span class="str">'#ffffff'</span>,
+        <span class="id">headerText</span>:        <span class="str">'#262626'</span>,
+        <span class="id">iconColor</span>:         <span class="str">'#ffffff'</span>,
+        <span class="id">followButton</span>:      <span class="str">'#0095f6'</span>,
+        <span class="id">followButtonText</span>:  <span class="str">'#ffffff'</span>,
+        <span class="cmt">// ... demais tokens em resources/instagram_feed.js</span>
+    },
+};</pre>
+        </div>
+
+    </div>
+
+    <!-- ================================================
+         CONFIGURAÇÃO E CARREGAMENTO DO PLUGIN
+         ================================================ -->
+    <script>
+        window.InstagramFeedConfig = {
+            feedUrl:          'https://feeds.behold.so/j0S6xO4wT0aPIUORZMfZ',
+            insertSelector:   '#ig-feed-demo',
+            insertMethod:     'beforeend',
+            followButtonUrl:  'https://www.instagram.com/alpix.dev',
+            showHoverOverlay: true,
+            columns:          { desktop: 6, tablet: 3, mobile: 2 },
+            imageSize:        'medium',
+            lightboxImageSize:'large',
+        };
+    </script>
+    <script src="resources/instagram_feed.js"></script>
+
+</body>
+</html>
