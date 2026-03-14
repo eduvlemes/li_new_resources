@@ -819,10 +819,7 @@
             let statsHTML = '';
             if (p.showStats) {
                 statsHTML = `<div class="ig-feed-stats">
-                    <span class="ig-feed-stat">
-                        <strong>${posts}</strong>
-                        <span class="ig-feed-stat-label">${this._esc(p.postsLabel)}</span>
-                    </span>
+                    
                     ${followers != null ? `<span class="ig-feed-stat">
                         <strong>${this._numFmt(followers)}</strong>
                         <span class="ig-feed-stat-label">${this._esc(p.followersLabel)}</span>
