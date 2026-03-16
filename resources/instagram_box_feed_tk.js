@@ -26,10 +26,21 @@
     const DEFAULT_CONFIG = {
 
         // ----------------------------------------
-        // OBRIGATÓRIO: URL do feed gerado no Behold.so
-        // Ex: 'https://feeds.behold.so/eyjMtcyMwcoUEs9vJdNB'
+        // FONTE DE DADOS
+        // 'behold'    → usa feedUrl (Behold.so CDN, sem token expirando)
+        // 'instagram' → usa accessToken (API Graph do Instagram, token de 60 dias)
         // ----------------------------------------
+        dataSource: 'behold',
+
+        // URL do feed gerado no Behold.so (usado quando dataSource === 'behold')
+        // Ex: 'https://feeds.behold.so/eyjMtcyMwcoUEs9vJdNB'
         feedUrl: '',
+
+        // Token de acesso do Instagram (usado quando dataSource === 'instagram')
+        // Obtenha em: https://developers.facebook.com/tools/explorer/
+        // ATENÇÃO: token exposto no front-end — restrinja o domínio no painel do app.
+        // Long-Lived Token dura 60 dias; implemente refresh server-side para uso contínuo.
+        accessToken: '',
 
         // Onde inserir a seção na página
         insertSelector: 'body',
@@ -761,6 +772,11 @@
         // Carregamento de dados via Behold
         // ----------------------------------------
         _loadData() {
+            if (CONFIG.dataSource === 'instagram') {
+                this._loadDataFromInstagram();
+                return;
+            }
+
             if (!CONFIG.feedUrl) {
                 this._showError('feedUrl não configurado. Defina CONFIG.feedUrl com a URL do seu feed no Behold.so.');
                 return;
@@ -780,6 +796,105 @@
                     console.error('[InstagramFeed]', err);
                     this._showError(CONFIG.errorText);
                 });
+        }
+
+        // ----------------------------------------
+        // Carregamento via API Graph do Instagram
+        // ----------------------------------------
+        _loadDataFromInstagram() {
+            const token = CONFIG.accessToken;
+            if (!token) {
+                this._showError('accessToken não configurado. Defina CONFIG.accessToken com seu token de acesso do Instagram.');
+                return;
+            }
+
+            const base         = 'https://graph.instagram.com';
+            const profileFields = 'id,username,profile_picture_url,followers_count,follows_count,media_count';
+            const mediaFields   = 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,children{id,media_type,media_url,thumbnail_url}';
+
+            const profileUrl = `${base}/me?fields=${profileFields}&access_token=${encodeURIComponent(token)}`;
+            const mediaUrl   = `${base}/me/media?fields=${mediaFields}&limit=50&access_token=${encodeURIComponent(token)}`;
+
+            Promise.all([
+                fetch(profileUrl).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+                fetch(mediaUrl).then((r)   => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+            ])
+            .then(([profile, media]) => {
+                const data = this._normalizeInstagramData(profile, media);
+                this._feedData = data;
+                if (CONFIG.showHeader) this._buildHeader(data);
+                this._buildGrid(data.posts || []);
+            })
+            .catch((err) => {
+                console.error('[InstagramFeed]', err);
+                this._showError(CONFIG.errorText);
+            });
+        }
+
+        // Normaliza a resposta da API do Instagram para o formato interno (compatível com Behold)
+        _normalizeInstagramData(profile, media) {
+            const posts = (media.data || []).map((item) => {
+                const isVideo    = item.media_type === 'VIDEO';
+                const isCarousel = item.media_type === 'CAROUSEL_ALBUM';
+
+                let children;
+                if (isCarousel && item.children?.data?.length) {
+                    children = item.children.data.map((c) => {
+                        const cIsVideo  = c.media_type === 'VIDEO';
+                        const cThumbUrl = cIsVideo
+                            ? (c.thumbnail_url || c.media_url || '')
+                            : (c.media_url || '');
+                        return {
+                            id:        c.id,
+                            mediaType: c.media_type,
+                            mediaUrl:  c.media_url || '',
+                            sizes: {
+                                small:  { mediaUrl: cThumbUrl },
+                                medium: { mediaUrl: cThumbUrl },
+                                large:  { mediaUrl: cThumbUrl },
+                                full:   { mediaUrl: cThumbUrl },
+                            },
+                        };
+                    });
+                }
+
+                // Thumbnail para o grid: carrossel → 1.º filho; vídeo → thumbnail_url; imagem → media_url
+                let thumbUrl;
+                if (isCarousel && children?.length) {
+                    thumbUrl = children[0].sizes.medium.mediaUrl;
+                } else if (isVideo) {
+                    thumbUrl = item.thumbnail_url || '';
+                } else {
+                    thumbUrl = item.media_url || '';
+                }
+
+                const sizes = {
+                    small:  { mediaUrl: thumbUrl },
+                    medium: { mediaUrl: thumbUrl },
+                    large:  { mediaUrl: thumbUrl },
+                    full:   { mediaUrl: thumbUrl },
+                };
+
+                return {
+                    id:            item.id,
+                    mediaType:     item.media_type,
+                    mediaUrl:      item.media_url   || '',
+                    caption:       item.caption     || '',
+                    prunedCaption: (item.caption || '').replace(/#\S+/g, '').trim(),
+                    permalink:     item.permalink   || '',
+                    timestamp:     item.timestamp   || '',
+                    sizes,
+                    children,
+                };
+            });
+
+            return {
+                username:          profile.username            || '',
+                profilePictureUrl: profile.profile_picture_url || '',
+                followersCount:    profile.followers_count     ?? null,
+                followsCount:      profile.follows_count       ?? null,
+                posts,
+            };
         }
 
         // ----------------------------------------

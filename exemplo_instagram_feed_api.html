@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo — Instagram Feed (API Direta)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        /* ---- Cabeçalho da página ---- */
+        .page-header {
+            background: linear-gradient(135deg, #405de6 0%, #833ab4 50%, #fd1d1d 100%);
+            color: #fff;
+            padding: 60px 24px 48px;
+            text-align: center;
+        }
+        .page-header h1  { font-size: 2em; font-weight: 700; margin-bottom: 10px; }
+        .page-header p   { font-size: 1em; opacity: .85; max-width: 560px; margin: 0 auto; }
+
+        /* ---- Badge de modo ---- */
+        .mode-badge {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 4px 14px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        /* ---- Conteúdo ---- */
+        .page-content { max-width: 960px; margin: 0 auto; padding: 40px 20px 60px; }
+
+        /* ---- Seção de demo ---- */
+        .demo-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        }
+        .demo-section h2 { font-size: 1.1em; font-weight: 700; color: #111; margin-bottom: 6px; }
+        .demo-section p  { font-size: 14px; color: #666; margin-bottom: 14px; line-height: 1.6; }
+        .demo-section p:last-child { margin-bottom: 0; }
+        .demo-section code,
+        .demo-section li code {
+            background: #f0f0f0;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        /* ---- Aviso / callout ---- */
+        .callout {
+            border-left: 4px solid #f0ad4e;
+            background: #fffbf2;
+            padding: 14px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: #7a5c00;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .callout.info {
+            border-color: #0095f6;
+            background: #f0f8ff;
+            color: #004a7c;
+        }
+
+        /* ---- Formulário de token ---- */
+        .token-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .token-form input[type="text"] {
+            flex: 1;
+            min-width: 260px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: monospace;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .token-form input[type="text"]:focus { border-color: #0095f6; }
+        .token-form input[type="text"]::placeholder { color: #bbb; }
+
+        /* ---- Snippet de código ---- */
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px 22px;
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        pre .cmt { color: #6a9955; }
+        pre .kw  { color: #569cd6; }
+        pre .id  { color: #9cdcfe; }
+        pre .str { color: #ce9178; }
+        pre .num { color: #b5cea8; }
+        pre .fn  { color: #dcdcaa; }
+
+        /* ---- Passos numerados ---- */
+        .steps { list-style: none; counter-reset: step; display: grid; gap: 10px; margin-top: 12px; }
+        .steps li {
+            counter-increment: step;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+        }
+        .steps li::before {
+            content: counter(step);
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background: #405de6;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+
+        /* ---- Botões de controle ---- */
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity .15s;
+        }
+        .btn:hover { opacity: .8; }
+        .btn-primary   { background: #405de6; color: #fff; }
+        .btn-secondary { background: #efefef; color: #333; }
+        .btn-danger    { background: #ed4956; color: #fff; }
+        .btn-green     { background: #1db954; color: #fff; }
+
+        /* ---- Separador ---- */
+        hr { border: none; border-top: 1px solid #e8e8e8; margin: 24px 0; }
+
+        /* ---- Container do feed ---- */
+        #ig-feed-demo { min-height: 60px; }
+    </style>
+</head>
+<body>
+
+    <!-- ================================================
+         CABEÇALHO
+         ================================================ -->
+    <header class="page-header">
+        <h1>Instagram Feed Plugin</h1>
+        <p>Exibe o feed diretamente da <strong>API Graph do Instagram</strong> — sem intermediários, usando seu próprio token de acesso.</p>
+        <span class="mode-badge">dataSource: instagram</span>
+    </header>
+
+    <div class="page-content">
+
+        <!-- ================================================
+             DEMO AO VIVO — entrada de token pelo usuário
+             ================================================ -->
+        <div class="demo-section">
+            <h2>Demo ao vivo</h2>
+            <p>
+                Informe um <strong>Long-Lived Access Token</strong> do Instagram para carregar o feed em tempo real.
+                O token nunca sai do seu navegador — a requisição vai direto para <code>graph.instagram.com</code>.
+            </p>
+
+            <div class="callout">
+                <strong>Atenção:</strong> Este campo é apenas para testes locais. Em produção, jamais exponha o token
+                em HTML público sem restringir o domínio no painel do seu App do Facebook.
+            </div>
+
+            <div class="token-form">
+                <input type="text" id="token-input" placeholder="Cole aqui seu Long-Lived Access Token…" autocomplete="off" spellcheck="false">
+                <button class="btn btn-green" onclick="carregarFeed()">Carregar Feed</button>
+            </div>
+        </div>
+
+        <!-- ================================================
+             CONTAINER DO FEED — o plugin injeta aqui
+             ================================================ -->
+        <div id="ig-feed-demo"></div>
+
+        <!-- ================================================
+             CONTROLES DA API PÚBLICA
+             ================================================ -->
+        <div class="demo-section">
+            <h2>API Pública</h2>
+            <p>Após carregar o feed, você pode controlá-lo via <code>window.InstagramFeed</code>:</p>
+
+            <div class="controls">
+                <button class="btn btn-primary"   onclick="window.InstagramFeed && window.InstagramFeed.reload()">reload()</button>
+                <button class="btn btn-secondary" onclick="window.InstagramFeed && window.InstagramFeed.reinit()">reinit()</button>
+                <button class="btn btn-danger"    onclick="window.InstagramFeed && window.InstagramFeed.destroy()">destroy()</button>
+            </div>
+
+            <pre>
+<span class="cmt">// Recarrega o feed mantendo a config atual</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">reload</span>();
+
+<span class="cmt">// Atualiza config e reinicializa</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">updateConfig</span>({
+    columns: { desktop: <span class="num">3</span>, tablet: <span class="num">2</span>, mobile: <span class="num">1</span> }
+});
+
+<span class="cmt">// Reinicializa sem alterar a config</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">reinit</span>();
+
+<span class="cmt">// Remove completamente do DOM</span>
+<span class="id">window</span>.<span class="id">InstagramFeed</span>.<span class="fn">destroy</span>();</pre>
+        </div>
+
+        <!-- ================================================
+             COMO OBTER O TOKEN
+             ================================================ -->
+        <div class="demo-section">
+            <h2>Como obter o Long-Lived Access Token</h2>
+
+            <div class="callout info">
+                O Long-Lived Token dura <strong>60 dias</strong>. Para uso contínuo em produção, implemente um endpoint
+                server-side que faça o refresh antes do vencimento usando a rota
+                <code>GET /refresh_access_token</code> da API do Instagram.
+            </div>
+
+            <ol class="steps">
+                <li>
+                    Acesse <strong>developers.facebook.com</strong> e crie (ou abra) um App do tipo
+                    <em>Consumer</em> ou <em>Business</em>.
+                </li>
+                <li>
+                    Adicione o produto <strong>Instagram Basic Display</strong> ao seu App.
+                </li>
+                <li>
+                    Em <em>Basic Display → User Token Generator</em>, clique em
+                    <strong>Generate Token</strong> para a sua conta de teste.
+                </li>
+                <li>
+                    Copie o <strong>Short-Lived Token</strong> gerado (válido por 1 hora) e troque-o por um
+                    Long-Lived Token com a chamada abaixo (substitua os valores):
+                    <pre>
+<span class="cmt"># Trocar Short-Lived por Long-Lived Token (válido 60 dias)</span>
+GET https://graph.instagram.com/access_token
+    ?grant_type=ig_exchange_token
+    &client_secret=<span class="str">{APP_SECRET}</span>
+    &access_token=<span class="str">{SHORT_LIVED_TOKEN}</span></pre>
+                </li>
+                <li>
+                    Cole o <code>access_token</code> retornado no campo acima ou em
+                    <code>window.InstagramFeedConfig.accessToken</code> no seu HTML.
+                </li>
+                <li>
+                    Renove antes do vencimento (máx 60 dias) com:
+                    <pre>
+<span class="cmt"># Renovar Long-Lived Token (a partir do dia 25 antes de expirar)</span>
+GET https://graph.instagram.com/refresh_access_token
+    ?grant_type=ig_refresh_token
+    &access_token=<span class="str">{LONG_LIVED_TOKEN}</span></pre>
+                </li>
+            </ol>
+        </div>
+
+        <!-- ================================================
+             REFERÊNCIA DE CONFIGURAÇÃO
+             ================================================ -->
+        <div class="demo-section">
+            <h2>Configuração completa — modo Instagram direto</h2>
+            <p>Defina <code>window.InstagramFeedConfig</code> antes de carregar o script:</p>
+
+            <pre>
+<span class="id">window</span>.<span class="id">InstagramFeedConfig</span> = {
+
+    <span class="cmt">// ── FONTE DE DADOS ───────────────────────────────────────</span>
+    <span class="id">dataSource</span>:  <span class="str">'instagram'</span>,          <span class="cmt">// 'behold' (padrão) | 'instagram'</span>
+    <span class="id">accessToken</span>: <span class="str">'SEU_LONG_LIVED_TOKEN'</span>, <span class="cmt">// obrigatório quando dataSource === 'instagram'</span>
+
+    <span class="cmt">// ── INSERÇÃO ────────────────────────────────────────────</span>
+    <span class="id">insertSelector</span>: <span class="str">'#meu-container'</span>,   <span class="cmt">// seletor CSS do container</span>
+    <span class="id">insertMethod</span>:   <span class="str">'beforeend'</span>,         <span class="cmt">// beforeend | afterbegin | beforebegin | afterend</span>
+
+    <span class="cmt">// ── HEADER DE PERFIL ────────────────────────────────────</span>
+    <span class="id">showHeader</span>: <span class="kw">true</span>,
+    <span class="id">profile</span>: {
+        <span class="id">displayName</span>:    <span class="str">''</span>,            <span class="cmt">// sobrescreve o username do Instagram</span>
+        <span class="id">showStats</span>:      <span class="kw">true</span>,
+        <span class="id">postsLabel</span>:     <span class="str">'publicações'</span>,
+        <span class="id">followersLabel</span>: <span class="str">'seguidores'</span>,
+        <span class="id">followingLabel</span>: <span class="str">'seguindo'</span>,
+    },
+    <span class="id">followButtonText</span>: <span class="str">'Seguir'</span>,
+    <span class="id">followButtonUrl</span>:  <span class="str">''</span>,              <span class="cmt">// ex: 'https://instagram.com/seu_usuario'</span>
+
+    <span class="cmt">// ── GRID ────────────────────────────────────────────────</span>
+    <span class="id">columns</span>: { <span class="id">desktop</span>: <span class="num">4</span>, <span class="id">tablet</span>: <span class="num">3</span>, <span class="id">mobile</span>: <span class="num">2</span> },
+    <span class="id">gap</span>:              <span class="str">'3px'</span>,
+    <span class="id">imageSize</span>:        <span class="str">'medium'</span>,        <span class="cmt">// 'small' | 'medium' | 'large' | 'full'</span>
+
+    <span class="cmt">// ── ÍCONES E OVERLAY ────────────────────────────────────</span>
+    <span class="id">showVideoIcon</span>:    <span class="kw">true</span>,
+    <span class="id">showCarouselIcon</span>: <span class="kw">true</span>,
+    <span class="id">showHoverOverlay</span>: <span class="kw">true</span>,
+
+    <span class="cmt">// ── LIGHTBOX ────────────────────────────────────────────</span>
+    <span class="id">showLightbox</span>:      <span class="kw">true</span>,
+    <span class="id">lightboxImageSize</span>: <span class="str">'large'</span>,
+    <span class="id">lightboxLinkText</span>:  <span class="str">'Ver no Instagram'</span>,
+
+    <span class="cmt">// ── TEXTOS ──────────────────────────────────────────────</span>
+    <span class="id">loadingText</span>: <span class="str">'Carregando feed...'</span>,
+    <span class="id">errorText</span>:   <span class="str">'Não foi possível carregar o feed.'</span>,
+    <span class="id">emptyText</span>:   <span class="str">'Nenhum post encontrado.'</span>,
+
+    <span class="cmt">// ── CORES (todas opcionais) ──────────────────────────────</span>
+    <span class="id">colors</span>: {
+        <span class="id">sectionBackground</span>: <span class="str">'transparent'</span>,
+        <span class="id">headerText</span>:        <span class="str">'#262626'</span>,
+        <span class="id">headerSubText</span>:     <span class="str">'#737373'</span>,
+        <span class="id">followButton</span>:      <span class="str">'#0095f6'</span>,
+        <span class="id">followButtonText</span>:  <span class="str">'#ffffff'</span>,
+        <span class="id">postOverlay</span>:       <span class="str">'rgba(0,0,0,0.5)'</span>,
+        <span class="id">lightboxOverlay</span>:   <span class="str">'rgba(0,0,0,0.85)'</span>,
+        <span class="id">iconColor</span>:         <span class="str">'#ffffff'</span>,
+        <span class="cmt">// ... todos os tokens em resources/instagram_box_feed.js → DEFAULT_CONFIG.colors</span>
+    },
+};</pre>
+        </div>
+
+        <!-- ================================================
+             DIFERENÇAS vs BEHOLD
+             ================================================ -->
+        <div class="demo-section">
+            <h2>Behold.so vs API Direta — comparativo</h2>
+            <p>Escolha a fonte de dados de acordo com o seu cenário:</p>
+
+            <pre>
+<span class="cmt">┌──────────────────────┬──────────────────────┬──────────────────────┐</span>
+<span class="cmt">│                      │      Behold.so        │   Instagram direto   │</span>
+<span class="cmt">├──────────────────────┼──────────────────────┼──────────────────────┤</span>
+<span class="cmt">│ Token expira?        │ Não                  │ Sim (60 dias)        │</span>
+<span class="cmt">│ URLs de imagem       │ CDN estável (Behold)  │ CDN do Instagram*    │</span>
+<span class="cmt">│ Bio / website        │ Sim                  │ Não (Basic Display)  │</span>
+<span class="cmt">│ Reqs HTTP p/ carga   │ 1                    │ 2 (perfil + mídia)   │</span>
+<span class="cmt">│ Custo                │ Plano gratuito lim.  │ Grátis (API)         │</span>
+<span class="cmt">│ Dependência externa  │ Behold.so            │ Nenhuma              │</span>
+<span class="cmt">│ Necessita servidor?  │ Não                  │ Para refresh do token│</span>
+<span class="cmt">└──────────────────────┴──────────────────────┴──────────────────────┘</span>
+
+<span class="cmt">* URLs de mídia da API do Instagram expiram após alguns dias.
+  Para cachê-las de forma permanente, sirva-as via proxy server-side.</span></pre>
+        </div>
+
+    </div>
+
+    <!-- ================================================
+         CONFIGURAÇÃO INICIAL DO PLUGIN
+         O feed inicia em modo 'behold' sem feedUrl para ficar em
+         espera silenciosa até o usuário fornecer o token.
+         ================================================ -->
+    <script>
+        window.InstagramFeedConfig = {
+            dataSource:       'instagram',  // inicia pedindo o token (estado de espera)
+            accessToken:      'IGAASEGIBk1D9BZAFlWeS1NbWhZAb1g0SEhCNFBHZAUZALT2sxVnNmV3NHMk1EcldwLTFmazRFT0g2MmRDWDNQbUJzUU1BMU9qbW9ocDl4a1hVaFdQT2wySFFMSzMzYTExU2lrQUJzZAmdIa2Nla2h4clpFMmdB',           // vazio → plugin exibe prompt de configuração
+            insertSelector:   '#ig-feed-demo',
+            insertMethod:     'beforeend',
+            showHeader:       true,
+            showHoverOverlay: true,
+            columns:          { desktop: 6, tablet: 3, mobile: 2 },
+            imageSize:        'medium',
+            lightboxImageSize:'large',
+            followButtonText: 'Seguir',
+            errorText:        'Não foi possível carregar o feed. Verifique o token e tente novamente.',
+        };
+    </script>
+    <script src="resources/instagram_box_feed.js"></script>
+
+    <!-- ================================================
+         LÓGICA DO BOTÃO — usa updateConfig() que atualiza o CONFIG
+         interno do plugin e chama reinit() automaticamente.
+         ================================================ -->
+    <script>
+        function carregarFeed() {
+            const token = document.getElementById('token-input').value.trim();
+
+            if (!token) {
+                alert('Cole seu Long-Lived Access Token no campo acima antes de carregar o feed.');
+                return;
+            }
+
+            if (!window.InstagramFeed) {
+                alert('Plugin não inicializado. Recarregue a página.');
+                return;
+            }
+
+            // updateConfig() faz Object.assign(CONFIG, ...) internamente e chama reinit()
+            window.InstagramFeed.updateConfig({
+                dataSource:  'instagram',
+                accessToken: token,
+            });
+        }
+    </script>
+
+</body>
+</html>
