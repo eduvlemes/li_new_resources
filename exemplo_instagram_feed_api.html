@@ -391,13 +391,14 @@ GET https://graph.instagram.com/refresh_access_token
             showHeader:       true,
             showHoverOverlay: true,
             columns:          { desktop: 6, tablet: 3, mobile: 2 },
+            maxPosts: 6,
             imageSize:        'medium',
             lightboxImageSize:'large',
             followButtonText: 'Seguir',
             errorText:        'Não foi possível carregar o feed. Verifique o token e tente novamente.',
         };
     </script>
-    <script src="resources/instagram_box_feed.js"></script>
+    <script src="resources/instagram_box_feed_tk.js"></script>
 
     <!-- ================================================
          LÓGICA DO BOTÃO — usa updateConfig() que atualiza o CONFIG

@@ -78,6 +78,9 @@
         },
         gap: '3px',
 
+        // Número máximo de posts a exibir no grid (0 = sem limite)
+        maxPosts: 6,
+
         // Tamanho das imagens no grid: 'small' | 'medium' | 'large' | 'full'
         imageSize: 'medium',
 
@@ -993,7 +996,8 @@
                 return;
             }
 
-            gridEl.innerHTML = posts.map((item) => this._buildPostCard(item)).join('');
+            const displayPosts = CONFIG.maxPosts > 0 ? posts.slice(0, CONFIG.maxPosts) : posts;
+            gridEl.innerHTML = displayPosts.map((item) => this._buildPostCard(item)).join('');
 
             if (CONFIG.showLightbox) {
                 gridEl.querySelectorAll('.ig-feed-post').forEach((el) => {
