@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo — stripe Select Dinâmica</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .demo-wrapper {
+            max-width: 860px;
+            margin: 48px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+
+        p.subtitle {
+            color: #6b7280;
+            margin-bottom: 36px;
+            font-size: 15px;
+        }
+
+        /* ── Cards de exemplo ─────────────────────────────── */
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin-bottom: 16px;
+        }
+
+        .config-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .config-card h2 {
+            font-size: 17px;
+            margin-bottom: 12px;
+            color: #111827;
+        }
+
+        .config-card pre {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            color: #374151;
+        }
+
+        /* ── API Buttons ──────────────────────────────────── */
+        .api-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .api-btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .api-btn:hover { opacity: 0.85; }
+
+        .btn-blue   { background: #3b82f6; color: #fff; }
+        .btn-orange { background: #f97316; color: #fff; }
+        .btn-green  { background: #10b981; color: #fff; }
+        .btn-red    { background: #ef4444; color: #fff; }
+        .btn-gray   { background: #6b7280; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!--
+        ══════════════════════════════════════════════════════════
+        CONFIGURAÇÃO PERSONALIZADA (opcional)
+        Defina ANTES de carregar o script.
+        Remova ou comente este bloco para usar os valores padrão.
+        ══════════════════════════════════════════════════════════
+    -->
+    <script>
+        window.stripeSelectConfig = {
+            active: true,
+            position: 'top',                         // 'top' ou 'bottom'
+            defaultText: 'Selecione sua região para ver a condição de frete',
+            selectPlaceholder: 'Sua região ▾',
+
+            // Cada item: valor do select, rótulo exibido e texto HTML da stripe
+            items: [
+                {
+                    value: 'sul',
+                    label: 'Sul',
+                    text: 'Adicione <b>R$ 300,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
+                },
+                {
+                    value: 'sudeste',
+                    label: 'Sudeste',
+                    text: 'Adicione <b>R$ 200,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
+                },
+                {
+                    value: 'centro-oeste',
+                    label: 'Centro-Oeste',
+                    text: 'Adicione <b>R$ 250,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
+                },
+                {
+                    value: 'nordeste',
+                    label: 'Nordeste',
+                    text: 'Adicione <b>R$ 300,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
+                },
+                {
+                    value: 'norte',
+                    label: 'Norte',
+                    text: 'Adicione <b>R$ 300,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
+                }
+            ],
+
+            defaultSelected: 'sul',   // opção pré-selecionada ao carregar
+
+            storageKey: 'stripe_select_value',
+            useLocalStorage: true,
+
+            colors: {
+                background: '#208d58',
+                text: '#ffffff',
+                selectBackground: 'rgba(0,0,0,0.25)',
+                selectText: '#ffffff',
+                selectBorder: 'rgba(255,255,255,0.35)',
+                selectArrow: '#ffffff'
+            }
+        };
+    </script>
+
+    <!-- Plugin -->
+    <script src="resources/stripe_select.js"></script>
+
+    <!-- ── Conteúdo de demonstração ─────────────────────── -->
+    <div class="demo-wrapper">
+
+        <h1>stripe Select Dinâmica</h1>
+        <p class="subtitle">
+            A barra no topo muda de texto de acordo com a região selecionada no menu dropdown.
+            A seleção é persistida via <code>localStorage</code> e restaurada automaticamente.
+        </p>
+
+        <!-- Configuração básica -->
+        <p class="section-title">Exemplo de configuração</p>
+        <div class="config-card">
+            <h2>window.stripeSelectConfig</h2>
+            <pre><code>&lt;script&gt;
+window.stripeSelectConfig = {
+    active: true,
+    position: 'top',            // 'top' ou 'bottom'
+    defaultText: 'Selecione sua região para ver a condição de frete',
+    selectPlaceholder: 'Sua região ▾',
+
+    items: [
+        {
+            value: 'sao-paulo',
+            label: 'São Paulo',
+            text: 'Adicione &lt;b&gt;R$ 99,99&lt;/b&gt; ao carrinho para ter &lt;b&gt;FRETE GRÁTIS&lt;/b&gt;'
+        },
+        {
+            value: 'outros',
+            label: 'Outros estados',
+            text: 'Frete calculado no checkout'
+        }
+        // ... adicione quantas regiões precisar
+    ],
+
+    useLocalStorage: true,      // salva a seleção do usuário
+
+    colors: {
+        background: '#1a4a7a',
+        text: '#ffffff',
+        selectBackground: 'rgba(0,0,0,0.25)',
+        selectText: '#ffffff',
+        selectBorder: 'rgba(255,255,255,0.35)',
+        selectArrow: '#ffffff'
+    }
+};
+&lt;/script&gt;
+&lt;script src="resources/stripe_select.js"&gt;&lt;/script&gt;</code></pre>
+        </div>
+
+        <!-- API pública -->
+        <p class="section-title">API Pública</p>
+        <div class="config-card">
+            <h2>Controle via JavaScript</h2>
+            <p style="font-size:14px; color:#6b7280; margin-bottom:16px;">
+                Após a inicialização, o plugin fica disponível em <code>window.stripeSelectDinamica</code>.
+            </p>
+            <div class="api-row">
+                <button class="api-btn btn-blue"
+                    onclick="window.stripeSelectDinamica.select('sul')">
+                    Selecionar: Sul
+                </button>
+                <button class="api-btn btn-blue"
+                    onclick="window.stripeSelectDinamica.select('sudeste')">
+                    Selecionar: Sudeste
+                </button>
+                <button class="api-btn btn-blue"
+                    onclick="window.stripeSelectDinamica.select('centro-oeste')">
+                    Selecionar: Centro-Oeste
+                </button>
+                <button class="api-btn btn-orange"
+                    onclick="window.stripeSelectDinamica.select('nordeste')">
+                    Selecionar: Nordeste
+                </button>
+                <button class="api-btn btn-orange"
+                    onclick="window.stripeSelectDinamica.select('norte')">
+                    Selecionar: Norte
+                </button>
+                <button class="api-btn btn-gray"
+                    onclick="window.stripeSelectDinamica.reset()">
+                    Resetar seleção
+                </button>
+                <button class="api-btn btn-red"
+                    onclick="window.stripeSelectDinamica.destroy()">
+                    Destruir plugin
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
