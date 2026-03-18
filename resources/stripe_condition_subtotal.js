@@ -52,6 +52,9 @@
         // Persistência: salva a última seleção do usuário
         storageKey: 'stripe_select_value',
         useLocalStorage: true, // true = persiste entre sessões, false = apenas na sessão atual
+        mobileBreakpoint: 768, // px — abaixo deste valor usa textMobile (se definido no item)
+        // Texto exibido quando o valor do carrinho já atingiu o mínimo para frete grátis
+        successText: 'PARABÉNS! Você ganhou <b>FRETE GRÁTIS</b>',
 
         // CORES E ESTILOS
         colors: {
@@ -207,14 +210,56 @@
         </style>
     `;
 
+    // Lê o total do carrinho do sessionStorage (key: 'carrinho_minicart' → totals.pciTotal)
+    function getCartTotal() {
+        try {
+            const raw = sessionStorage.getItem('carrinho_minicart');
+            if (!raw) return 0;
+            const data = JSON.parse(raw);
+            const total = parseFloat(data && data.totals && data.totals.pciTotal);
+            return isNaN(total) ? 0 : total;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    function formatCurrency(value) {
+        return 'R$\u00a0' + value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function buildOptionsHTML() {
+        const hasGroups = CONFIG.items.some(item => item.group);
+
+        if (!hasGroups) {
+            return CONFIG.items
+                .map(item => `<option value="${escapeAttr(item.value)}">${escapeAttr(item.label)}</option>`)
+                .join('\n');
+        }
+
+        let html = '';
+        let currentGroup = null;
+
+        CONFIG.items.forEach(item => {
+            const itemGroup = item.group || null;
+            if (itemGroup !== currentGroup) {
+                if (currentGroup !== null) html += '</optgroup>';
+                if (itemGroup) html += `<optgroup label="${escapeAttr(itemGroup)}">`;
+                currentGroup = itemGroup;
+            }
+            html += `<option value="${escapeAttr(item.value)}">${escapeAttr(item.label)}</option>`;
+        });
+
+        if (currentGroup !== null) html += '</optgroup>';
+
+        return html;
+    }
+
     function buildHTMLTemplate() {
         const positionClass = CONFIG.position === 'bottom'
             ? 'stripe-position-bottom'
             : 'stripe-position-top';
 
-        const optionsHTML = CONFIG.items
-            .map(item => `<option value="${escapeAttr(item.value)}">${escapeAttr(item.label)}</option>`)
-            .join('\n                    ');
+        const optionsHTML = buildOptionsHTML();
 
         return `
         <div id="stripe-select-container" class="${positionClass}">
@@ -246,6 +291,8 @@
         constructor() {
             this.textEl = null;
             this.selectEl = null;
+            this.currentItem = null;
+            this._resizeHandler = null;
             this.init();
         }
 
@@ -275,6 +322,22 @@
             this.selectEl = document.getElementById('stripe-select-dropdown');
         }
 
+        isMobile() {
+            return window.innerWidth <= CONFIG.mobileBreakpoint;
+        }
+
+        buildItemText(item) {
+            if (item.freeShippingMin != null) {
+                const cartTotal = getCartTotal();
+                const remaining = item.freeShippingMin - cartTotal;
+                if (remaining <= 0) {
+                    return CONFIG.successText;
+                }
+                return `Adicione <b>${formatCurrency(remaining)}</b> ao carrinho para ter <b>FRETE GR\u00c1TIS</b>`;
+            }
+            return (this.isMobile() && item.textMobile) ? item.textMobile : item.text;
+        }
+
         restoreSelection() {
             let resolved = null;
 
@@ -294,8 +357,9 @@
             }
 
             if (resolved) {
+                this.currentItem = resolved;
                 this.selectEl.value = resolved.value;
-                this.updateText(resolved.text, false);
+                this.updateText(this.buildItemText(resolved), false);
             }
         }
 
@@ -307,10 +371,22 @@
                 const match = CONFIG.items.find(item => item.value === selectedValue);
 
                 if (match) {
-                    this.updateText(match.text, true);
+                    this.currentItem = match;
+                    this.updateText(this.buildItemText(match), true);
                     this.saveSelection(selectedValue);
                 }
             });
+
+            // Atualiza o texto ao cruzar o breakpoint mobile/desktop
+            let lastMobile = this.isMobile();
+            this._resizeHandler = () => {
+                const nowMobile = this.isMobile();
+                if (nowMobile !== lastMobile && this.currentItem) {
+                    lastMobile = nowMobile;
+                    this.updateText(this.buildItemText(this.currentItem), false);
+                }
+            };
+            window.addEventListener('resize', this._resizeHandler);
         }
 
         updateText(html, animate) {
@@ -347,9 +423,20 @@
         select(value) {
             const match = CONFIG.items.find(item => item.value === value);
             if (!match || !this.selectEl) return;
+            this.currentItem = match;
             this.selectEl.value = value;
-            this.updateText(match.text, true);
+            this.updateText(this.buildItemText(match), true);
             this.saveSelection(value);
+        }
+
+        /**
+         * Recalcula e atualiza o texto da tarja com base no carrinho atual.
+         * Útil para chamar após o usuário adicionar itens ao carrinho.
+         */
+        refresh() {
+            if (this.currentItem) {
+                this.updateText(this.buildItemText(this.currentItem), false);
+            }
         }
 
         /**
@@ -371,6 +458,10 @@
          * Remove completamente o plugin do DOM
          */
         destroy() {
+            if (this._resizeHandler) {
+                window.removeEventListener('resize', this._resizeHandler);
+            }
+
             const container = document.getElementById('stripe-select-container');
             if (container) container.remove();
 

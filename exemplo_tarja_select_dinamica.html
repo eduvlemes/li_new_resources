@@ -108,36 +108,45 @@
             defaultText: 'Selecione sua região para ver a condição de frete',
             selectPlaceholder: 'Sua região ▾',
 
-            // Cada item: valor do select, rótulo exibido e texto HTML da stripe
+            // Cada item: value (interno), label (select), freeShippingMin (valor mínimo para frete grátis)
+            // O plugin lê carrinho_minicart.totals.pciTotal do sessionStorage e calcula o restante automaticamente
+            // group: agrupa os estados em <optgroup> no select
             items: [
-                {
-                    value: 'sul',
-                    label: 'Sul',
-                    text: 'Adicione <b>R$ 300,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
-                },
-                {
-                    value: 'sudeste',
-                    label: 'Sudeste',
-                    text: 'Adicione <b>R$ 200,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
-                },
-                {
-                    value: 'centro-oeste',
-                    label: 'Centro-Oeste',
-                    text: 'Adicione <b>R$ 250,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
-                },
-                {
-                    value: 'nordeste',
-                    label: 'Nordeste',
-                    text: 'Adicione <b>R$ 300,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
-                },
-                {
-                    value: 'norte',
-                    label: 'Norte',
-                    text: 'Adicione <b>R$ 300,00</b> ao carrinho para ter <b>FRETE GRÁTIS</b>'
-                }
+                // Sul — R$ 300,00
+                { group: 'Sul', value: 'pr', label: 'Paraná',               freeShippingMin: 300 },
+                { group: 'Sul', value: 'sc', label: 'Santa Catarina',       freeShippingMin: 300 },
+                { group: 'Sul', value: 'rs', label: 'Rio Grande do Sul',    freeShippingMin: 300 },
+                // Sudeste — R$ 200,00
+                { group: 'Sudeste', value: 'sp', label: 'São Paulo',        freeShippingMin: 200 },
+                { group: 'Sudeste', value: 'rj', label: 'Rio de Janeiro',   freeShippingMin: 200 },
+                { group: 'Sudeste', value: 'mg', label: 'Minas Gerais',     freeShippingMin: 200 },
+                { group: 'Sudeste', value: 'es', label: 'Espírito Santo',   freeShippingMin: 200 },
+                // Centro-Oeste — R$ 250,00
+                { group: 'Centro-Oeste', value: 'df', label: 'Distrito Federal',   freeShippingMin: 250 },
+                { group: 'Centro-Oeste', value: 'go', label: 'Goiás',              freeShippingMin: 250 },
+                { group: 'Centro-Oeste', value: 'mt', label: 'Mato Grosso',        freeShippingMin: 250 },
+                { group: 'Centro-Oeste', value: 'ms', label: 'Mato Grosso do Sul', freeShippingMin: 250 },
+                // Nordeste — R$ 300,00
+                { group: 'Nordeste', value: 'al', label: 'Alagoas',             freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'ba', label: 'Bahia',               freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'ce', label: 'Ceará',               freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'ma', label: 'Maranhão',            freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'pb', label: 'Paraíba',             freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'pe', label: 'Pernambuco',          freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'pi', label: 'Piauí',               freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'rn', label: 'Rio Grande do Norte', freeShippingMin: 300 },
+                { group: 'Nordeste', value: 'se', label: 'Sergipe',             freeShippingMin: 300 },
+                // Norte — R$ 300,00
+                { group: 'Norte', value: 'ac', label: 'Acre',        freeShippingMin: 300 },
+                { group: 'Norte', value: 'am', label: 'Amazonas',    freeShippingMin: 300 },
+                { group: 'Norte', value: 'ap', label: 'Amapá',       freeShippingMin: 300 },
+                { group: 'Norte', value: 'pa', label: 'Pará',        freeShippingMin: 300 },
+                { group: 'Norte', value: 'ro', label: 'Rondônia',    freeShippingMin: 300 },
+                { group: 'Norte', value: 'rr', label: 'Roraima',     freeShippingMin: 300 },
+                { group: 'Norte', value: 'to', label: 'Tocantins',   freeShippingMin: 300 }
             ],
 
-            defaultSelected: 'sul',   // opção pré-selecionada ao carregar
+            defaultSelected: 'sp',   // opção pré-selecionada ao carregar
 
             storageKey: 'stripe_select_value',
             useLocalStorage: true,
@@ -214,24 +223,24 @@ window.stripeSelectConfig = {
             </p>
             <div class="api-row">
                 <button class="api-btn btn-blue"
-                    onclick="window.stripeSelectDinamica.select('sul')">
-                    Selecionar: Sul
+                    onclick="window.stripeSelectDinamica.select('rs')">
+                    Sul (RS)
                 </button>
                 <button class="api-btn btn-blue"
-                    onclick="window.stripeSelectDinamica.select('sudeste')">
-                    Selecionar: Sudeste
+                    onclick="window.stripeSelectDinamica.select('sp')">
+                    Sudeste (SP)
                 </button>
                 <button class="api-btn btn-blue"
-                    onclick="window.stripeSelectDinamica.select('centro-oeste')">
-                    Selecionar: Centro-Oeste
+                    onclick="window.stripeSelectDinamica.select('go')">
+                    Centro-Oeste (GO)
                 </button>
                 <button class="api-btn btn-orange"
-                    onclick="window.stripeSelectDinamica.select('nordeste')">
-                    Selecionar: Nordeste
+                    onclick="window.stripeSelectDinamica.select('ba')">
+                    Nordeste (BA)
                 </button>
                 <button class="api-btn btn-orange"
-                    onclick="window.stripeSelectDinamica.select('norte')">
-                    Selecionar: Norte
+                    onclick="window.stripeSelectDinamica.select('am')">
+                    Norte (AM)
                 </button>
                 <button class="api-btn btn-gray"
                     onclick="window.stripeSelectDinamica.reset()">
