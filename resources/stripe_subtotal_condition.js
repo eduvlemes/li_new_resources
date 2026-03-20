@@ -178,14 +178,6 @@
                 font-family: inherit;
             }
 
-            .stripe-select-dropdown option {
-                background: #1a1a2e;
-                color: #ffffff;
-            }
-
-            .stripe-select-dropdown:focus {
-                border-color: rgba(255,255,255,0.7);
-            }
 
             /* Responsivo */
             @media (max-width: 768px) {
