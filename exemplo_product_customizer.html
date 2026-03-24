@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Customizer - Exemplo de Uso</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f1f5f9;
+        }
+
+        .container { max-width: 920px; margin: 0 auto; padding: 20px; }
+
+        header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        header h1 { font-size: 2.4em; margin-bottom: 8px; }
+        header p  { font-size: 1.1em; opacity: 0.85; }
+
+        .demo-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+        .demo-section h2 { color: #1f2937; margin-bottom: 8px; font-size: 1.25em; }
+        .demo-section > p { color: #6b7280; margin-bottom: 20px; font-size: 0.95em; }
+
+        /* ---- Layout de produtos ---- */
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 640px) { .produtos-grid { grid-template-columns: 1fr; } }
+
+        .produto-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .produto-imagem {
+            height: 160px;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+
+        .produto-body { padding: 18px; }
+        .produto-body h3 { font-size: 1.1em; color: #1f2937; margin-bottom: 4px; }
+        .produto-body .preco { font-size: 1.4em; font-weight: 700; color: #2563eb; margin-bottom: 8px; }
+        .produto-body p { color: #6b7280; font-size: 0.88em; margin-bottom: 16px; }
+
+        /* Botões estilo Aw Loja */
+        .acoes-produto { display: flex; gap: 8px; }
+
+        .botao {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .botao:active { transform: scale(0.97); }
+        .botao-comprar  { background: #2563eb; color: #fff; flex: 1; }
+        .botao-comprar:hover { background: #1d4ed8; }
+
+        /* ---- Storage viewer ---- */
+        .storage-viewer {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #334155;
+            min-height: 64px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .storage-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        .refresh-btn {
+            margin-top: 10px;
+            padding: 7px 16px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .refresh-btn:hover { background: #cbd5e1; }
+
+        /* ---- Code blocks ---- */
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        code { font-family: 'Courier New', monospace; }
+
+        .badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 99px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 99px;
+            margin: 2px;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        footer {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+            padding: 32px 0 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🎨 Product Customizer</h1>
+    <p>Modal de personalização de produto com múltiplos tipos de campo e persistência no sessionStorage</p>
+</header>
+
+<div class="container">
+
+    <!-- =====================================================
+         DEMO — Produtos com personalização
+    ====================================================== -->
+    <div class="demo-section">
+        <span class="badge">Demo ao vivo</span>
+        <h2>Produtos personalizáveis</h2>
+        <p>
+            Clique em <strong>Comprar</strong> em qualquer produto. O modal de personalização será exibido.
+            Ao confirmar, os dados são salvos no sessionStorage com a chave <code>[produto-id]_properties</code>
+            e o clique no botão prossegue normalmente.
+        </p>
+
+        <div class="produtos-grid">
+            <div class="produto-card">
+                <div class="produto-imagem">🖼️</div>
+                <div class="produto-body">
+                    <h3>Caneca Personalizada</h3>
+                    <div class="preco">R$ 49,90</div>
+                    <p>Caneca 325ml com gravação personalizada em alta qualidade.</p>
+                    <div class="acoes-produto" data-produto-id="1001">
+                        <button class="botao botao-comprar principal">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="produto-card">
+                <div class="produto-imagem">👕</div>
+                <div class="produto-body">
+                    <h3>Camiseta Estampada</h3>
+                    <div class="preco">R$ 89,90</div>
+                    <p>Camiseta 100% algodão com estampa customizável.</p>
+                    <div class="acoes-produto" data-produto-id="2002">
+                        <button class="botao botao-comprar principal">Comprar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         VISUALIZADOR DE sessionStorage
+    ====================================================== -->
+    <div class="demo-section">
+        <span class="badge">sessionStorage</span>
+        <h2>Dados salvos</h2>
+        <p>Após confirmar no modal, os campos ficam disponíveis no sessionStorage para uso no checkout.</p>
+        <div class="storage-label">sessionStorage — chaves do personalizador</div>
+        <div class="storage-viewer" id="storage-viewer">Clique em "Comprar" e confirme o modal para ver os dados aqui.</div>
+        <button class="refresh-btn" onclick="refreshStorage()">↻ Atualizar</button>
+    </div>
+
+    <!-- =====================================================
+         TIPOS DE CAMPO SUPORTADOS
+    ====================================================== -->
+    <div class="demo-section">
+        <h2>Tipos de campo suportados</h2>
+        <p>Configure o array <code>fields</code> com qualquer combinação dos tipos abaixo:</p>
+
+        <div class="grid-2" style="margin-top:12px;">
+            <div>
+                <strong>Campos de texto</strong><br style="margin-bottom:8px;">
+                <span class="tag">text</span>
+                <span class="tag">textarea</span>
+                <span class="tag">number</span>
+                <span class="tag">email</span>
+                <span class="tag">tel</span>
+            </div>
+            <div>
+                <strong>Campos de seleção</strong><br style="margin-bottom:8px;">
+                <span class="tag">select</span>
+                <span class="tag">radio</span>
+                <span class="tag">checkbox</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         COMO USAR
+    ====================================================== -->
+    <div class="demo-section">
+        <h2>Como usar</h2>
+        <p>
+            Defina <code>window.ProductCustomizerConfig</code> <strong>antes</strong> de carregar o script.
+            O plugin intercepta automaticamente qualquer botão com a classe <code>.botao.botao-comprar.principal</code>.
+        </p>
+
+        <pre><code>&lt;!-- 1. Configuração (definida antes do script) --&gt;
+&lt;script&gt;
+window.ProductCustomizerConfig = {
+    modalTitle: "Personalize seu produto",
+    modalSubtitle: "Preencha antes de adicionar ao carrinho.",
+    confirmButtonText: "Confirmar e adicionar",
+    cancelButtonText: "Cancelar",
+
+    // Prefixo opcional: chave final = storagePrefix + productId + "_properties"
+    storagePrefix: "",
+
+    fields: [
+        // Texto simples
+        { id: "nome",     label: "Nome para gravação",   type: "text",     required: true,  placeholder: "Ex: João da Silva" },
+
+        // Área de texto
+        { id: "mensagem", label: "Mensagem especial",    type: "textarea", required: false, placeholder: "Mensagem opcional" },
+
+        // Lista suspensa
+        { id: "tamanho",  label: "Tamanho",              type: "select",   required: true,
+          options: ["P", "M", "G", "GG"]
+          // ou: options: [{ value: "p", label: "Pequeno" }, ...]
+        },
+
+        // Escolha única (radio)
+        { id: "cor",      label: "Cor preferida",        type: "radio",    required: true,
+          options: [{ value: "preto", label: "Preto" }, { value: "branco", label: "Branco" }]
+        },
+
+        // Múltipla escolha (checkbox)
+        { id: "extras",   label: "Adicionais",           type: "checkbox", required: false,
+          options: ["Embalagem presente", "Cartão personalizado"]
+        },
+
+        // Checkbox único (aceite)
+        { id: "aceite",   label: "Confirmação",          type: "checkbox", required: true,
+          placeholder: "Confirmo que revisei as informações",
+          errorMessage: "Você precisa confirmar antes de continuar."
+        }
+    ],
+
+    colors: {
+        confirmBackground: "#2563eb",
+        confirmHover: "#1d4ed8"
+    }
+};
+&lt;/script&gt;
+
+&lt;!-- 2. Script do plugin --&gt;
+&lt;script src="resources/product_customizer.js"&gt;&lt;/script&gt;
+
+&lt;!-- 3. Estrutura HTML esperada na página de produto --&gt;
+&lt;div class="acoes-produto" data-produto-id="123"&gt;
+    &lt;button class="botao botao-comprar principal"&gt;Comprar&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+
+    <!-- =====================================================
+         API PÚBLICA
+    ====================================================== -->
+    <div class="demo-section">
+        <h2>API pública — <code>window.ProductCustomizer</code></h2>
+
+        <pre><code>// Abre o modal manualmente
+window.ProductCustomizer.open();
+
+// Fecha o modal
+window.ProductCustomizer.close();
+
+// Ativa ou desativa o plugin sem removê-lo
+window.ProductCustomizer.updateConfig({ active: false });
+
+// Remove o plugin do DOM
+window.ProductCustomizer.destroy();
+
+// Reinicializa o plugin
+window.ProductCustomizer.reinit();
+
+// Lendo os dados salvos no sessionStorage:
+const dados = JSON.parse(sessionStorage.getItem("1001_properties"));
+// Retorno exemplo:
+// {
+//   nome: "Maria Souza",
+//   tamanho: "M",
+//   cor: "preto",
+//   extras: ["Embalagem presente"],
+//   aceite: true
+// }</code></pre>
+    </div>
+
+</div>
+
+<footer>Product Customizer — Plugin JavaScript</footer>
+
+<!-- =====================================================
+     CONFIGURAÇÃO DO PLUGIN
+     Deve ser definida ANTES de carregar o script
+====================================================== -->
+<script>
+    window.ProductCustomizerConfig = {
+        modalTitle: "Personalize seu produto",
+        modalSubtitle: "Preencha as informações abaixo antes de adicionar ao carrinho.",
+        confirmButtonText: "Confirmar e adicionar",
+        cancelButtonText: "Cancelar",
+
+        fields: [
+           
+            {
+                id: "tamanho_calca",
+                label: "Qual seu tamanho de calça jeans habitual?",
+                type: "select",
+                required: false,
+                options: ["34","36","38","40","42","44","46","48","50","52","54","56","Outras"]
+            },
+            {
+                id: "tamanho_sutia_camisa",
+                label: "Qual o tamanho de sutiã, ou camisa habitual?",
+                type: "select",
+                required: false,
+                options: ["PP","P","M","G","GG","EXG","Outro"]
+            },
+            {
+                id: "altura",
+                label: "Qual sua altura aproximada?",
+                type: "text",
+                required: false,
+                placeholder: "Ex: 1,65m"
+            },
+            {
+                id: "peso",
+                label: "Qual seu peso aproximado?",
+                type: "text",
+                required: false,
+                placeholder: "Ex: 65kg"
+            },
+            {
+                id: "dificuldade_compra",
+                label: "Você tem alguma dificuldade ao comprar roupas?",
+                type: "radio",
+                required: false,
+                options: [
+                    { value: "sim", label: "Sim" },
+                    { value: "nao", label: "Não" }
+                ]
+            },
+            {
+                id: "tipo_dificuldade",
+                label: "Se sim, escolha uma ou mais alternativa:",
+                type: "checkbox",
+                required: false,
+                showIf: { field: "dificuldade_compra", value: "sim" },
+                options: [
+                    "Tenho muito busto e pouco quadril.",
+                    "Tenho muito quadril e pouco busto.",
+                    "Tenho a cintura muito fina.",
+                    "Tenho as costas largas.",
+                    "Sou muito alta.",
+                    "Não tenho dificuldades.",
+                    "Outras."
+                ]
+            },
+            {
+                id: "outra_dificuldade",
+                label: "Caso tenha outra dificuldade, descreva abaixo:",
+                type: "textarea",
+                required: false,
+                showIf: { field: "tipo_dificuldade", values: ["Outras."] },
+                placeholder: "Descreva sua dificuldade..."
+            },
+           
+            {
+                id: "obs",
+                label: "Observação",
+                type: "textarea",
+                required: false,
+                placeholder: "Algum detalhe especial? (opcional)"
+            }
+        ],
+
+        colors: {
+            confirmBackground: "#2563eb",
+            confirmHover:      "#1d4ed8"
+        }
+    };
+</script>
+
+<script src="resources/product_customizer.js"></script>
+
+<script>
+    // ----------------------------------------------------------------
+    // Visualizador de sessionStorage
+    // ----------------------------------------------------------------
+    function refreshStorage() {
+        const viewer = document.getElementById('storage-viewer');
+        const keys   = Object.keys(sessionStorage).filter(k => k.endsWith('_properties'));
+
+        if (keys.length === 0) {
+            viewer.textContent = 'Nenhum dado salvo ainda. Clique em "Comprar" e confirme o modal.';
+            return;
+        }
+
+        viewer.textContent = keys.map(key => {
+            const data = JSON.parse(sessionStorage.getItem(key));
+            return '📦 Produto ID: ' + key.replace('_properties', '') + '\n' + JSON.stringify(data, null, 2);
+        }).join('\n\n─────────────────────────────────────\n\n');
+    }
+
+    // Atualiza o viewer automaticamente quando algo é salvo
+    const _origSetItem = sessionStorage.setItem.bind(sessionStorage);
+    sessionStorage.setItem = function (key, value) {
+        _origSetItem(key, value);
+        if (key.endsWith('_properties')) refreshStorage();
+    };
+</script>
+
+</body>
+</html>

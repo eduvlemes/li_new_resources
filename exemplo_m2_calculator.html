@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M2 Calculator - Calculadora por Metro Quadrado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f1f5f9;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 1.05em;
+            opacity: 0.85;
+        }
+
+        .demo-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+
+        .demo-section h2 {
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 1.25em;
+        }
+
+        .demo-section p {
+            color: #6b7280;
+            margin-bottom: 14px;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .demo-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .demo-section code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-right: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.18s;
+            font-family: inherit;
+        }
+
+        .btn-blue   { background: #3b82f6; color: #fff; }
+        .btn-blue:hover { background: #2563eb; }
+
+        .btn-green  { background: #10b981; color: #fff; }
+        .btn-green:hover { background: #059669; }
+
+        .btn-gray   { background: #6b7280; color: #fff; }
+        .btn-gray:hover { background: #4b5563; }
+
+        .btn-dark   { background: #1f2937; color: #fff; }
+        .btn-dark:hover { background: #374151; }
+
+        .log-box {
+            margin-top: 14px;
+            background: #0f172a;
+            color: #86efac;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            min-height: 48px;
+            max-height: 160px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .log-empty {
+            color: #475569;
+            font-style: italic;
+        }
+
+        pre.code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 18px;
+            font-size: 13px;
+            overflow-x: auto;
+            line-height: 1.65;
+            margin-top: 14px;
+        }
+
+        .product-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .product-card-img {
+            width: 100px;
+            height: 100px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            flex-shrink: 0;
+        }
+
+        .product-card-info {
+            flex: 1;
+        }
+
+        .product-card-info h3 {
+            font-size: 16px;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .product-card-info .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .product-card-info .price small {
+            font-size: 13px;
+            font-weight: 400;
+            color: #6b7280;
+        }
+
+        /* Âncora de inserção do plugin */
+        #plugin-anchor {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 14px;
+            background: #f9fafb;
+        }
+
+        #plugin-anchor-label {
+            font-size: 11px;
+            color: #9ca3af;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .config-table th {
+            background: #f3f4f6;
+            text-align: left;
+            padding: 8px 12px;
+            font-weight: 600;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .config-table td {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            vertical-align: top;
+        }
+
+        .config-table td:first-child {
+            font-family: 'Courier New', monospace;
+            color: #1d4ed8;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .config-table tr:nth-child(even) td {
+            background: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📐 M2 Calculator</h1>
+        <p>Calculadora de produtos vendidos por metro quadrado — define a quantidade correta no carrinho</p>
+    </header>
+
+    <div class="container">
+
+        <!-- ======================================================= -->
+        <!-- DEMONSTRAÇÃO AO VIVO                                    -->
+        <!-- ======================================================= -->
+        <div class="demo-section">
+            <h2>Plugin em ação</h2>
+            <p>
+                Simula uma página de produto. O ID do produto (<code>window.PRODUTO_ID</code>) está definido
+                como <code>399627934</code>, que corresponde à condição configurada abaixo.
+                O widget é inserido logo após o elemento com <code>id="plugin-anchor"</code>.
+            </p>
+
+            <!-- Simula o card do produto na loja -->
+            <div class="product-card">
+                <div class="product-card-img">🪟</div>
+                <div class="product-card-info">
+                    <h3>Película de Controle Solar</h3>
+                    <div class="price">
+                        <!-- O plugin lê o preço deste atributo: data-sell-price -->
+                        <span class="principal">
+                            <span data-sell-price="19.90">R$ 19,90</span>
+                        </span>
+                        <small>/ unidade</small>
+                    </div>
+                    <p style="font-size:13px; color:#6b7280;">
+                        Venda por metro quadrado. Informe as medidas da sua janela para calcular a quantidade exata.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Âncora onde o plugin será inserido -->
+            <div id="plugin-anchor">
+                <div id="plugin-anchor-label">↓ plugin renderizado aqui (afterend de #plugin-anchor) ↓</div>
+            </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- CONTROLES DA DEMO                                       -->
+        <!-- ======================================================= -->
+        <div class="demo-section">
+            <h2>Controles da Demo</h2>
+            <p>Interaja com a API pública do plugin via botões abaixo. Os resultados aparecem no log.</p>
+            <div class="button-group">
+                <button class="btn btn-blue" onclick="logMsg('Quantidade atual: ' + window.M2Calculator.getQuantity() + ' un.')">
+                    getQuantity()
+                </button>
+                <button class="btn btn-gray" onclick="window.M2Calculator.reinit(); logMsg('Plugin reinicializado.')">
+                    reinit()
+                </button>
+                <button class="btn btn-dark" onclick="window.M2Calculator.destroy(); logMsg('Plugin destruído. Use reinit() para restaurar.')">
+                    destroy()
+                </button>
+            </div>
+            <div class="log-box" id="log-box">
+                <span class="log-empty">// aguardando interação...</span>
+            </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- REFERÊNCIA DE CONFIGURAÇÃO                              -->
+        <!-- ======================================================= -->
+        <div class="demo-section">
+            <h2>Referência de configuração</h2>
+            <p>Todas as opções disponíveis no objeto <code>window.M2CalculatorConfig</code>:</p>
+
+            <table class="config-table">
+                <thead>
+                    <tr>
+                        <th>Propriedade</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>onQuantityCalculated</td>
+                        <td>Function</td>
+                        <td>Callback disparado ao confirmar as medidas. Recebe a quantidade (inteiro) como argumento. <strong>Principal ponto de integração com o carrinho.</strong></td>
+                    </tr>
+                    <tr>
+                        <td>products</td>
+                        <td>Array</td>
+                        <td>Lista de objetos de configuração por produto (ver detalhes abaixo).</td>
+                    </tr>
+                    <tr>
+                        <td>priceSelector</td>
+                        <td>String</td>
+                        <td>Seletor CSS do elemento que contém o preço unitário. Padrão: <code>.principal [data-sell-price]</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>priceAttribute</td>
+                        <td>String</td>
+                        <td>Atributo HTML do qual o preço é lido. Padrão: <code>data-sell-price</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>insertAfterSelector</td>
+                        <td>String</td>
+                        <td>Seletor CSS do elemento após o qual o widget será inserido. Se vazio, insere no final do <code>&lt;body&gt;</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>title</td>
+                        <td>String</td>
+                        <td>Título exibido no topo do widget.</td>
+                    </tr>
+                    <tr>
+                        <td>widthLabel / heightLabel</td>
+                        <td>String</td>
+                        <td>Rótulos dos campos de largura e altura.</td>
+                    </tr>
+                    <tr>
+                        <td>buttonText</td>
+                        <td>String</td>
+                        <td>Texto do botão de confirmação.</td>
+                    </tr>
+                    <tr>
+                        <td>colors</td>
+                        <td>Object</td>
+                        <td>Objeto de cores para personalizar a aparência. Merge parcial suportado.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="margin-top:16px;"><strong>Propriedades de cada objeto em <code>products[]</code>:</strong></p>
+            <table class="config-table">
+                <thead>
+                    <tr>
+                        <th>Propriedade</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>condition</td>
+                        <td>String</td>
+                        <td>Expressão JS avaliada em runtime. Ex: <code>"window.PRODUTO_ID == 399627934"</code>. Omita para ativar em qualquer página.</td>
+                    </tr>
+                    <tr>
+                        <td>quantityRatio</td>
+                        <td>Number</td>
+                        <td>Unidades por m². Ex: <code>1000</code> → 1,50 m² = 1500 unidades. Fórmula: <code>Math.ceil(largura × altura × quantityRatio)</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>quantityFormula</td>
+                        <td>Function</td>
+                        <td>Fórmula personalizada: <code>function(width, height) { return qty; }</code>. Substitui <code>quantityRatio</code> quando definida.</td>
+                    </tr>
+                    <tr>
+                        <td>minWidth / maxWidth</td>
+                        <td>Number</td>
+                        <td>Limites de largura em metros. Exibe erro de validação se ultrapassados.</td>
+                    </tr>
+                    <tr>
+                        <td>minHeight / maxHeight</td>
+                        <td>Number</td>
+                        <td>Limites de altura em metros. Exibe erro de validação se ultrapassados.</td>
+                    </tr>
+                    <tr>
+                        <td>widthStep</td>
+                        <td>Number</td>
+                        <td>Incremento do campo de largura (atributo <code>step</code> do input). Ex: <code>0.01</code>, <code>0.05</code>, <code>0.10</code>, <code>1</code>. Padrão: <code>0.01</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>heightStep</td>
+                        <td>Number</td>
+                        <td>Incremento do campo de altura (atributo <code>step</code> do input). Ex: <code>0.01</code>, <code>0.05</code>, <code>0.10</code>, <code>1</code>. Padrão: <code>0.01</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>priceSelector / priceAttribute</td>
+                        <td>String</td>
+                        <td>Sobrescreve os seletores de preço globais apenas para este produto.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- CÓDIGO DE IMPLEMENTAÇÃO                                 -->
+        <!-- ======================================================= -->
+        <div class="demo-section">
+            <h2>Código de implementação</h2>
+            <p>
+                Adicione o bloco abaixo na página do produto, <strong>antes</strong> de carregar o script.
+                Ajuste <code>condition</code>, <code>quantityRatio</code> e <code>onQuantityCalculated</code>
+                conforme a loja.
+            </p>
+<pre class="code-block">&lt;!-- 1. Configuração — inserir ANTES do script --&gt;
+&lt;script&gt;
+window.M2CalculatorConfig = {
+
+    // Callback disparado ao confirmar as medidas.
+    // Adapte para atualizar o campo de quantidade do seu tema.
+    onQuantityCalculated: function(quantity) {
+        var qtyInput = document.querySelector('[name="qty"]');
+        if (qtyInput) {
+            qtyInput.value = quantity;
+            qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    },
+
+    // Seletor do elemento após o qual o widget será inserido
+    insertAfterSelector: '#comprar',   // Ex: botão "Comprar"
+
+    // Seletor e atributo do preço unitário
+    priceSelector: '.principal [data-sell-price]',
+    priceAttribute: 'data-sell-price',
+
+    // Configuração por produto
+    products: [
+        {
+            condition: 'window.PRODUTO_ID == 399627934',
+            quantityRatio: 1000,   // 1 m² = 1000 unidades
+            minWidth:  0.10,
+            maxWidth:  5.00,
+            minHeight: 0.10,
+            maxHeight: 3.00,
+            widthStep:  0.01,      // incremento do input de largura
+            heightStep: 0.01,      // incremento do input de altura
+        },
+        {
+            condition: 'window.PRODUTO_ID == 112233445',
+            quantityRatio: 500,    // 1 m² = 500 unidades
+            minWidth:  0.20,
+            maxWidth: 10.00,
+            minHeight: 0.20,
+            maxHeight:  4.00,
+            widthStep:  0.05,
+            heightStep: 0.05,
+        },
+    ],
+
+    // Personalização visual (opcional — merge parcial)
+    colors: {
+        primary: '#2563eb',
+        primaryHover: '#1d4ed8',
+    },
+};
+&lt;/script&gt;
+
+&lt;!-- 2. Script do plugin --&gt;
+&lt;script src="resources/m2_calculator.js"&gt;&lt;/script&gt;</pre>
+
+            <p style="margin-top:16px;">
+                Para usar uma fórmula de quantidade customizada (ex: arredondamento diferente, múltiplos de caixa),
+                substitua <code>quantityRatio</code> por <code>quantityFormula</code>:
+            </p>
+<pre class="code-block">// Exemplo: arredondar para múltiplos de 50
+quantityFormula: function(width, height) {
+    var raw = width * height * 1000;
+    return Math.ceil(raw / 50) * 50;
+},</pre>
+        </div>
+
+    </div><!-- /container -->
+
+    <!-- ============================================ -->
+    <!-- IMPLEMENTAÇÃO DA DEMO                        -->
+    <!-- ============================================ -->
+
+    <!-- Simula o ID do produto na página (como a loja faria) -->
+    <script>
+        window.PRODUTO_ID = 399627934;
+    </script>
+
+    <!-- 1. Configuração do plugin -->
+    <script>
+        window.M2CalculatorConfig = {
+
+            // Callback: aqui você define o que acontece com a quantidade calculada
+            onQuantityCalculated: function (quantity) {
+                logMsg('✅ onQuantityCalculated chamado → quantidade: ' + quantity + ' un.');
+                // Exemplo real:
+                // document.querySelector('[name="qty"]').value = quantity;
+            },
+
+            // Inserir o widget logo após o elemento #plugin-anchor desta demo
+            insertAfterSelector: '#plugin-anchor',
+
+            // Preço lido do atributo data-sell-price do produto simulado acima
+            priceSelector: '[data-sell-price]',
+            priceAttribute: 'data-sell-price',
+
+            products: [
+                {
+                    condition: 'window.PRODUTO_ID == 399627934',
+                    quantityRatio: 1000,   // 1 m² = 1000 unidades
+                    minWidth:  0.10,
+                    maxWidth:  5.00,
+                    minHeight: 0.10,
+                    maxHeight: 3.00,
+                    widthStep:  0.01,
+                    heightStep: 0.01,
+                },
+            ],
+
+            colors: {
+                primary: '#2563eb',
+                primaryHover: '#1d4ed8',
+            },
+        };
+    </script>
+
+    <!-- 2. Carrega o plugin -->
+    <script src="resources/m2_calculator.js"></script>
+
+    <!-- Utilitário de log da demo -->
+    <script>
+        function logMsg(msg) {
+            var box = document.getElementById('log-box');
+            if (!box) return;
+            var now = new Date().toLocaleTimeString('pt-BR');
+            box.innerHTML = '[' + now + '] ' + msg + '\n' + box.innerHTML.replace('<span class="log-empty">// aguardando interação...</span>', '');
+        }
+    </script>
+
+</body>
+</html>

@@ -10,6 +10,35 @@
     productImageUrl: "https://cdn.awsli.com.br/380x380/1930/1930166/produto/191964467/caixapresente-4fgiyy9loh.jpg", 
     targetSelector: "#formularioCheckout > div > .span4:nth-child(1)",
 
+    onFormInput: function(e, plugin) {
+        if (e.target === plugin.messageInput) return;
+        if (!plugin.messageInput || !plugin.messageInput.value) return;
+        var obsField = document.querySelector("[name='cliente_obs']");
+        if (!obsField || e.target === obsField) return;
+        setTimeout(function() {
+            var marker = '\n===========\nMensagem cartão: ';
+            var currentVal = obsField.value || '';
+            if (currentVal.indexOf(marker + plugin.messageInput.value) !== -1) return;
+            var markerIdx = currentVal.indexOf(marker);
+            var base = markerIdx !== -1 ? currentVal.substring(0, markerIdx) : currentVal;
+            var nativeSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
+            nativeSetter.call(obsField, base + marker + plugin.messageInput.value);
+        }, 1000);
+    },
+
+    onCardMessageChange: function(message, plugin) {
+        var field = document.querySelector("[name='cliente_obs']");
+        if (!field) return;
+        var marker = '\n===========\nMensagem cartão: ';
+        var currentVal = field.value || '';
+        var markerIdx = currentVal.indexOf(marker);
+        var base = markerIdx !== -1 ? currentVal.substring(0, markerIdx) : currentVal;
+        var newVal = message ? base + marker + message : base;
+        // Setter nativo sem dispatchEvent — React não re-renderiza, valor fica
+        var nativeSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
+        nativeSetter.call(field, newVal);
+    },
+
     colors: {
         cardBackground: "#ffffff",
         cardBorder: "#e5e7eb",
@@ -55,6 +84,7 @@
         addButtonText: "Adicionar",
         cardMessageLabel: "Mensagem do cartão presente",
         cardMessagePlaceholder: "Escreva sua mensagem para o cartão...",
+        cardMessageStorageKey: "gift_package_card_message", // chave do sessionStorage para a mensagem
 
         // Callbacks
         // function(plugin) — chamada ao clicar em "+" (ou no botão Adicionar inicial)
@@ -67,6 +97,9 @@
 
         // function(message, plugin) — chamada sempre que a mensagem do cartão é alterada
         onCardMessageChange: null,
+
+        // function(e, plugin) — chamada a cada input event no formulário (para integrações específicas da loja)
+        onFormInput: null,
 
         // Seletor CSS do elemento onde o plugin será inserido (null = document.body)
         targetSelector: null,
@@ -430,10 +463,20 @@
 
             if (this.messageInput) {
                 this.messageInput.addEventListener('input', () => {
+                    try {
+                        sessionStorage.setItem(CONFIG.cardMessageStorageKey, this.messageInput.value);
+                    } catch (e) {
+                        console.warn('[GiftPackage] Erro ao salvar mensagem na sessão:', e);
+                    }
                     if (typeof CONFIG.onCardMessageChange === 'function') {
                         CONFIG.onCardMessageChange(this.messageInput.value, this);
                     }
                 });
+            }
+
+                const form = document.getElementById('formularioCheckout');
+            if (form && typeof CONFIG.onFormInput === 'function') {
+                form.addEventListener('input', (e) => CONFIG.onFormInput(e, this));
             }
         }
 
@@ -566,6 +609,18 @@
                 );
                 if (item && item.quantity > 0) {
                     this.setQuantity(item.quantity);
+                    // Restaura mensagem salva na sessão
+                    try {
+                        var savedMessage = sessionStorage.getItem(CONFIG.cardMessageStorageKey);
+                        if (savedMessage && this.messageInput) {
+                            this.messageInput.value = savedMessage;
+                            if (typeof CONFIG.onCardMessageChange === 'function') {
+                                CONFIG.onCardMessageChange(savedMessage, this);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('[GiftPackage] Erro ao restaurar mensagem da sessão:', e);
+                    }
                 }
             } catch (e) {
                 console.warn('[GiftPackage] Erro ao sincronizar estado do carrinho:', e);
@@ -585,6 +640,7 @@
                 this.qtySelector.classList.remove('gp-qty-visible');
                 this.messageSection.classList.remove('gp-visible');
                 if (this.messageInput) this.messageInput.value = '';
+                try { sessionStorage.removeItem(CONFIG.cardMessageStorageKey); } catch (e) {}
             }
         }
 
