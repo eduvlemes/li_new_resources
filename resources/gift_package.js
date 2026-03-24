@@ -2,65 +2,65 @@
  * Gift Package - Exibe uma seção para adicionar embalagem de presente ao carrinho
  */
 
- window.GiftPackageConfig = {
-    title: "Vai presentear? Dê um upgrade com uma embalagem especial",
-    description: "Aviso: A embalagem é enviada à parte para você montar.",
-    productName: "Embalagem Dra. Charm",
-    productPrice: "R$ 10,00",
-    productImageUrl: "https://cdn.awsli.com.br/380x380/1930/1930166/produto/191964467/caixapresente-4fgiyy9loh.jpg", 
-    targetSelector: "#formularioCheckout > div > .span4:nth-child(1)",
+//  window.GiftPackageConfig = {
+//     title: "Vai presentear? Dê um upgrade com uma embalagem especial",
+//     description: "Aviso: A embalagem é enviada à parte para você montar.",
+//     productName: "Embalagem Dra. Charm",
+//     productPrice: "R$ 10,00",
+//     productImageUrl: "https://cdn.awsli.com.br/380x380/1930/1930166/produto/191964467/caixapresente-4fgiyy9loh.jpg", 
+//     targetSelector: "#formularioCheckout > div > .span4:nth-child(1)",
 
-    onFormInput: function(e, plugin) {
-        if (e.target === plugin.messageInput) return;
-        if (!plugin.messageInput || !plugin.messageInput.value) return;
-        var obsField = document.querySelector("[name='cliente_obs']");
-        if (!obsField || e.target === obsField) return;
-        setTimeout(function() {
-            var marker = '\n===========\nMensagem cartão: ';
-            var currentVal = obsField.value || '';
-            if (currentVal.indexOf(marker + plugin.messageInput.value) !== -1) return;
-            var markerIdx = currentVal.indexOf(marker);
-            var base = markerIdx !== -1 ? currentVal.substring(0, markerIdx) : currentVal;
-            var nativeSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
-            nativeSetter.call(obsField, base + marker + plugin.messageInput.value);
-        }, 1000);
-    },
+//     onFormInput: function(e, plugin) {
+//         if (e.target === plugin.messageInput) return;
+//         if (!plugin.messageInput || !plugin.messageInput.value) return;
+//         var obsField = document.querySelector("[name='cliente_obs']");
+//         if (!obsField || e.target === obsField) return;
+//         setTimeout(function() {
+//             var marker = '\n===========\nMensagem cartão: ';
+//             var currentVal = obsField.value || '';
+//             if (currentVal.indexOf(marker + plugin.messageInput.value) !== -1) return;
+//             var markerIdx = currentVal.indexOf(marker);
+//             var base = markerIdx !== -1 ? currentVal.substring(0, markerIdx) : currentVal;
+//             var nativeSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
+//             nativeSetter.call(obsField, base + marker + plugin.messageInput.value);
+//         }, 1000);
+//     },
 
-    onCardMessageChange: function(message, plugin) {
-        var field = document.querySelector("[name='cliente_obs']");
-        if (!field) return;
-        var marker = '\n===========\nMensagem cartão: ';
-        var currentVal = field.value || '';
-        var markerIdx = currentVal.indexOf(marker);
-        var base = markerIdx !== -1 ? currentVal.substring(0, markerIdx) : currentVal;
-        var newVal = message ? base + marker + message : base;
-        // Setter nativo sem dispatchEvent — React não re-renderiza, valor fica
-        var nativeSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
-        nativeSetter.call(field, newVal);
-    },
+//     onCardMessageChange: function(message, plugin) {
+//         var field = document.querySelector("[name='cliente_obs']");
+//         if (!field) return;
+//         var marker = '\n===========\nMensagem cartão: ';
+//         var currentVal = field.value || '';
+//         var markerIdx = currentVal.indexOf(marker);
+//         var base = markerIdx !== -1 ? currentVal.substring(0, markerIdx) : currentVal;
+//         var newVal = message ? base + marker + message : base;
+//         // Setter nativo sem dispatchEvent — React não re-renderiza, valor fica
+//         var nativeSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
+//         nativeSetter.call(field, newVal);
+//     },
 
-    colors: {
-        cardBackground: "#ffffff",
-        cardBorder: "#e5e7eb",
-        titleColor: "#1f2937",
-        descriptionColor: "#6b7280",
-        productNameColor: "#1f2937",
-        productPriceColor: "#1f2937",
-        addButtonBackground: "#ff7cae",
-        addButtonText: "#ffffff",
-        addButtonHover: "#ff4c8b",
-        qtyBackground: "#1f2937",
-        qtyText: "#ffffff",
-        qtyCountBackground: "#ffffff",
-        qtyCountColor: "#1f2937",
-        qtyBorder: "#1f2937",
-        inputBorder: "#d1d5db",
-        inputFocus: "#131313",
-        inputText: "#131313",
-        labelColor: "#374151"
-    },
+//     colors: {
+//         cardBackground: "#ffffff",
+//         cardBorder: "#e5e7eb",
+//         titleColor: "#1f2937",
+//         descriptionColor: "#6b7280",
+//         productNameColor: "#1f2937",
+//         productPriceColor: "#1f2937",
+//         addButtonBackground: "#ff7cae",
+//         addButtonText: "#ffffff",
+//         addButtonHover: "#ff4c8b",
+//         qtyBackground: "#1f2937",
+//         qtyText: "#ffffff",
+//         qtyCountBackground: "#ffffff",
+//         qtyCountColor: "#1f2937",
+//         qtyBorder: "#1f2937",
+//         inputBorder: "#d1d5db",
+//         inputFocus: "#131313",
+//         inputText: "#131313",
+//         labelColor: "#374151"
+//     },
    
-};
+// };
 
 (function () {
     'use strict';
