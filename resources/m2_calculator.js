@@ -841,67 +841,37 @@
                 const exceedsH = CONFIG.panelSplitEnabled !== false && pc.maxHeight != null && height > pc.maxHeight;
                 this.panelMode = exceedsW || exceedsH;
 
-                if (this.panelMode) {
-                    // Oculta linhas do resumo normal
-                    this.areaRow.style.display      = 'none';
-                    this.quantityRow.style.display  = 'none';
-                    this.totalRow.style.display     = 'none';
-                    this.m2PriceRow.style.display   = 'none';
-                    this.unitPriceRow.style.display = 'none';
+                // Oculta sempre as linhas do resumo simples — o panel-section é exibido em todos os casos
+                this.areaRow.style.display      = 'none';
+                this.quantityRow.style.display  = 'none';
+                this.totalRow.style.display     = 'none';
+                this.m2PriceRow.style.display   = 'none';
+                this.unitPriceRow.style.display = 'none';
 
-                    // Calcula e renderiza diagrama de painéis
-                    const { panels, cntX, cntY, panelW, panelH } = this.calculatePanels(width, height);
-                    const totalQty  = panels.reduce((sum, p) => sum + p.quantity, 0);
-                    const unitPrice = this.getUnitPrice();
+                // Calcula e renderiza diagrama de painéis (1 ou mais)
+                const { panels, cntX, cntY, panelW, panelH } = this.calculatePanels(width, height);
+                const totalQty  = panels.reduce((sum, p) => sum + p.quantity, 0);
+                const unitPrice = this.getUnitPrice();
 
-                    // Título com contagem de painéis e grade
-                    this.panelTitle.textContent = `${panels.length} ${panels.length === 1 ? 'painel necessário' : 'painéis necessários'}`;
-                    if (cntX > 1 && cntY > 1) {
-                        const small = document.createElement('small');
-                        small.className = 'm2calc-panel-grid-info';
-                        small.textContent = ` (${cntX} col × ${cntY} lin)`;
-                        this.panelTitle.appendChild(small);
-                    }
-
-                    this.panelItems.innerHTML = this.renderPanelDiagram(cntX, cntY, panelW, panelH);
-
-                    if (unitPrice !== null) {
-                        const total = totalQty * unitPrice;
-                        this.panelTotalValue.textContent = `${totalQty} un. — ${this.formatCurrency(total)}`;
-                    } else {
-                        this.panelTotalValue.textContent = `${totalQty} un.`;
-                    }
-
-                    this.panelSection.style.display = '';
-                } else {
-                    // Modo normal — exibe linhas do resumo
-                    this.panelSection.style.display = 'none';
-                    this.areaRow.style.display     = '';
-                    this.quantityRow.style.display = '';
-                    this.totalRow.style.display    = '';
-
-                    const area      = width * height;
-                    const quantity  = this.calculateQuantity(width, height);
-                    const unitPrice = this.getUnitPrice();
-
-                    this.areaValue.textContent     = area.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) + ' m²';
-                    this.quantityValue.textContent = quantity + ' un.';
-
-                    if (unitPrice !== null) {
-                        const ratio   = pc.quantityRatio || 1;
-                        const m2Price = unitPrice * ratio;
-                        const total   = quantity * unitPrice;
-                        this.unitPriceValue.textContent = this.formatCurrency(unitPrice);
-                        this.m2PriceValue.textContent   = this.formatCurrency(m2Price);
-                        this.totalValue.textContent     = this.formatCurrency(total);
-                        this.unitPriceRow.style.display = '';
-                        this.m2PriceRow.style.display   = '';
-                    } else {
-                        this.unitPriceRow.style.display = 'none';
-                        this.m2PriceRow.style.display   = 'none';
-                        this.totalValue.textContent     = '—';
-                    }
+                // Título com contagem de painéis e grade
+                this.panelTitle.textContent = `${panels.length} ${panels.length === 1 ? 'painel necessário' : 'painéis necessários'}`;
+                if (cntX > 1 && cntY > 1) {
+                    const small = document.createElement('small');
+                    small.className = 'm2calc-panel-grid-info';
+                    small.textContent = ` (${cntX} col × ${cntY} lin)`;
+                    this.panelTitle.appendChild(small);
                 }
+
+                this.panelItems.innerHTML = this.renderPanelDiagram(cntX, cntY, panelW, panelH);
+
+                if (unitPrice !== null) {
+                    const total = totalQty * unitPrice;
+                    this.panelTotalValue.textContent = `${totalQty} un. — ${this.formatCurrency(total)}`;
+                } else {
+                    this.panelTotalValue.textContent = `${totalQty} un.`;
+                }
+
+                this.panelSection.style.display = '';
 
                 this.summary.classList.add('m2calc-visible');
             } else {
