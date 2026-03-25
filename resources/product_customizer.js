@@ -46,6 +46,8 @@
         modalSubtitle: "Preencha as informações abaixo antes de adicionar ao carrinho.",
         confirmButtonText: "Confirmar e adicionar",
         cancelButtonText: "Cancelar",
+        skipButtonText: "Comprar sem preencher",
+        allowSkip: true,
         requiredLabel: "*",
         requiredMessage: "Por favor, preencha todos os campos obrigatórios.",
 
@@ -135,7 +137,9 @@
                 max-width: ${CONFIG.modalMaxWidth};
                 width: 100%;
                 max-height: 90vh;
-                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
                 transform: translateY(20px);
                 transition: transform 0.25s ease;
             }
@@ -168,6 +172,8 @@
                 display: flex;
                 flex-direction: column;
                 gap: 16px;
+                overflow-y: auto;
+                flex: 1 1 auto;
             }
 
             .pc-field {
@@ -269,7 +275,16 @@
             }
 
             .pc-modal-footer {
-                padding: 0 24px 24px;
+                padding: 16px 24px 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                border-top: 1px solid ${CONFIG.colors.modalBorder};
+                background: ${CONFIG.colors.modalBackground};
+                flex-shrink: 0;
+            }
+
+            .pc-footer-actions {
                 display: flex;
                 gap: 12px;
                 justify-content: flex-end;
@@ -285,6 +300,7 @@
                 transition: background 0.2s, transform 0.1s;
                 font-family: inherit;
                 line-height: 1;
+                width:100%;
             }
 
             .pc-btn:active {
@@ -310,7 +326,7 @@
             }
 
             @media (max-width: 480px) {
-                .pc-modal-footer {
+                .pc-footer-actions {
                     flex-direction: column-reverse;
                 }
 
@@ -368,8 +384,10 @@
                             ${fieldsHTML}
                         </div>
                         <div class="pc-modal-footer">
-                            <button class="pc-btn pc-btn-cancel" id="pc-btn-cancel" type="button">${this._esc(CONFIG.cancelButtonText)}</button>
-                            <button class="pc-btn pc-btn-confirm" id="pc-btn-confirm" type="button">${this._esc(CONFIG.confirmButtonText)}</button>
+                            <div class="pc-footer-actions">
+                                <button class="pc-btn pc-btn-cancel" id="pc-btn-skip" type="button">${this._esc(CONFIG.skipButtonText)}</button>
+                                <button class="pc-btn pc-btn-confirm" id="pc-btn-confirm" type="button">${this._esc(CONFIG.confirmButtonText)}</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -491,7 +509,7 @@
         setupElements() {
             this.overlay = document.getElementById('product-customizer-overlay');
             this.confirmBtn = document.getElementById('pc-btn-confirm');
-            this.cancelBtn = document.getElementById('pc-btn-cancel');
+            this.skipBtn = document.getElementById('pc-btn-skip');
         }
 
         setupEventListeners() {
@@ -513,7 +531,7 @@
             }, true); // captura = true para interceptar antes de handlers nativos
 
             this.confirmBtn.addEventListener('click', () => this._handleConfirm());
-            this.cancelBtn.addEventListener('click', () => this._closeModal());
+            if (this.skipBtn) this.skipBtn.addEventListener('click', () => this._handleSkip());
 
             // Wiring de campos condicionais (showIf)
             this._setupConditionals();
@@ -556,9 +574,11 @@
 
             const properties = this._collectValues();
             const productId = this._getProductId();
+            const sku = this._getSku();
 
             if (productId) {
                 const storageKey = CONFIG.storagePrefix + productId + '_properties';
+                properties._sku = sku;
                 try {
                     sessionStorage.setItem(storageKey, JSON.stringify(properties));
                 } catch (e) {
@@ -580,10 +600,33 @@
             }, 270);
         }
 
+        _handleSkip() {
+            const btn = this.currentButton;
+            this.currentButton = null;
+            this._closeModal();
+
+            // Re-dispara o clique original sem salvar propriedades
+            setTimeout(() => {
+                if (btn) {
+                    this._pendingClick = true;
+                    btn.click();
+                    this._pendingClick = false;
+                }
+            }, 270);
+        }
+
         _getProductId() {
             if (!this.currentButton) return null;
             const acoes = this.currentButton.closest('.acoes-produto');
             return acoes ? acoes.getAttribute('data-produto-id') : null;
+        }
+
+        _getSku() {
+            if (!this.currentButton) return null;
+            const acoes = this.currentButton.closest('.acoes-produto');
+            if (!acoes) return null;
+            const classes = [...acoes.classList];
+            return classes.length ? classes[classes.length - 1] : null;
         }
 
         _setupConditionals() {
