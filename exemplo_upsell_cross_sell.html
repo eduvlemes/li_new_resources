@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upsell Cross Sell - Exemplos</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; color: #1f2937; }
+
+        .demo-nav {
+            background: #1f2937;
+            padding: 0;
+            display: flex;
+            gap: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .demo-nav a {
+            display: block;
+            padding: 14px 24px;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        .demo-nav a.active,
+        .demo-nav a:hover {
+            color: #fff;
+            background: #374151;
+        }
+
+        .demo-page { display: none; padding: 0 0 80px; }
+        .demo-page.active { display: block; }
+
+        /* ── Simulação de página de produto ── */
+        .produto-detalhe {
+            background: #fff;
+            padding: 32px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .produto-detalhe h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .produto-detalhe .preco {
+            font-size: 26px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+
+        .produto-detalhe p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .produto-detalhe .btn-comprar {
+            background: #1f2937;
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ── Simulação de carrinho ── */
+        .cart-table {
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 24px 32px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .cart-item:last-child { border-bottom: none; }
+
+        .cart-item-img {
+            width: 64px;
+            height: 64px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .cart-item h3 { font-size: 14px; margin-bottom: 4px; }
+        .cart-item span { color: #6b7280; font-size: 13px; }
+
+        /* ── Simulação de checkout ── */
+        .checkout-wrap {
+            background: #fff;
+            padding: 24px 32px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .checkout-wrap h2 { font-size: 18px; margin-bottom: 16px; }
+
+        .resumo-compra {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .resumo-compra h3 { font-size: 15px; margin-bottom: 12px; }
+        .resumo-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 6px 0;
+            color: #374151;
+        }
+
+        .resumo-total {
+            font-weight: 700;
+            font-size: 16px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        /* ── Info box ── */
+        .info-box {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin: 32px;
+            overflow: hidden;
+        }
+
+        .info-box-header {
+            background: #1f2937;
+            color: #fff;
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .info-box-body {
+            padding: 24px;
+        }
+
+        .info-box-body h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin: 0 0 12px 0;
+        }
+
+        .info-box-body pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* ── Page wrapper ── */
+        .pagina-produto,
+        .pagina-carrinho {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navegação entre contextos -->
+<nav class="demo-nav">
+    <a href="#" class="active" data-page="page-produto">Página de Produto</a>
+    <a href="#" data-page="page-carrinho">Carrinho</a>
+    <a href="#" data-page="page-checkout">Checkout</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     CONTEXTO 1: PÁGINA DE PRODUTO
+     ══════════════════════════════════════════════════════════ -->
+<div id="page-produto" class="demo-page active">
+
+    <!-- Simula .pagina-produto -->
+    <div class="pagina-produto">
+        <div class="produto-detalhe">
+            <h1>Cama Caixa para Gatos</h1>
+            <div class="preco">R$ 249,99</div>
+            <p>A cama mais confortável para o seu pet. Estrutura firme, revestimento macio e fácil higienização. Disponível em duas cores.</p>
+            <button class="btn-comprar">Comprar agora</button>
+        </div>
+        <!-- O plugin insere a vitrine afterend deste elemento -->
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-header">CONFIGURAÇÃO — PÁGINA DE PRODUTO</div>
+        <div class="info-box-body">
+            <h3>Exemplo: compre junto com fallback por categoria</h3>
+            <pre>window.UpsellCrossSellConfig = {
+    productPage: {
+        title: 'Complete o look do seu pet',
+        source: 'compre_junto',      // tenta /compre_junto/{PRODUTO_ID}
+                                     // se insuficiente, usa a categoria principal
+        maxProducts: 9,
+        cardsPerRow: 3,
+        insertSelector: '.produto-detalhe',
+        insertMethod: 'afterend',
+        onAddToCart: function(response, skuId) {
+            console.log('[Produto] SKU adicionado:', skuId);
+        }
+    }
+};</pre>
+            <br>
+            <h3>Exemplo: categoria fixa</h3>
+            <pre>window.UpsellCrossSellConfig = {
+    productPage: {
+        source: 'category',
+        categoryId: '2548389',       // ID da categoria
+        maxProducts: 6,
+        cardsPerRow: 3
+    }
+};</pre>
+            <br>
+            <h3>Exemplo: IDs fixos</h3>
+            <pre>window.UpsellCrossSellConfig = {
+    productPage: {
+        source: 'fixed',
+        fixedProductIds: ['29003487', '63153681', '29119612']
+    }
+};</pre>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     CONTEXTO 2: CARRINHO
+     ══════════════════════════════════════════════════════════ -->
+<div id="page-carrinho" class="demo-page">
+
+    <!-- Simula .pagina-carrinho (sem .carrinho-checkout) -->
+    <div class="pagina-carrinho">
+        <div class="cart-table">
+            <h2 style="font-size:18px;margin-bottom:20px;">Meu Carrinho</h2>
+
+            <!-- Produtos no carrinho com data-produto-id -->
+            <div class="cart-item" data-produto-id="29003487">
+                <div class="cart-item-img"></div>
+                <div>
+                    <h3>Cama Caixa para Gatos</h3>
+                    <span>1x R$ 249,99</span>
+                </div>
+            </div>
+            <div class="cart-item" data-produto-id="63153681">
+                <div class="cart-item-img"></div>
+                <div>
+                    <h3>Mantinha</h3>
+                    <span>1x R$ 79,99</span>
+                </div>
+            </div>
+        </div>
+        <!-- As seções do carrinho são inseridas beforeend neste elemento -->
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-header">CONFIGURAÇÃO — CARRINHO</div>
+        <div class="info-box-body">
+            <h3>Exemplo: múltiplas seções com fontes diferentes</h3>
+            <pre>window.UpsellCrossSellConfig = {
+    cart: {
+        insertSelector: '.pagina-carrinho',
+        insertMethod: 'beforeend',
+        sections: [
+
+            // Seção 1: compre junto de cada produto no carrinho
+            {
+                id: 'ucs-cart-cj',
+                title: 'Leve junto',
+                source: 'compre_junto',
+                maxProducts: 6,
+                onAddToCart: function(response, skuId) {
+                    console.log('[Carrinho CJ] adicionado:', skuId);
+                }
+            },
+
+            // Seção 2: mapa produto → recomendados
+            //   "se o produto 29003487 estiver no carrinho, sugerir 63153681 e 29119612"
+            {
+                id: 'ucs-cart-map',
+                title: 'Combina com o que você escolheu',
+                source: 'product_map',
+                productMap: {
+                    '29003487': ['29119612', '63153681'],
+                    '63153681': ['29003487']
+                },
+                maxProducts: 6
+            },
+
+            // Seção 3: categoria fixa (ex: lançamentos)
+            {
+                id: 'ucs-cart-lancamentos',
+                title: 'Novidades',
+                source: 'category',
+                categoryId: '22901706',
+                maxProducts: 6
+            },
+
+            // Seção 4: IDs fixos
+            {
+                id: 'ucs-cart-fixed',
+                title: 'Produtos especiais',
+                source: 'fixed',
+                fixedProductIds: ['373398725'],
+                maxProducts: 4
+            }
+        ]
+    }
+};</pre>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     CONTEXTO 3: CHECKOUT
+     ══════════════════════════════════════════════════════════ -->
+<div id="page-checkout" class="demo-page">
+
+    <!-- Simula .pagina-carrinho.carrinho-checkout -->
+    <div class="pagina-carrinho carrinho-checkout">
+        <div class="checkout-wrap">
+            <h2>Finalizar Pedido</h2>
+
+            <div style="display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start;">
+                <!-- Formulário (simulação) -->
+                <div>
+                    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:20px;">
+                        <h3 style="font-size:15px;margin-bottom:16px;">Dados de entrega</h3>
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                            <input type="text" placeholder="Nome completo" style="padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                            <input type="text" placeholder="E-mail" style="padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                            <input type="text" placeholder="CEP" style="padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                        </div>
+                    </div>
+
+                    <!-- Produtos no carrinho com data-produto-id -->
+                    <div style="margin-top:16px;" data-produto-id="29003487"></div>
+                    <div style="margin-top:8px;" data-produto-id="63153681"></div>
+                </div>
+
+                <!-- Resumo (o plugin insere beforebegin deste elemento) -->
+                <div class="resumo-compra">
+                    <h3>Resumo do pedido</h3>
+                    <div class="resumo-line"><span>Subtotal</span><span>R$ 329,98</span></div>
+                    <div class="resumo-line"><span>Frete</span><span>R$ 12,00</span></div>
+                    <div class="resumo-line resumo-total"><span>Total</span><span>R$ 341,98</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-header">CONFIGURAÇÃO — CHECKOUT</div>
+        <div class="info-box-body">
+            <h3>Exemplo: produto de menor preço relacionado (automático)</h3>
+            <pre>window.UpsellCrossSellConfig = {
+    checkout: {
+        title: 'Você ainda pode adicionar',
+        source: 'lowest_related',    // busca pelas categorias dos produtos no carrinho
+                                     // e exibe o de menor preço que não está no carrinho
+        insertSelector: '.resumo-compra',
+        insertMethod: 'beforebegin',
+        onAddToCart: function(response, skuId) {
+            console.log('[Checkout] SKU adicionado:', skuId);
+        }
+    }
+};</pre>
+            <br>
+            <h3>Exemplo: produto fixo</h3>
+            <pre>window.UpsellCrossSellConfig = {
+    checkout: {
+        title: 'Não esqueça',
+        source: 'fixed',
+        fixedProductId: '373398725', // não exibe se já estiver no carrinho
+        insertSelector: '.resumo-compra',
+        insertMethod: 'beforebegin'
+    }
+};</pre>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     REFERÊNCIA COMPLETA DE CONFIGURAÇÃO
+     ══════════════════════════════════════════════════════════ -->
+<div style="max-width:960px;margin:0 auto;">
+    <div class="info-box">
+        <div class="info-box-header">REFERÊNCIA COMPLETA — window.UpsellCrossSellConfig</div>
+        <div class="info-box-body">
+            <pre>window.UpsellCrossSellConfig = {
+    active: true,
+
+    // Prefixo das URLs de imagem (ex: "https://cdn.awsli.com.br/600x450/")
+    imageBaseUrl: '',
+
+    // ── Página de produto ──────────────────────────────────────────────────
+    productPage: {
+        active: true,
+        title: 'Você também pode gostar',
+
+        // 'compre_junto' | 'category' | 'fixed'
+        source: 'compre_junto',
+        categoryId: '',              // usado quando source = 'category'
+        fixedProductIds: [],         // usado quando source = 'fixed'
+
+        maxProducts: 9,
+        cardsPerRow: 3,
+
+        insertSelector: '.produto-detalhe',
+        insertMethod: 'afterend',
+
+        onAddToCart: function(response, skuId) {}
+    },
+
+    // ── Carrinho ───────────────────────────────────────────────────────────
+    cart: {
+        active: true,
+        insertSelector: '.pagina-carrinho',
+        insertMethod: 'beforeend',
+
+        sections: [
+            {
+                id: 'ucs-secao-1',       // ID único para esta seção
+                title: 'Leve também',
+
+                // 'compre_junto' | 'category' | 'fixed' | 'product_map'
+                source: 'compre_junto',
+                categoryId: '',
+                fixedProductIds: [],
+                productMap: {
+                    // 'ID_PRODUTO_NO_CARRINHO': ['ID_REC_1', 'ID_REC_2']
+                },
+
+                maxProducts: 6,
+
+                onAddToCart: function(response, skuId) {}
+            }
+        ]
+    },
+
+    // ── Checkout ───────────────────────────────────────────────────────────
+    checkout: {
+        active: true,
+        title: 'Aproveite e leve também',
+
+        // 'lowest_related' | 'fixed'
+        source: 'lowest_related',
+        fixedProductId: '',
+
+        insertSelector: '.resumo-compra',
+        insertMethod: 'beforebegin',
+
+        onAddToCart: function(response, skuId) {}
+    },
+
+    // ── Cores ──────────────────────────────────────────────────────────────
+    colors: {
+        sectionBackground:       '#f9fafb',
+        sectionBorder:           '#e5e7eb',
+        titleColor:              '#111827',
+        cardBackground:          '#ffffff',
+        cardBorder:              '#e5e7eb',
+        cardShadow:              'rgba(0,0,0,0.06)',
+        textColor:               '#1f2937',
+        textLight:               '#6b7280',
+        priceColor:              '#111827',
+        priceOldColor:           '#9ca3af',
+        buttonBg:                '#1f2937',
+        buttonText:              '#ffffff',
+        buttonHoverBg:           '#374151',
+        buttonSuccessBg:         '#16a34a',
+        buttonErrorBg:           '#dc2626',
+        sliderArrowBg:           '#ffffff',
+        sliderArrowBorder:       '#e5e7eb',
+        sliderArrowIcon:         '#374151',
+        modalOverlay:            'rgba(0,0,0,0.5)',
+        modalBackground:         '#ffffff',
+        skuOptionBorder:         '#e5e7eb',
+        skuOptionHoverBg:        '#f3f4f6',
+        skuOptionActiveBg:       '#f0fdf4',
+        skuOptionActiveBorder:   '#16a34a'
+    }
+};</pre>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCRIPTS
+     ══════════════════════════════════════════════════════════ -->
+
+<!-- jQuery (necessário para o trigger de métricas do LI) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- Simula os globals do LI para testes locais -->
+<script>
+    // Simula sendMetrics do LI
+    window.sendMetrics = function(payload) {
+        console.log('[LI sendMetrics]', payload);
+        return { eventId: 'evt_' + Date.now() };
+    };
+
+    // Simula a variável PRODUTO_ID (presente na página de produto da LI)
+    // Altere para o ID do produto que deseja testar
+    window.PRODUTO_ID = 29003487;
+</script>
+
+<!-- Configuração do plugin para a demo -->
+<script>
+    window.UpsellCrossSellConfig = {
+        active: true,
+
+        imageBaseUrl: '',
+
+        productPage: {
+            active: true,
+            title: 'Complete o look do seu pet',
+            source: 'compre_junto',
+            maxProducts: 9,
+            cardsPerRow: 3,
+            insertSelector: '.produto-detalhe',
+            insertMethod: 'afterend',
+            onAddToCart: function(response, skuId) {
+                console.log('[Produto] onAddToCart — SKU:', skuId, '| Response:', response);
+            }
+        },
+
+        cart: {
+            active: true,
+            insertSelector: '.pagina-carrinho:not(.carrinho-checkout)',
+            insertMethod: 'beforeend',
+            sections: [
+                {
+                    id: 'ucs-cart-cj',
+                    title: 'Leve junto',
+                    source: 'compre_junto',
+                    maxProducts: 6,
+                    onAddToCart: function(response, skuId) {
+                        console.log('[Carrinho CJ] onAddToCart — SKU:', skuId);
+                    }
+                },
+                {
+                    id: 'ucs-cart-map',
+                    title: 'Combina com o que você escolheu',
+                    source: 'product_map',
+                    productMap: {
+                        '29003487': ['29119612', '373398725'],
+                        '63153681': ['29003487']
+                    },
+                    maxProducts: 6,
+                    onAddToCart: function(response, skuId) {
+                        console.log('[Carrinho Map] onAddToCart — SKU:', skuId);
+                    }
+                }
+            ]
+        },
+
+        checkout: {
+            active: true,
+            title: 'Você ainda pode adicionar',
+            source: 'lowest_related',
+            insertSelector: '.resumo-compra',
+            insertMethod: 'beforebegin',
+            onAddToCart: function(response, skuId) {
+                console.log('[Checkout] onAddToCart — SKU:', skuId);
+            }
+        },
+
+        colors: {
+            buttonBg: '#1f2937',
+            buttonHoverBg: '#374151',
+            buttonSuccessBg: '#16a34a'
+        }
+    };
+</script>
+
+<!-- Plugin -->
+<script src="resources/upsell_cross_sell.js"></script>
+
+<!-- Navegação entre páginas demo -->
+<script>
+    document.querySelectorAll('.demo-nav a').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var pageId = link.getAttribute('data-page');
+
+            // Esconder todas as páginas / desativar o plugin atual
+            document.querySelectorAll('.demo-page').forEach(function(p) { p.classList.remove('active'); });
+            document.querySelectorAll('.demo-nav a').forEach(function(a) { a.classList.remove('active'); });
+
+            link.classList.add('active');
+            var page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+
+            // Reinicializar o plugin para o contexto da nova aba
+            if (window.UpsellCrossSell) {
+                window.UpsellCrossSell.reinit();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
