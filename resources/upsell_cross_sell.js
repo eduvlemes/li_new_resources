@@ -464,8 +464,7 @@
             .ucs-slider {
                 overflow: hidden;
                 border-radius: 8px;
-                padding: 8px;
-                margin: -8px;
+               
             }
 
             .ucs-track {
