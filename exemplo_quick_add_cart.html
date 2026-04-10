@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Add to Cart - Compra Direta na Listagem</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; color: #1f2937; }
+
+        .page-header {
+            background: #1f2937;
+            color: #fff;
+            padding: 16px 24px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .page-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 16px;
+        }
+
+        /* Listagem de produtos */
+        .listagem-produtos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        /* Cada item da listagem */
+        .listagem-item {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .listagem-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .listagem-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .listagem-item-body {
+            padding: 12px 12px 10px;
+        }
+
+        .listagem-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .listagem-item-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 8px;
+        }
+
+        /* Bloco de documentação */
+        .docs-section {
+            margin-top: 50px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 28px;
+        }
+        .docs-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+        .docs-section h3 {
+            font-size: 14px;
+            margin: 20px 0 8px;
+            color: #374151;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<header class="page-header">🛍️ Quick Add to Cart — Demonstração</header>
+
+<div class="page-container">
+
+    <!-- ===================================================
+         SIMULA UMA GRADE DE LISTAGEM DE PRODUTOS DA LOJA
+         Cada .listagem-item DEVE ter uma classe prod-id-{ID}
+    ==================================================== -->
+    <div class="listagem-produtos">
+
+        <!-- Produto sem variações -->
+        <div class="listagem-item prod-id-373398725">
+            <img src="https://via.placeholder.com/400x280/d1fae5/059669?text=Produto+Sem+Variacao" alt="">
+            <div class="listagem-item-body">
+                <p class="listagem-item-name">Petisco Sabor Leite para Gatos</p>
+                <p class="listagem-item-price">R$ 7,99</p>
+                <!-- O widget quick_add_cart será injetado aqui automaticamente -->
+            </div>
+        </div>
+
+        <!-- Produto com variação de COR -->
+        <div class="listagem-item prod-id-111111111">
+            <img src="https://via.placeholder.com/400x280/dbeafe/2563eb?text=Produto+com+Cor" alt="">
+            <div class="listagem-item-body">
+                <p class="listagem-item-name">Camiseta Básica</p>
+                <p class="listagem-item-price">R$ 49,90</p>
+            </div>
+        </div>
+
+        <!-- Produto com variações de TAMANHO -->
+        <div class="listagem-item prod-id-222222222">
+            <img src="https://via.placeholder.com/400x280/fef3c7/d97706?text=Produto+com+Tamanho" alt="">
+            <div class="listagem-item-body">
+                <p class="listagem-item-name">Calça Jogger</p>
+                <p class="listagem-item-price">R$ 119,90</p>
+            </div>
+        </div>
+
+        <!-- Produto com COR + TAMANHO -->
+        <div class="listagem-item prod-id-333333333">
+            <img src="https://via.placeholder.com/400x280/fce7f3/db2777?text=Cor+%2B+Tamanho" alt="">
+            <div class="listagem-item-body">
+                <p class="listagem-item-name">Blusa com Cor e Tamanho</p>
+                <p class="listagem-item-price">R$ 89,90</p>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ===============================================================
+         DOCUMENTAÇÃO
+    ================================================================ -->
+    <div class="docs-section">
+        <h2>📋 Como Implementar</h2>
+
+        <h3>1. Estrutura HTML obrigatória</h3>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:8px;">
+            Cada produto da listagem precisa ter a classe <code>listagem-item</code>
+            e uma classe <code>prod-id-{ID_DO_PRODUTO}</code>:
+        </p>
+        <pre>&lt;div class="listagem-item prod-id-373398725"&gt;
+    &lt;!-- conteúdo do produto --&gt;
+&lt;/div&gt;</pre>
+
+        <h3>2. Configuração (antes do script)</h3>
+        <pre>&lt;script&gt;
+window.QuickAddCartConfig = {
+    active: true,
+
+    // Textos
+    addButtonText:     'Adicionar ao carrinho',
+    outOfStockText:    'Sem estoque',
+    selectHintText:    'Selecione uma opção',
+    popupTitle:        'Produto adicionado ao carrinho!',
+    popupKeepText:     'Continuar comprando',
+    popupCheckoutText: 'Finalizar compra',
+
+    // Cores (substitui apenas as informadas; demais mantêm o padrão)
+    colors: {
+        primary:      '#1f3a5f',
+        primaryHover: '#16305a',
+        success:      '#16a34a'
+    }
+};
+&lt;/script&gt;</pre>
+
+        <h3>3. Carregar o script</h3>
+        <pre>&lt;script src="quick_add_cart.js"&gt;&lt;/script&gt;</pre>
+
+        <h3>Comportamento das variações</h3>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:18px;">
+            <li>Grupos com <code>grid.value_for_display</code> igual a "Cor" → exibem <strong>bolinha colorida</strong> usando <code>value.codes.primary</code></li>
+            <li>Demais grupos → exibem <strong>quadradinho com o texto</strong> do valor</li>
+            <li>Quantidade máxima é limitada ao <code>inventory.available_quantity</code> da variação selecionada</li>
+            <li>O botão fica desabilitado até que todos os grupos de variação tenham uma seleção</li>
+            <li>Adição ao carrinho via <code>GET /carrinho/produto/{skuId}/adicionar/{quantidade}</code></li>
+            <li>Após sucesso exibe popup com "Continuar comprando" ou "Finalizar compra" → <code>/carrinho/index</code></li>
+        </ul>
+    </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- IMPLEMENTAÇÃO                                                -->
+<!-- ============================================================ -->
+
+<!-- 1. Configuração (antes do script) -->
+<script>
+    window.QuickAddCartConfig = {
+        active: true,
+
+        // Textos
+        addButtonText:     'Adicionar ao carrinho',
+        outOfStockText:    'Sem estoque',
+        selectHintText:    'Selecione uma opção',
+        popupTitle:        'Produto adicionado ao carrinho!',
+        popupKeepText:     'Continuar comprando',
+        popupCheckoutText: 'Finalizar compra',
+
+        // Cores
+        colors: {
+            primary:      '#1f3a5f',
+            primaryHover: '#16305a',
+            success:      '#16a34a'
+        }
+    };
+</script>
+
+<!-- 2. Carrega o script -->
+<script src="../resources/quick_add_cart.js"></script>
+
+</body>
+</html>
