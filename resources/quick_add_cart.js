@@ -168,22 +168,22 @@
                 width: 26px;
                 height: 26px;
                 border-radius: 50%;
-                border: 2px solid transparent;
+                border: 2px solid #f2f2f2;
                 outline: 2px solid transparent;
-                outline-offset: 2px;
+                outline-offset: 0px;
                 cursor: pointer;
                 transition: outline-color 0.15s, transform 0.15s;
                 flex-shrink: 0;
             }
 
-            .qac-option-color:hover:not(.qac-option-disabled) {
-                transform: scale(1.12);
-                outline-color: #9ca3af;
-            }
+            // .qac-option-color:hover:not(.qac-option-disabled) {
+            //     transform: scale(1.12);
+            //     outline-color: #9ca3af;
+            // }
 
             .qac-option-color.qac-option-active {
-                outline-color: ${CONFIG.colors.optionActiveBorder};
-                border-color: #fff;
+                border-color: ${CONFIG.colors.optionActiveBorder};
+                
             }
 
             .qac-option-color.qac-option-disabled {
@@ -603,7 +603,7 @@
                 var isColor = (gLabel === 'Cor');
                 var vId    = String(v.value.id);
                 var vDisplay = v.value.name || v.value.value || vId;
-                var colorCode = (isColor && v.value.codes && v.value.codes.primary) ? v.value.codes.primary : null;
+                var colorCode = (isColor && v.value.swatch && v.value.swatch.color && v.value.swatch.color.primary) ? v.value.swatch.color.primary : null;
 
                 if (!groupMap[gId]) {
                     groupMap[gId] = { label: gLabel, isColor: isColor, valueMap: {}, valueOrder: [] };
