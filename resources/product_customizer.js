@@ -6,6 +6,7 @@
  *   [storagePrefix] + [data-produto-id] + "_properties"
  */
 
+
 (function () {
     'use strict';
 
@@ -50,6 +51,16 @@
         allowSkip: true,
         requiredLabel: "*",
         requiredMessage: "Por favor, preencha todos os campos obrigatórios.",
+
+        
+
+        // TELA DE INTRODUÇÃO (BAnner)
+        showIntro: false,
+        introBanner: "",
+        introTitle: "Personalize seu produto",
+        introSubtitle: "Este item possui personalização. Deseja adicionar agora?",
+        introContinueButtonText: "Personalizar Agora",
+        introSkipButtonText: "Pular e adicionar",
 
         // Prefixo opcional para a chave do sessionStorage.
         // A chave final será: storagePrefix + productId + "_properties"
@@ -149,6 +160,28 @@
             }
 
             .pc-modal-header {
+                padding: 0;
+            }
+
+            .pc-intro-banner-container {
+                width: 100%;
+                overflow: hidden;
+                background: ${CONFIG.colors.modalBorder};
+                display: flex;
+            }
+
+            .pc-intro-banner-container:empty {
+                display: none;
+            }
+
+            .pc-intro-banner {
+                width: 100%;
+                height: auto;
+                object-fit: cover;
+                display: block;
+            }
+
+            .pc-header-texts {
                 padding: 24px 24px 0;
             }
 
@@ -174,6 +207,17 @@
                 gap: 16px;
                 overflow-y: auto;
                 flex: 1 1 auto;
+            }
+
+            .pc-intro-step,
+            .pc-form-step {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .pc-step--hidden {
+                display: none !important;
             }
 
             .pc-field {
@@ -347,6 +391,7 @@
             this.currentButton = null;
             this.overlay = null;
             this._pendingClick = false;
+            this.currentStep = 'form'; // 'intro' | 'form'
             this.init();
         }
 
@@ -369,19 +414,31 @@
 
             const fieldsHTML = CONFIG.fields.map(field => this._buildFieldHTML(field)).join('');
 
-            const subtitleHTML = CONFIG.modalSubtitle
-                ? `<p class="pc-modal-subtitle">${this._esc(CONFIG.modalSubtitle)}</p>`
+            const bannerHTML = CONFIG.introBanner 
+                ? `<div class="pc-intro-banner-container"><img src="${this._esc(CONFIG.introBanner)}" class="pc-intro-banner" alt="Banner"></div>`
                 : '';
 
             const html = `
                 <div id="product-customizer-overlay" class="pc-overlay" role="dialog" aria-modal="true" aria-labelledby="pc-modal-title" style="display:none;">
                     <div class="pc-modal">
                         <div class="pc-modal-header">
-                            <h2 class="pc-modal-title" id="pc-modal-title">${this._esc(CONFIG.modalTitle)}</h2>
-                            ${subtitleHTML}
+                            ${bannerHTML}
+                            <div class="pc-header-texts">
+                                <h2 class="pc-modal-title" id="pc-modal-title">${this._esc(CONFIG.modalTitle)}</h2>
+                                <p class="pc-modal-subtitle" id="pc-modal-subtitle">${this._esc(CONFIG.modalSubtitle)}</p>
+                            </div>
                         </div>
                         <div class="pc-modal-body">
-                            ${fieldsHTML}
+                            <!-- FASE 1: INTRO -->
+                            <div class="pc-intro-step pc-step--hidden" id="pc-step-intro">
+                                <h2 class="pc-modal-title">${this._esc(CONFIG.introTitle)}</h2>
+                                <p class="pc-modal-subtitle">${this._esc(CONFIG.introSubtitle)}</p>
+                            </div>
+                            
+                            <!-- FASE 2: FORMULÁRIO -->
+                            <div class="pc-form-step" id="pc-step-form">
+                                ${fieldsHTML}
+                            </div>
                         </div>
                         <div class="pc-modal-footer">
                             <div class="pc-footer-actions">
@@ -552,6 +609,14 @@
         _openModal() {
             this._clearErrors();
             this._updateConditionals();
+
+            // Determina a fase inicial
+            if (CONFIG.showIntro) {
+                this._setStep('intro');
+            } else {
+                this._setStep('form');
+            }
+
             this.overlay.style.display = 'flex';
             // Força reflow para disparar a transição CSS
             this.overlay.offsetHeight;
@@ -562,6 +627,34 @@
             if (firstFocusable) firstFocusable.focus();
         }
 
+        _setStep(step) {
+            this.currentStep = step;
+            const stepIntro = document.getElementById('pc-step-intro');
+            const stepForm = document.getElementById('pc-step-form');
+            const btnConfirm = document.getElementById('pc-btn-confirm');
+            const btnSkip = document.getElementById('pc-btn-skip');
+            const headerTexts = this.overlay.querySelector('.pc-header-texts');
+            const banner = this.overlay.querySelector('.pc-intro-banner-container');
+
+            if (step === 'intro') {
+                if (stepIntro) stepIntro.classList.remove('pc-step--hidden');
+                if (stepForm) stepForm.classList.add('pc-step--hidden');
+                if (headerTexts) headerTexts.style.display = 'none';
+                if (banner) banner.style.display = 'flex';
+
+                if (btnConfirm) btnConfirm.textContent = CONFIG.introContinueButtonText;
+                if (btnSkip) btnSkip.textContent = CONFIG.introSkipButtonText;
+            } else {
+                if (stepIntro) stepIntro.classList.add('pc-step--hidden');
+                if (stepForm) stepForm.classList.remove('pc-step--hidden');
+                if (headerTexts) headerTexts.style.display = 'block';
+                if (banner) banner.style.display = 'none';
+
+                if (btnConfirm) btnConfirm.textContent = CONFIG.confirmButtonText;
+                if (btnSkip) btnSkip.textContent = CONFIG.skipButtonText;
+            }
+        }
+
         _closeModal() {
             this.overlay.classList.remove('pc-visible');
             setTimeout(() => {
@@ -570,6 +663,12 @@
         }
 
         _handleConfirm() {
+            // Se estiver na fase de intro, apenas muda para o formulário
+            if (this.currentStep === 'intro') {
+                this._setStep('form');
+                return;
+            }
+
             if (!this._validateFields()) return;
 
             const properties = this._collectValues();

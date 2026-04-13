@@ -355,7 +355,15 @@ const dados = JSON.parse(sessionStorage.getItem("1001_properties"));
 ====================================================== -->
 <script>
     window.ProductCustomizerConfig = {
-        modalTitle: "Personalize seu produto",
+        // Ativa a tela de intro solicitada
+        showIntro: true,
+        introBanner: "https://placehold.co/600x300/2563eb/ffffff?text=Personalize+seu+Produto",
+        introTitle: "Quem irá usar esta peça?",
+        introSubtitle: "Este produto pode ser personalizado com o nome de quem irá usá-lo.",
+        introContinueButtonText: "Personalizar Agora",
+        introSkipButtonText: "Pular e adicionar",
+
+        modalTitle: "Quem irá usar esta peça?",
         modalSubtitle: "Preencha as informações abaixo antes de adicionar ao carrinho.",
         confirmButtonText: "Confirmar e adicionar",
         cancelButtonText: "Cancelar",
