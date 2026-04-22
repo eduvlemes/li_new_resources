@@ -98,10 +98,20 @@
                 vertical-align: middle;
             }
 
+            /* ── Coluna de cabeçalho de linha com sticky no scroll horizontal ── */
+            .gp-th-corner,
+            .gp-td-row-header {
+                position: sticky;
+                left: 0;
+                z-index: 2;
+            }
+
             .gp-th-corner {
                 background: ${CONFIG.colors.headerBg};
-                min-width: 60px;
-                position: relative;
+                min-width: 40px;
+                position: sticky;
+                left: 0;
+                z-index: 3;
                 overflow: hidden;
             }
 
@@ -160,6 +170,7 @@
                 font-size: 11px;
                 white-space: nowrap;
                 color: #333;
+                min-width: 72px;
             }
 
             .gp-td-row-header {
@@ -168,6 +179,7 @@
                 font-size: 13px;
                 color: ${CONFIG.colors.rowHeader};
                 white-space: nowrap;
+                min-width: 40px;
             }
 
             /* ── Célula indisponível ── */
@@ -368,7 +380,49 @@
                 background: ${CONFIG.colors.successBg};
             }
 
-            @media (max-width: 540px) {
+            @media (max-width: 600px) {
+                .gp-table {
+                    table-layout: auto;
+                }
+
+                .gp-table th,
+                .gp-table td {
+                    padding: 5px 0;
+                }
+
+                /* Sombra na coluna sticky para indicar scroll */
+                .gp-th-corner,
+                .gp-td-row-header {
+                    box-shadow: 2px 0 4px rgba(0,0,0,0.08);
+                }
+
+                .gp-th-col {
+                    min-width: 72px;
+                    font-size: 10px;
+                }
+
+                .gp-th-corner {
+                    min-width: 26px;
+                }
+
+                /* Oculta o texto da coluna de cabeçalho de linha */
+                .gp-td-row-header {
+                    min-width: 20px;
+                    font-size: 11px;
+                    
+                }
+
+                /* Mantém o número visível via ::before com font-size normal */
+                .gp-th-corner *{font-size:0}
+
+                .gp-cell-available {
+                    min-width: 72px;
+                }
+
+                .gp-unavailable {
+                    font-size: 9px;
+                }
+
                 .gp-footer {
                     flex-direction: column;
                     align-items: stretch;
@@ -524,7 +578,7 @@
             html += '</tr></thead><tbody>';
 
             for (const row of rows) {
-                html += `<tr><td class="gp-td-row-header">${this.escapeHTML(row.name)}</td>`;
+                html += `<tr><td class="gp-td-row-header" data-row-label="${this.escapeHTML(row.name)}">${this.escapeHTML(row.name)}</td>`;
 
                 for (const col of cols) {
                     const sku = skuMap[row.id] && skuMap[row.id][col.id];
