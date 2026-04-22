@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Purchase - Exemplo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        /* ── Barra de demo ── */
+        .demo-header {
+            background: #1f2937;
+            color: #fff;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .demo-header h1 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .demo-badge {
+            background: #3b82f6;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            letter-spacing: 0.05em;
+        }
+
+        .demo-note {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-left: auto;
+        }
+
+        /* ── Simulação de página de produto ── */
+        .pagina-produto {
+            max-width: 760px;
+            margin: 32px auto;
+            padding: 0 16px 80px;
+        }
+
+        .produto-detalhe {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .produto-detalhe .produto-nome {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .produto-detalhe .produto-codigo {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+        }
+
+        .produto-detalhe .produto-preco {
+            font-size: 26px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+
+        .produto-detalhe .produto-preco small {
+            font-size: 14px;
+            font-weight: 400;
+            color: #6b7280;
+        }
+
+        .produto-detalhe .produto-desc {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        /* ── Painel de configuração (demo) ── */
+        .demo-config {
+            max-width: 760px;
+            margin: 0 auto 32px;
+            padding: 0 16px;
+        }
+
+        .demo-config-box {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+
+        .demo-config-box h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 14px;
+        }
+
+        .demo-config-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .demo-config-row label {
+            font-size: 13px;
+            color: #6b7280;
+            min-width: 120px;
+        }
+
+        .demo-config-row select,
+        .demo-config-row input[type="text"] {
+            font-size: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: #111;
+        }
+
+        .demo-apply-btn {
+            background: #374151;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .demo-apply-btn:hover { background: #1f2937; }
+
+        .demo-log {
+            max-width: 760px;
+            margin: 0 auto 32px;
+            padding: 0 16px;
+        }
+
+        .demo-log-box {
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #d1fae5;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .demo-log-box .log-entry { margin-bottom: 3px; }
+        .demo-log-box .log-entry.success { color: #6ee7b7; }
+        .demo-log-box .log-entry.info { color: #93c5fd; }
+        .demo-log-box .log-entry.warn { color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<div class="demo-header">
+    <h1>Grade Purchase</h1>
+    <span class="demo-badge">DEMO</span>
+    <span class="demo-note">Dados mockados — chamadas de API interceptadas localmente</span>
+</div>
+
+<!-- Configurações da demo -->
+<div class="demo-config">
+    <div class="demo-config-box">
+        <h3>Configurações do Plugin</h3>
+        <div class="demo-config-row">
+            <label>Após adicionar:</label>
+            <select id="cfg-after-add">
+                <option value="none" selected>Permanecer na página</option>
+                <option value="redirect">Redirecionar para /carrinho</option>
+            </select>
+        </div>
+        <div class="demo-config-row">
+            <label>Cor primária:</label>
+            <input type="color" id="cfg-color" value="#3057a8">
+        </div>
+        <div class="demo-config-row">
+            <label>Inserção:</label>
+            <select id="cfg-method">
+                <option value="afterend" selected>afterend (abaixo do produto-detalhe)</option>
+                <option value="beforeend">beforeend (dentro, ao final)</option>
+            </select>
+        </div>
+        <button class="demo-apply-btn" onclick="applyConfig()">Aplicar e Reiniciar</button>
+    </div>
+</div>
+
+<!-- Simulação da página de produto da LI -->
+<div class="pagina-produto">
+
+    <!-- .produto-detalhe é o ponto de inserção padrão do plugin -->
+    <div class="produto-detalhe">
+        <div class="produto-nome">166 - CIGARRETE FEM SPORT FINO #MM# ESTONIA</div>
+        <div class="produto-codigo">Ref.: 166</div>
+        <div class="produto-preco">R$ 39,90 <small>/ unidade</small></div>
+        <div class="produto-desc">
+            Calça cigarrete feminina em tecido premium. Modelagem slim que valoriza a silhueta.
+            Disponível em diversas cores e tamanhos para maior conforto e estilo.
+        </div>
+    </div>
+
+    <!-- O plugin grade_purchase.js injeta o widget após .produto-detalhe -->
+
+</div>
+
+<!-- Log da demo -->
+<div class="demo-log">
+    <div class="demo-log-box" id="demo-log">
+        <div class="log-entry info">[ demo ] Inicializando página de produto simulada...</div>
+    </div>
+</div>
+
+<!-- jQuery (necessário para o plugin) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+    // ══════════════════════════════════════════════════════════════
+    // SIMULAÇÃO DA LOJA INTEGRADA
+    // ══════════════════════════════════════════════════════════════
+
+    // Variáveis globais injetadas pela plataforma LI na página de produto
+    window.PRODUTO_ID = 369819504;
+    window.LOJA_ID = '2862793';
+
+    // ── Mock da API de busca /_search ─────────────────────────────
+    const MOCK_SEARCH_RESPONSE = {"total":1,"products":[{"alternative_links":["/cigarrete-fem-sport-fino-mm-estonia","/produto//166-cigarrete-fem-sport-fino-mm-estonia.html"],"created_at":"2025-09-04T13:43:37.043264+00:00","updated_at":"2026-04-17T13:56:58.627756+00:00","active":true,"removed":false,"highlighted":false,"used":false,"status":"active","summary":null,"reference_codes":{"gtin":null,"mpn":null,"ncm":null},"brand":{"id":"21508753","name":"Muito Mais Jeans","path":"/muito-mais-jeans"},"seo":{"title":"","description":"","keyword":"","id":128850344},"main_category":{"id":"23695040","name":"FEMININO","path":"/feminino","child":null},"alternative_categories":[{"id":"23695040","name":"FEMININO","path":"/feminino","child":{"id":"23699335","name":"CIGARRETE FEMININA","path":"/cigarrete-feminina","child":null}}],"images":[{"id":"214342308","path":"/2862/2862793/produto/369819504/166-8tnuxrj2s7.jpg"},{"id":"214342307","path":"/2862/2862793/produto/369819504/166-verso-z42xzqkvst.jpg"}],"skus":[{"id":"369819799","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-38-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:45:19.534571+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37105","order":4,"name":"38","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820614","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-48-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":22,"reserved_quantity":0,"available_quantity":22,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:50:50.643483+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37110","order":9,"name":"48","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369819872","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-42-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:45:43.472647+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37107","order":6,"name":"42","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369819952","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-46-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":6,"reserved_quantity":0,"available_quantity":6,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:46:02.924206+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37109","order":8,"name":"46","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820040","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-50-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":20,"reserved_quantity":0,"available_quantity":20,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:46:29.297691+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37111","order":10,"name":"50","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821164","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-56-marrom","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":3,"reserved_quantity":0,"available_quantity":3,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:53:33.888587+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37114","order":13,"name":"56","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820684","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-42-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":4,"reserved_quantity":0,"available_quantity":4,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:51:09.772888+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37107","order":6,"name":"42","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821377","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-40-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:54:42.458236+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37106","order":5,"name":"40","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821484","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-48-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:55:22.816737+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37110","order":9,"name":"48","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369819848","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-40-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:45:34.556271+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37106","order":5,"name":"40","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820936","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-44-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:52:19.630882+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37108","order":7,"name":"44","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821006","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-48-marrom","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":10,"reserved_quantity":0,"available_quantity":10,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:52:37.79627+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37110","order":9,"name":"48","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369819677","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-36-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:44:48.287747+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37104","order":3,"name":"36","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369819655","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-34-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":2,"reserved_quantity":0,"available_quantity":2,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:44:39.306471+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37103","order":2,"name":"34","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820570","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-34-marrom","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:50:32.445918+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37103","order":2,"name":"34","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821056","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-50-marrom","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":10,"reserved_quantity":0,"available_quantity":10,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:52:53.298587+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37111","order":10,"name":"50","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821454","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-46-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:55:11.434635+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37109","order":8,"name":"46","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821396","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-42-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":1,"reserved_quantity":0,"available_quantity":1,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:54:51.478287+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37107","order":6,"name":"42","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369819913","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-44-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:45:54.608374+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37108","order":7,"name":"44","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820257","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-56-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":6,"reserved_quantity":0,"available_quantity":6,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:47:57.676653+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37114","order":13,"name":"56","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820062","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-52-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":7,"reserved_quantity":0,"available_quantity":7,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:46:38.558656+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37112","order":11,"name":"52","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820191","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-54-amendoa","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":4,"reserved_quantity":0,"available_quantity":4,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:47:48.344787+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37113","order":12,"name":"54","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821264","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-34-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":1,"reserved_quantity":0,"available_quantity":1,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:54:08.290507+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37103","order":2,"name":"34","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821299","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-36-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:54:21.375035+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37104","order":3,"name":"36","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821413","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-44-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":7,"reserved_quantity":0,"available_quantity":7,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:55:01.128442+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37108","order":7,"name":"44","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821525","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-50-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":5,"reserved_quantity":0,"available_quantity":5,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:55:38.628347+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37111","order":10,"name":"50","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820590","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-50-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":4,"reserved_quantity":0,"available_quantity":4,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:50:41.721895+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37111","order":10,"name":"50","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820976","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-46-marrom","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":14,"reserved_quantity":0,"available_quantity":14,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:52:28.540294+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37109","order":8,"name":"46","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369820652","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-40-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":2,"reserved_quantity":0,"available_quantity":2,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:50:59.474895+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37106","order":5,"name":"40","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821083","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-52-marrom","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":9,"reserved_quantity":0,"available_quantity":9,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:53:02.227957+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37112","order":11,"name":"52","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821127","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-54-marrom","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":4,"reserved_quantity":0,"available_quantity":4,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:53:20.471555+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37113","order":12,"name":"54","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821542","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-52-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":4,"reserved_quantity":0,"available_quantity":4,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:55:49.571278+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37112","order":11,"name":"52","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821635","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-56-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":2,"reserved_quantity":0,"available_quantity":2,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:56:22.569223+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37114","order":13,"name":"56","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821324","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-38-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2025-09-04T13:54:32.532698+00:00","modified_at":"2026-04-17T19:09:24.740476+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37105","order":4,"name":"38","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"369821598","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-54-azul-bic","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":1,"reserved_quantity":0,"available_quantity":1,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2025-09-04T13:56:08.369223+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37113","order":12,"name":"54","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235135","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-50-natural","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":0,"reserved_quantity":0,"available_quantity":0,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":false,"can_be_delivered":true,"created_at":"2026-04-17T13:47:05.201861+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37111","order":10,"name":"50","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020243","order":0,"name":"Natural","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235127","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-56-natural","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":10,"reserved_quantity":0,"available_quantity":10,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2026-04-17T13:46:20.763643+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37114","order":13,"name":"56","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020243","order":0,"name":"Natural","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235139","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-52-natural","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":2,"reserved_quantity":0,"available_quantity":2,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2026-04-17T13:47:22.862809+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37112","order":11,"name":"52","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020243","order":0,"name":"Natural","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235130","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-54-natural","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":11,"reserved_quantity":0,"available_quantity":11,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2026-04-17T13:46:39.833443+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37113","order":12,"name":"54","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020243","order":0,"name":"Natural","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235190","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-34-natural","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":1,"reserved_quantity":0,"available_quantity":1,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2026-04-17T13:49:57.24751+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37103","order":2,"name":"34","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020243","order":0,"name":"Natural","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235238","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-52-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":4,"reserved_quantity":0,"available_quantity":4,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2026-04-17T13:51:56.421766+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37112","order":11,"name":"52","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235214","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-56-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":2,"reserved_quantity":0,"available_quantity":2,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2026-04-17T13:51:06.155847+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37114","order":13,"name":"56","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]},{"id":"400235225","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","code":"166-54-tomato","active":true,"removed":false,"status":"active","reference_codes":{"gtin":null,"mpn":null,"ncm":null},"price":{"base":39.90,"selling":39.90,"upon_request":false},"dimensions":{"weight":0.003,"height":15,"width":20,"length":5},"inventory":{"total_quantity":4,"reserved_quantity":0,"available_quantity":4,"is_managed":true,"has_stock":true},"delivery":{"in_stock_delay":0,"out_of_stock_delay":-1,"is_fragile":false,"free_shipping":false},"available":true,"can_be_delivered":true,"created_at":"2026-04-17T13:51:22.727757+00:00","modified_at":"2026-04-17T19:09:24.734096+00:00","variations":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"value":{"id":"37114","order":13,"name":"56","related_images":[],"swatch":null}},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"value":{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}}],"specification_images":[]}],"options":[{"option":{"id":"8947","order":12,"name":"Tamanho de calça","display_name":"Tamanho"},"values":[{"id":"37103","order":2,"name":"34","related_images":[],"swatch":null},{"id":"37104","order":3,"name":"36","related_images":[],"swatch":null},{"id":"37105","order":4,"name":"38","related_images":[],"swatch":null},{"id":"37106","order":5,"name":"40","related_images":[],"swatch":null},{"id":"37107","order":6,"name":"42","related_images":[],"swatch":null},{"id":"37108","order":7,"name":"44","related_images":[],"swatch":null},{"id":"37109","order":8,"name":"46","related_images":[],"swatch":null},{"id":"37110","order":9,"name":"48","related_images":[],"swatch":null},{"id":"37111","order":10,"name":"50","related_images":[],"swatch":null},{"id":"37112","order":11,"name":"52","related_images":[],"swatch":null},{"id":"37113","order":12,"name":"54","related_images":[],"swatch":null},{"id":"37114","order":13,"name":"56","related_images":[],"swatch":null}]},{"option":{"id":"5148307","order":1000,"name":"CORES","display_name":"CORES"},"values":[{"id":"14020240","order":0,"name":"Amendoa","related_images":[],"swatch":null},{"id":"14020249","order":0,"name":"Azul Bic","related_images":[],"swatch":null},{"id":"14020237","order":0,"name":"Marrom","related_images":[],"swatch":null},{"id":"14020243","order":0,"name":"Natural","related_images":[],"swatch":null},{"id":"14020248","order":0,"name":"Tomato","related_images":[],"swatch":null}]}],"media":{"youtube":null},"tags":[],"slug":"/166-cigarrete-fem-sport-fino-mm-estonia","id":"369819504","name":"166- CIGARRETE FEM SPORT FINO #MM# ESTONIA","url":"/cigarrete-fem-sport-fino-mm-estonia","units_sold":43,"price":{"base":39.90,"selling":39.90,"upon_request":false},"available":true,"description":null,"type":"multiple","code":"166","price_varies":false,"free_shipping":false}],"filters":[],"price":{"min":null,"max":null}};
+
+    // ── Mock do fetch (intercepta chamadas /_search) ──────────────
+    const _originalFetch = window.fetch;
+    window.fetch = function(url) {
+        if (typeof url === 'string' && url.includes('_search') && url.includes('filters=product_ids')) {
+            demoLog('info', '[ fetch ] GET ' + url.split('?')[0] + '?... → mock response (369819504)');
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve(JSON.parse(JSON.stringify(MOCK_SEARCH_RESPONSE)))
+            });
+        }
+        return _originalFetch.apply(this, arguments);
+    };
+
+    // ── Mock do $.get (intercepta chamadas /carrinho/produto/…) ───
+    // Aguarda jQuery carregar antes de fazer o mock
+    document.addEventListener('DOMContentLoaded', function () {
+        const _originalGet = $.get;
+        $.get = function(url, callback) {
+            if (typeof url === 'string' && url.includes('/carrinho/produto/')) {
+                const parts = url.split('/');
+                const skuId = decodeURIComponent(parts[3] || '');
+                const qty   = decodeURIComponent(parts[5] || '1');
+                demoLog('success', '[ carrinho ] Adicionando SKU ' + skuId + ' × ' + qty + ' un. → sucesso (mock)');
+                const jqXHR = {
+                    fail: function(fn) { return this; }
+                };
+                setTimeout(function() {
+                    if (typeof callback === 'function') {
+                        callback({ status: 'sucesso', carrinho_id: 'mock-cart-123', produto_id: skuId });
+                    }
+                }, 350);
+                return jqXHR;
+            }
+            return _originalGet.apply(this, arguments);
+        };
+    });
+
+    // ── Utilitário de log ─────────────────────────────────────────
+    function demoLog(type, msg) {
+        const box = document.getElementById('demo-log');
+        if (!box) return;
+        const el = document.createElement('div');
+        el.className = 'log-entry ' + (type || 'info');
+        el.textContent = msg;
+        box.appendChild(el);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    // ── Aplicar configurações e reiniciar plugin ──────────────────
+    function applyConfig() {
+        window.GradePurchaseConfig = {
+            afterAdd: document.getElementById('cfg-after-add').value,
+            colors: {
+                primary: document.getElementById('cfg-color').value
+            },
+            insertMethod: document.getElementById('cfg-method').value
+        };
+        if (window.GradePurchase) {
+            window.GradePurchase.reinit();
+            demoLog('info', '[ config ] Plugin reiniciado com novas configurações');
+        }
+    }
+</script>
+
+<!-- Plugin Grade Purchase -->
+<script src="resources/grade_purchase.js"></script>
+
+</body>
+</html>

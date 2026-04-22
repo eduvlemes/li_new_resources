@@ -110,7 +110,16 @@
             arrowIcon: '#333333',
             arrowHover: '#f0f0f0',
             dotActive: '#111111',
-            dotInactive: '#cccccc'
+            dotInactive: '#cccccc',
+            viewAllBackground: '#111111',
+            viewAllTextColor: '#ffffff',
+            viewAllBorder: 'transparent',
+            viewAllHover: '#333333',
+            productCardBackground: '#ffffff',
+            productCardBorder: '#e0e0e0',
+            productNameColor: '#111111',
+            viewProductBackground: '#111111',
+            viewProductTextColor: '#ffffff'
         },
 
         // Dimensões
@@ -119,7 +128,33 @@
         photoAspectRatio: '3/4',
 
         // Classe CSS adicional na section (útil para customização externa)
-        containerClass: ''
+        containerClass: '',
+
+        // Limite de itens exibidos no slider (0 = sem limite, mostra todos)
+        sliderLimit: 0,
+
+        // Botão "Ver todos" exibido após a navegação do slider / lista
+        showViewAll: false,
+        viewAllText: 'Ver todos',
+        viewAllUrl: '',
+        viewAllTarget: '_self',
+
+        // Modo de exibição: 'slider' | 'list'
+        displayMode: 'slider',
+
+        // Número de colunas no modo lista por breakpoint
+        listColumns: {
+            desktop: 3,
+            tablet: 1,
+            mobile: 1
+        },
+
+        // Texto do botão "ver produto" vinculado ao depoimento
+        viewProductLabel: 'Ver produto',
+
+        // URL base da loja (necessário para busca de produto por ID)
+        // Ex: 'https://www.minhaloja.com.br'
+        storeUrl: ''
     };
 
     // Mescla configuração padrão com configuração do cliente (se existir)
@@ -143,6 +178,10 @@
             } else if (typeof qml === 'object') {
                 CONFIG.quoteMaxLines = Object.assign({}, DEFAULT_CONFIG.quoteMaxLines, qml);
             }
+        }
+
+        if (window.TestimonialsSliderConfig.listColumns && typeof window.TestimonialsSliderConfig.listColumns === 'object') {
+            CONFIG.listColumns = Object.assign({}, DEFAULT_CONFIG.listColumns, window.TestimonialsSliderConfig.listColumns);
         }
 
         if (!window.TestimonialsSliderConfig.testimonials) {
@@ -484,6 +523,138 @@
                     overflow: visible;`}
                 }` : ''}
             }
+
+            /* ---- Modo lista ---- */
+            .ts-list {
+                display: grid;
+                grid-template-columns: repeat(${CONFIG.listColumns.desktop}, 1fr);
+                gap: 24px;
+            }
+
+            @media (max-width: 1023px) {
+                .ts-list {
+                    grid-template-columns: repeat(${CONFIG.listColumns.tablet}, 1fr);
+                }
+            }
+
+            @media (max-width: 599px) {
+                .ts-list {
+                    grid-template-columns: repeat(${CONFIG.listColumns.mobile}, 1fr);
+                }
+            }
+
+            .ts-list-item {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .ts-list-item .ts-card-inner {
+                height: 100%;
+            }
+
+            /* ---- Produto flutuante (aparece no topo da foto) ---- */
+            .ts-product-float {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                height: 54px;
+                background: rgba(255, 255, 255, 0.93);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+                max-width: 54px;
+                transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .ts-photo-box:hover .ts-product-float {
+                max-width: 280px;
+            }
+
+            .ts-product-float-img {
+                width: 54px;
+                height: 54px;
+                object-fit: cover;
+                flex-shrink: 0;
+                display: block;
+            }
+
+            .ts-product-float-body {
+                padding: 6px 10px 6px 8px;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                white-space: nowrap;
+                opacity: 0;
+                transition: opacity 0.2s ease 0.1s;
+            }
+
+            .ts-photo-box:hover .ts-product-float-body {
+                opacity: 1;
+            }
+
+            .ts-product-float-name {
+                font-size: 0.72rem;
+                font-weight: 600;
+                color: ${CONFIG.colors.productNameColor};
+                margin: 0;
+                line-height: 1.35;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 180px;
+            }
+
+            .ts-product-float-link {
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                text-decoration: none;
+                color: ${CONFIG.colors.viewProductBackground};
+                transition: opacity 0.2s ease;
+            }
+
+            .ts-product-float-link:hover {
+                opacity: 0.7;
+            }
+
+            .ts-product-float-loading {
+                padding: 0 14px;
+                font-size: 0.72rem;
+                color: #bbb;
+                white-space: nowrap;
+            }
+
+            /* ---- Botão ver todos ---- */
+            .ts-view-all-wrap {
+                text-align: center;
+                margin-top: 36px;
+            }
+
+            .ts-view-all {
+                display: inline-block;
+                font-size: 0.88rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                text-decoration: none;
+                color: ${CONFIG.colors.viewAllTextColor};
+                background: ${CONFIG.colors.viewAllBackground};
+                border: 1px solid ${CONFIG.colors.viewAllBorder};
+                border-radius: 100px;
+                padding: 14px 40px;
+                transition: background 0.2s ease;
+            }
+
+            .ts-view-all:hover {
+                background: ${CONFIG.colors.viewAllHover};
+            }
         </style>
     `;
 
@@ -503,6 +674,7 @@
             this.dragCurrentX = 0;
             this.dragMoved = false;
             this.visibleCount = 1;
+            this.displayedTestimonials = CONFIG.testimonials;
             this.totalSlides = CONFIG.testimonials.length;
 
             this.init();
@@ -510,9 +682,26 @@
 
         init() {
             if (!CONFIG.active) return;
-            if (!CONFIG.testimonials || this.totalSlides === 0) return;
+            if (!CONFIG.testimonials || CONFIG.testimonials.length === 0) return;
+
+            // Aplicar limite de itens no modo slider
+            this.displayedTestimonials = CONFIG.testimonials;
+            if (CONFIG.displayMode === 'slider' && CONFIG.sliderLimit > 0) {
+                this.displayedTestimonials = CONFIG.testimonials.slice(0, CONFIG.sliderLimit);
+            }
+            this.totalSlides = this.displayedTestimonials.length;
 
             this.injectStyles();
+
+            // Modo lista
+            if (CONFIG.displayMode === 'list') {
+                this.renderList();
+                this.setupListElements();
+                this.loadProductCards(); // fire and forget — async
+                return;
+            }
+
+            // Modo slider (padrão)
             this.render();
             this.setupElements();
             this.visibleCount = this.getVisible();
@@ -521,6 +710,7 @@
             this.goTo(0, false);
             this.setupEventListeners();
             if (CONFIG.autoplay) this.startAutoplay();
+            this.loadProductCards(); // fire and forget — async
         }
 
         injectStyles() {
@@ -584,6 +774,12 @@
                 `;
             }
 
+            const productFloatHTML = t.productId ? `
+                <div class="ts-product-float" data-product-id="${this.escHtml(String(t.productId))}">
+                    <span class="ts-product-float-loading">...</span>
+                </div>
+            ` : '';
+
             return `
                 <div class="ts-card" data-index="${index}" style="width:${this.cardWidthPct()}%" role="group" aria-label="Depoimento ${index + 1} de ${this.totalSlides}">
                     <div class="ts-card-inner">
@@ -598,6 +794,7 @@
                                 <p class="ts-author-name">${safeAuthor}</p>
                                 ${safeRole ? `<p class="ts-author-role">${safeRole}</p>` : ''}
                             </div>
+                            ${productFloatHTML}
                         </div>
                     </div>
                 </div>
@@ -628,6 +825,12 @@
                 </div>
             ` : '';
 
+            const viewAllHTML = CONFIG.showViewAll && CONFIG.viewAllUrl ? `
+                <div class="ts-view-all-wrap">
+                    <a class="ts-view-all" href="${this.escHtml(CONFIG.viewAllUrl)}" target="${this.escHtml(CONFIG.viewAllTarget)}">${this.escHtml(CONFIG.viewAllText)}</a>
+                </div>
+            ` : '';
+
             const extraClass = CONFIG.containerClass ? ` ${CONFIG.containerClass}` : '';
 
             const html = `
@@ -638,6 +841,7 @@
                             <div class="ts-track"></div>
                         </div>
                         ${navHTML}
+                        ${viewAllHTML}
                     </div>
                 </section>
             `;
@@ -657,7 +861,7 @@
 
         buildTrack() {
             this.track.innerHTML = '';
-            CONFIG.testimonials.forEach((t, i) => {
+            this.displayedTestimonials.forEach((t, i) => {
                 this.track.insertAdjacentHTML('beforeend', this.buildCardHTML(t, i));
             });
         }
@@ -878,6 +1082,164 @@
                 this.buildDots();
                 this.goTo(Math.min(this.currentIndex, this.maxIndex()), false);
             }
+        }
+
+        // ========================================
+        // MODO LISTA
+        // ========================================
+        renderList() {
+            const existing = document.getElementById(SECTION_ID);
+            if (existing) existing.remove();
+
+            const titleHTML = CONFIG.showTitle ? `
+                <div class="ts-header">
+                    <h2 class="ts-title">${this.escHtml(CONFIG.title)}</h2>
+                    ${CONFIG.subtitle ? `<p class="ts-subtitle">${this.escHtml(CONFIG.subtitle)}</p>` : ''}
+                </div>
+            ` : '';
+
+            const itemsHTML = CONFIG.testimonials.map((t, i) => this.buildListItemHTML(t, i)).join('');
+
+            const viewAllHTML = CONFIG.showViewAll && CONFIG.viewAllUrl ? `
+                <div class="ts-view-all-wrap">
+                    <a class="ts-view-all" href="${this.escHtml(CONFIG.viewAllUrl)}" target="${this.escHtml(CONFIG.viewAllTarget)}">${this.escHtml(CONFIG.viewAllText)}</a>
+                </div>
+            ` : '';
+
+            const extraClass = CONFIG.containerClass ? ` ${CONFIG.containerClass}` : '';
+
+            const html = `
+                <section id="${SECTION_ID}" class="ts-section${extraClass}" aria-label="Depoimentos de clientes">
+                    <div class="ts-inner">
+                        ${titleHTML}
+                        <div class="ts-list">
+                            ${itemsHTML}
+                        </div>
+                        ${viewAllHTML}
+                    </div>
+                </section>
+            `;
+
+            const target = document.querySelector(CONFIG.insertSelector) || document.body;
+            target.insertAdjacentHTML(CONFIG.insertMethod, html);
+        }
+
+        setupListElements() {
+            this.section = document.getElementById(SECTION_ID);
+        }
+
+        buildListItemHTML(t, index) {
+            const safeQuote = this.escHtml(t.quote || '');
+            const safeAuthor = this.escHtml(t.author || '');
+            const safeRole = t.role ? this.escHtml(t.role) : '';
+            const initials = this.getInitials(t.author);
+
+            let photoContent;
+            if (t.photo) {
+                const safePhoto = this.escHtml(t.photo);
+                photoContent = `
+                    <img
+                        class="ts-photo-img"
+                        src="${safePhoto}"
+                        alt="${safeAuthor}"
+                        loading="lazy"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                    >
+                    <div class="ts-photo-placeholder" style="display:none" aria-hidden="true">
+                        <span class="ts-photo-initials-large">${initials}</span>
+                    </div>
+                `;
+            } else {
+                photoContent = `
+                    <div class="ts-photo-placeholder" aria-hidden="true">
+                        <span class="ts-photo-initials-large">${initials}</span>
+                    </div>
+                `;
+            }
+
+            const productFloatHTML = t.productId ? `
+                <div class="ts-product-float" data-product-id="${this.escHtml(String(t.productId))}">
+                    <span class="ts-product-float-loading">...</span>
+                </div>
+            ` : '';
+
+            return `
+                <div class="ts-list-item" role="group" aria-label="Depoimento ${index + 1}">
+                    <div class="ts-card-inner">
+                        <div class="ts-quote-box">
+                            <span class="ts-quote-open" aria-hidden="true">&ldquo;</span>
+                            <p class="ts-quote-text">${safeQuote}</p>
+                            <span class="ts-quote-close" aria-hidden="true">&rdquo;</span>
+                        </div>
+                        <div class="ts-photo-box">
+                            ${photoContent}
+                            <div class="ts-photo-overlay">
+                                <p class="ts-author-name">${safeAuthor}</p>
+                                ${safeRole ? `<p class="ts-author-role">${safeRole}</p>` : ''}
+                            </div>
+                            ${productFloatHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async fetchProduct(productId) {
+            if (!CONFIG.storeUrl) return null;
+            try {
+                const base = CONFIG.storeUrl.replace(/\/$/, '');
+                const url = base + '/_search?filters=product_ids:' + encodeURIComponent(productId) ;
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (!data.products || data.products.length === 0) return null;
+                return data.products[0];
+            } catch (e) {
+                return null;
+            }
+        }
+
+        buildProductCardContent(product) {
+            const imgBase = 'https://cdn.awsli.com.br/200x200';
+            const rawImage = product.preview_images && product.preview_images[0] ? product.preview_images[0] : '';
+            const imageUrl = rawImage
+                ? (rawImage.startsWith('http') ? rawImage : imgBase + rawImage)
+                : '';
+            const storeBase = (CONFIG.storeUrl || '').replace(/\/$/, '');
+            const rawUrl = product.url || '';
+            const productUrl = rawUrl
+                ? (rawUrl.startsWith('http') ? rawUrl : storeBase + rawUrl)
+                : '#';
+            const safeName = this.escHtml(product.name || '');
+            const safeUrl = this.escHtml(productUrl);
+            const safeLabel = this.escHtml(CONFIG.viewProductLabel);
+
+            const imgHTML = imageUrl ? `
+                <img class="ts-product-float-img" src="${this.escHtml(imageUrl)}" alt="${safeName}" loading="lazy">
+            ` : '';
+
+            return `
+                ${imgHTML}
+                <div class="ts-product-float-body">
+                    <p class="ts-product-float-name">${safeName}</p>
+                    <a class="ts-product-float-link" href="${safeUrl}?utm_source=testimonials" target="_blank" rel="noopener noreferrer">${safeLabel}</a>
+                </div>
+            `;
+        }
+
+        async loadProductCards() {
+            if (!this.section) return;
+            const cards = this.section.querySelectorAll('[data-product-id]');
+            const promises = Array.from(cards).map(async (card) => {
+                const productId = card.getAttribute('data-product-id');
+                const product = await this.fetchProduct(productId);
+                if (product) {
+                    card.innerHTML = this.buildProductCardContent(product);
+                } else {
+                    card.remove();
+                }
+            });
+            await Promise.all(promises);
         }
 
         // ========================================
