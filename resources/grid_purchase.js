@@ -591,7 +591,7 @@
                             ? (sku.inventory.available_quantity || 0)
                             : 999;
                         html += `<td class="gp-cell gp-cell-available" data-sku="${sku.id}" data-max="${maxQty}">` +
-                            `<span class="gp-price">${this.formatPrice(sku.price.selling)}${CONFIG.priceUnit}</span>` +
+                            `<span class="gp-price">${this.formatPrice(this.getSkuPrice(sku))}${CONFIG.priceUnit}</span>` +
                             `<div class="gp-qty-control">` +
                             `<button class="gp-qty-btn gp-qty-minus" data-sku="${sku.id}" aria-label="Diminuir" disabled>−</button>` +
                             `<span class="gp-qty-value" id="gp-qty-${sku.id}">0</span>` +
@@ -696,7 +696,7 @@
             html += '<ul class="gp-summary-list">';
 
             for (const item of items) {
-                const subtotal = item.qty * item.sku.price.selling;
+                const subtotal = item.qty * this.getSkuPrice(item.sku);
                 total += subtotal;
 
                 const label = this.productData.colOption
@@ -765,6 +765,15 @@
         }
 
         // ── Utilitários ──────────────────────────────────────────────────────
+
+        getSkuPrice(sku) {
+            const el = $('.acoes-produto[data-produto-id="' + sku.id + '"] [data-sell-price]');
+            if (el.length) {
+                const price = parseFloat(el.attr('data-sell-price'));
+                if (!isNaN(price) && price > 0) return price;
+            }
+            return sku.price.selling;
+        }
 
         formatPrice(value) {
             const parts = value.toFixed(2).split('.');
