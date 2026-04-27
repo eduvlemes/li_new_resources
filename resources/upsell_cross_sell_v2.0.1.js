@@ -1365,7 +1365,7 @@
                 if (typeof sendMetrics === 'function') {
                     try {
                         var MS = {
-                            id: response.carrinho_id,
+                            id: skuId,
                             origin: source || 'unknown',
                             items: [{
                                 item_id: response.produto_id,
