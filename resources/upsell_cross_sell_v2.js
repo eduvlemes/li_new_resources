@@ -1372,7 +1372,7 @@
                             }]
                         };
                         var L = sendMetrics({ type: 'event', name: 'add_to_cart', data: MS });
-                        $(document).trigger('li_change_quantity', [L, MS]);
+                        $(document).trigger('add_to_cart', [L, MS]);
                     } catch (e) { /* métricas não disponíveis */ }
                 }
 
