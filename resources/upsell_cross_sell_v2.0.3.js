@@ -1365,10 +1365,10 @@
                 if (typeof sendMetrics === 'function') {
                     try {
                         var MS = {
-                            id: skuId,
+                            id: response.carrinho_id,
                             origin: source || 'unknown',
                             items: [{
-                                item_id: response.produto_id,
+                                item_id: skuId,
                                 quantity: (response.produto && response.produto.quantidade ? response.produto.quantidade : 0),
                                 origin: source || 'unknown',
                             }]
