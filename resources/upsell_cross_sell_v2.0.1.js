@@ -1369,7 +1369,8 @@
                             origin: source || 'unknown',
                             items: [{
                                 item_id: response.produto_id,
-                                quantity: (response.produto && response.produto.quantidade ? response.produto.quantidade : 0)
+                                quantity: (response.produto && response.produto.quantidade ? response.produto.quantidade : 0),
+                                origin: source || 'unknown',
                             }]
                         };
                         var L = sendMetrics({ type: 'event', name: 'add_to_cart', data: MS });
