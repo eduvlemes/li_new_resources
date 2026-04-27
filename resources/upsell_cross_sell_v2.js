@@ -1366,6 +1366,7 @@
                     try {
                         var MS = {
                             id: response.carrinho_id,
+                            origin: source || 'unknown',
                             items: [{
                                 item_id: response.produto_id,
                                 quantity: (response.produto && response.produto.quantidade ? response.produto.quantidade : 0)
