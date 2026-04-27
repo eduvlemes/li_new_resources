@@ -1373,6 +1373,7 @@
                                 origin: source || 'unknown',
                             }]
                         };
+                        console.log(MS);
                         var L = sendMetrics({ type: 'event', name: 'add_to_cart', data: MS });
                         $(document).trigger('li_add_to_cart', [L, MS]);
                     } catch (e) { /* métricas não disponíveis */ }
