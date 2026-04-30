@@ -2002,7 +2002,7 @@
                     <div class="qr-product-info">
                         <div class="qr-product-name">${product.name}</div>
                         ${price ? `<div class="qr-product-price">${price}</div>` : ''}
-                        <a class="qr-product-buy" href="${product.url}" target="_blank" rel="noopener">${CONFIG.buttons.buy}</a>
+                        <a class="qr-product-buy" href="${product.url}" target="_blank" rel="noopener">${CONFIG.buttons.buy}?utm_search=tipo_mordida</a>
                     </div>
                 </div>
             `;
