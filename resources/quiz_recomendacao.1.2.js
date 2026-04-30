@@ -1469,6 +1469,7 @@
                 .qr-profile-grid { grid-template-columns: 1fr; }
                 .qr-products-grid { grid-template-columns: repeat(2, 1fr); }
             }
+                body div#barraNewsletter{margin-top:0!important}
         </style>
     `;
 
