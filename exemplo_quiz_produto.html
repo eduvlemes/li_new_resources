@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Recomendação — Biobone</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #f4f8f4;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        }
+        #quiz-recomendacao {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         CONFIGURAÇÃO DO QUIZ — edite aqui para personalizar
+         ============================================================ -->
+    <script>
+        window.QuizRecomendacaoConfig = {
+
+            // Textos do cabeçalho
+            badgeLabel: '🦴 GUIA DE RECOMENDAÇÃO BIOBONE',
+            title: 'Encontre o Mordedor Ideal',
+            subtitle: 'Responda 4 perguntas rápidas para descobrir qual Biobone é o certo para o seu cão.',
+
+            // Escala de durabilidade
+            scaleLabel: 'ESCALA DE DENSIDADE',
+            scaleLevels: [
+                { key: 'SOFT',   label: 'Macio',              description: 'Ideal para filhotes e sêniors',  color: '#52b788' },
+                { key: 'MEDIUM', label: 'Balanceado / Moderado', description: 'Para adultos, uso diário',    color: '#2d6a4f' },
+                { key: 'HARD',   label: 'Resistente',          description: 'Para mordedores intensos',      color: '#0d2118' }
+            ],
+
+            // Aviso no rodapé
+            disclaimer: 'Nota: A raça é um ponto de partida. Sempre ajuste de acordo com a intensidade de mordida individual do seu cão, saúde dental e idade. Os valores de PSI são médias por raça baseadas em pesquisas veterinárias. Limiares de idade sênior: raças gigantes (40+ kg) aos 5–7 anos; grandes (23–40 kg) aos 6–8 anos; médias (9–23 kg) aos 8–10 anos; pequenas/toy (abaixo de 9 kg) aos 10–13 anos. Em caso de dúvida, comece mais macio e ajuste.',
+
+            // Rótulos dos botões
+            buttons: {
+                continue: 'Continuar →',
+                back: '← Voltar',
+                restart: 'Recomeçar',
+                seeResult: 'Ver Minha Recomendação →',
+                buy: 'Comprar'
+            },
+
+            // Termos de busca — devem corresponder às palavras nos títulos dos seus produtos
+            durabilityTerms: {
+                SOFT:   'Moderada',
+                MEDIUM: 'Forte',
+                HARD:   'Extra Forte'
+            },
+            sizeTerms: {
+                MINI:   'Mini',
+                SMALL:  'Pequeno',
+                MEDIUM: 'Médio',
+                LARGE:  'Grande'
+            },
+
+            // Quantidade máxima de produtos exibidos
+            resultsLimit: 8,
+
+            // Paleta de cores — identidade visual Biobone
+            colors: {
+                background:              '#f4f8f4',
+                cardBackground:          '#ffffff',
+                cardBorder:              '#d4e4d4',
+                headerText:              '#0d2118',
+                bodyText:                '#3a4a3a',
+                softColor:               '#52b788',
+                mediumColor:             '#2d6a4f',
+                hardColor:               '#0d2118',
+                selectedBorder:          '#2d6a4f',
+                continueBtn:             '#2d6a4f',
+                continueBtnText:         '#ffffff',
+                continueBtnDisabled:     '#b8cdb8',
+                backBtn:                 '#ffffff',
+                backBtnBorder:           '#b8cdb8',
+                backBtnText:             '#3a4a3a'
+            },
+
+            // Passos do quiz
+            steps: [
+                {
+                    id: 'breed',
+                    stepLabel: 'RAÇA',
+                    title: 'Qual é a raça do seu cão?',
+                    description: 'Mais de 200 raças + mixes de Doodle disponíveis. Opções de raças mistas no final da lista.',
+                    type: 'searchable-list',
+                    searchPlaceholder: 'Digite para buscar raças...',
+                    options: null
+                },
+                {
+                    id: 'age',
+                    stepLabel: 'IDADE', 
+                    title: 'Quantos anos tem seu cão?',
+                    description: 'A idade afeta o desenvolvimento da mandíbula e a sensibilidade dental.',
+                    type: 'single-select',
+                    options: [
+                        { id: 'puppy',  label: 'Menos de 1 ano',  description: 'Filhote',            emoji: '🐾', tag: 'Filhote' },
+                        { id: 'young',  label: '1 a 4 anos',      description: 'Adulto jovem',       emoji: '🐕', tag: null },
+                        { id: 'adult',  label: '5 a 7 anos',      description: 'Adulto maduro',      emoji: '🐕', tag: null },
+                        { id: 'senior', label: '8 a 10 anos',     description: 'Adulto mais velho',  emoji: '🦴', tag: 'Sênior' },
+                        { id: 'elder',  label: '11+ anos',        description: 'Anos dourados',      emoji: '🦴', tag: 'Sênior' }
+                    ]
+                },
+                {
+                    id: 'chewStyle',
+                    stepLabel: 'MORDIDA',
+                    title: 'Como seu cão morde?',
+                    description: 'Escolha o estilo que melhor descreve a mordida diária dele.',
+                    type: 'single-select',
+                    options: [
+                        { id: 'gentle',   label: 'Mordedor Suave',    description: 'Mordiscada leve, perde o interesse rapidamente', emoji: '😌' },
+                        { id: 'everyday', label: 'Mordedor Moderado', description: 'Morde todo dia, pressão moderada',               emoji: '😊' },
+                        { id: 'power',    label: 'Mordedor Intenso',  description: 'Destrói brinquedos, mastigação pesada',          emoji: '💪' }
+                    ]
+                },
+                {
+                    id: 'health',
+                    stepLabel: 'SAÚDE',
+                    title: 'Alguma consideração de saúde?',
+                    description: 'Selecione as que se aplicam — ou avance se nenhuma se aplica.',
+                    type: 'multi-select',
+                    options: [
+                        { id: 'allergies', label: 'Propensão a Alergias',  description: 'Estômago sensível, reações na pele ou intolerâncias alimentares',           emoji: '🌿' },
+                        { id: 'dental',    label: 'Sensibilidade Dental',  description: 'Dentes quebrados/desgastados, problemas gengivais, trabalho dental recente', emoji: '🦷' }
+                    ],
+                    infoBox: 'Boa notícia: o Biobone é 100% natural — sem nylon, borracha ou subprodutos animais. Se seu cão tem alergias, recomendaremos o sabor Cana ou Laranja. Sem alergias? O sabor Carne e Peixe é uma ótima escolha!'
+                }
+            ],
+
+            // Recomendações de sabor
+            flavors: {
+                allergies: {
+                    name: 'Cana / Laranja',
+                    description: 'Os sabores Cana e Laranja do Biobone são feitos para cães sensíveis — à base de ingredientes naturais, livres de alérgenos comuns e irresistíveis.'
+                },
+                default: {
+                    name: 'Carne e Peixe',
+                    description: 'O sabor Carne e Peixe do Biobone é a escolha favorita para a maioria dos cães. Rico, natural e irresistível.'
+                }
+            }
+
+        };
+    </script>
+
+    <!-- Container do quiz -->
+    <div id="quiz-recomendacao"></div>
+
+    <!-- Plugin -->
+    <script src="resources/quiz_recomendacao.js"></script>
+
+</body>
+</html>
