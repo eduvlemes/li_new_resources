@@ -876,6 +876,7 @@
                 available: s.available !== false && (s.inventory ? s.inventory.has_stock !== false : true)
             };
         });
+        if (p.active === false || p.available === false) return null;
         return {
             id: String(p.id),
             name: p.name || '',
@@ -885,7 +886,7 @@
             priceOld: (p.price && p.price.base && p.price.selling && p.price.base > p.price.selling) ? p.price.base : null,
             skus: skus,
             isMultiple: skus.length > 1,
-            available: p.available !== false,
+            available: true,
             unitsSold: p.units_sold || 0
         };
     }
@@ -1159,11 +1160,13 @@
             var fixedRaw   = results[0];
             var dynamicRaw = results[1];
 
-            // Filtra excluídos (produto atual, itens do carrinho)
+            // Filtra excluídos (produto atual, itens do carrinho) e indisponíveis
             var fixedFiltered = fixedRaw.filter(function (p) {
-                return p && !excludeIds.has(p.id);
+                return p && p.available && !excludeIds.has(p.id);
             });
-            var dynamicFiltered = filterProducts(dynamicRaw, excludeIds);
+            var dynamicFiltered = filterProducts(dynamicRaw, excludeIds).filter(function (p) {
+                return p && p.available;
+            });
 
             // Remove dos dinâmicos os que já estão nos fixos
             var fixedSet = new Set(fixedFiltered.map(function (p) { return p.id; }));
