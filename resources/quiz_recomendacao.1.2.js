@@ -1470,6 +1470,7 @@
                 .qr-products-grid { grid-template-columns: repeat(2, 1fr); }
             }
                 body div#barraNewsletter{margin-top:0!important}
+                .pagina-pagina #corpo{margin:0!important}
         </style>
     `;
 
