@@ -1946,6 +1946,9 @@
             // because "forte" is a substring of "extra forte" in the API results
             const excludeTerm = (durability === 'MEDIUM') ? normalize(CONFIG.durabilityTerms['HARD'] || 'extra forte') : null;
 
+            // The term the product name must contain (positive durability assertion)
+            const requireTerm = normalize(durabilityTerm);
+
             fetch(url)
                 .then(function (response) {
                     if (!response.ok) throw new Error('Search request failed');
@@ -1960,6 +1963,11 @@
                             return !normalize(p.name).includes(excludeTerm);
                         });
                     }
+
+                    // Second filter: product name must actually contain the target durability term
+                    allProducts = allProducts.filter(function (p) {
+                        return normalize(p.name).includes(requireTerm);
+                    });
 
                     // Filter by size aliases
                     const filtered = allProducts.filter(function (p) {
