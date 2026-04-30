@@ -1985,7 +1985,7 @@
         }
 
         static _buildProductCard(product) {
-            const imageBaseUrl = window.MEDIA_URL || 'https://cdn.awsli.com.br';
+            const imageBaseUrl = 'https://cdn.awsli.com.br';
             const imgPath = product.preview_images && product.preview_images[0]
                 ? imageBaseUrl + product.preview_images[0]
                 : null;
