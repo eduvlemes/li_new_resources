@@ -36,6 +36,25 @@
         // Quando ativado (padrão), medidas acima do máximo são divididas automaticamente
         // em painéis que respeitam os limites configurados.
         panelSplitEnabled: true,
+
+        // Diagrama de painéis — margens e espaçamentos (em px do SVG).
+        // Podem ser sobrescritos individualmente em cada produto.
+        diagramInnerMarginTop: 3,    // margem entre a borda externa e os painéis (cima)
+        diagramInnerMarginBottom: 3, // margem entre a borda externa e os painéis (baixo)
+        diagramInnerMarginLeft: 3,   // margem entre a borda externa e os painéis (esquerda)
+        diagramInnerMarginRight: 3,  // margem entre a borda externa e os painéis (direita)
+        diagramPanelGap: 4,          // espaço entre painéis adjacentes
+
+        // Layout físico dos itens dentro de cada painel (para visualização no diagrama).
+        // Todos em metros. Se null (padrão), o interior dos painéis não é detalhado.
+        panelItemWidth: null,        // largura de cada item/produto no painel
+        panelItemHeight: null,       // altura de cada item/produto no painel
+        panelItemGapX: null,         // espaço horizontal entre itens (entre colunas)
+        panelItemGapY: null,         // espaço vertical entre itens (entre linhas)
+        panelItemMarginTop: null,    // margem física superior dentro do painel
+        panelItemMarginBottom: null, // margem física inferior dentro do painel
+        panelItemMarginLeft: null,   // margem física esquerda dentro do painel
+        panelItemMarginRight: null,  // margem física direita dentro do painel
         panelListTitle: 'Painéis necessários:',
         panelItemLabel: 'Painel',
         panelTotalLabel: 'Total:',
@@ -128,6 +147,25 @@
                 // Fórmula personalizada de quantidade (opcional).
                 // Se definida, substitui o cálculo padrão com quantityRatio.
                 // quantityFormula: function(width, height) { return Math.ceil(width * height * 1000); },
+
+                // Diagrama de painéis — margens e espaçamentos (em px do SVG).
+                // Se omitidos, usam os valores padrão de CONFIG.diagramInnerMargin* / CONFIG.diagramPanelGap.
+                // diagramInnerMarginTop: 3,
+                // diagramInnerMarginBottom: 3,
+                // diagramInnerMarginLeft: 3,
+                // diagramInnerMarginRight: 3,
+                // diagramPanelGap: 4,
+
+                // Layout físico dos itens dentro de cada painel (para o diagrama).
+                // Todos em metros. Se omitidos, usa CONFIG.panelItem* (padrão null = sem detalhe).
+                // panelItemWidth: 0.142,
+                // panelItemHeight: 0.07,
+                // panelItemGapX: 0.028,
+                // panelItemGapY: 0.0,
+                // panelItemMarginTop: 0.066,
+                // panelItemMarginBottom: 0.066,
+                // panelItemMarginLeft: 0.064,
+                // panelItemMarginRight: 0.028,
             }
             */
         ],
@@ -733,13 +771,18 @@
             const totalW = panelW * cntX;
             const totalH = panelH * cntY;
             const ML = 32, MT = 8, MR = 8, MB = 28;
+            const GAP      = this.productConfig.diagramPanelGap          != null ? this.productConfig.diagramPanelGap          : CONFIG.diagramPanelGap;
+            const INNER_T  = this.productConfig.diagramInnerMarginTop    != null ? this.productConfig.diagramInnerMarginTop    : CONFIG.diagramInnerMarginTop;
+            const INNER_B  = this.productConfig.diagramInnerMarginBottom != null ? this.productConfig.diagramInnerMarginBottom : CONFIG.diagramInnerMarginBottom;
+            const INNER_L  = this.productConfig.diagramInnerMarginLeft   != null ? this.productConfig.diagramInnerMarginLeft   : CONFIG.diagramInnerMarginLeft;
+            const INNER_R  = this.productConfig.diagramInnerMarginRight  != null ? this.productConfig.diagramInnerMarginRight  : CONFIG.diagramInnerMarginRight;
             const DRAW_W = 220;
             const rawH   = DRAW_W * (totalH / totalW);
             const DRAW_H = Math.min(Math.max(rawH, 70), 180);
             const VW     = ML + DRAW_W + MR;
             const VH     = MT + DRAW_H + MB;
-            const cellW  = DRAW_W / cntX;
-            const cellH  = DRAW_H / cntY;
+            const cellW  = (DRAW_W - INNER_L - INNER_R - GAP * Math.max(cntX - 1, 0)) / cntX;
+            const cellH  = (DRAW_H - INNER_T - INNER_B - GAP * Math.max(cntY - 1, 0)) / cntY;
             const clrP   = CONFIG.colors.primary;
             const clrB   = CONFIG.colors.border;
             const clrL   = CONFIG.colors.label;
@@ -747,19 +790,69 @@
             const f1     = v => v.toFixed(1);
             const FILLS  = [clrP + '22', clrP + '44'];
 
+            const pc = this.productConfig;
+            // Helper: resolve panelItem* from product config → global config → fallback
+            const _pi = (key, fb) => pc[key] != null ? pc[key] : (CONFIG[key] != null ? CONFIG[key] : fb);
+
             let cells = '';
             for (let y = 0; y < cntY; y++) {
                 for (let x = 0; x < cntX; x++) {
-                    const rx  = ML + x * cellW;
-                    const ry  = MT + y * cellH;
+                    const rx  = ML + INNER_L + x * (cellW + GAP);
+                    const ry  = MT + INNER_T + y * (cellH + GAP);
                     const idx = y * cntX + x + 1;
+
+                    // Panel cell background
                     cells += `<rect x="${f1(rx)}" y="${f1(ry)}" width="${f1(cellW)}" height="${f1(cellH)}" fill="${FILLS[(x + y) % 2]}" stroke="${clrB}" stroke-width="1.5"/>`;
+
+                    // Internal item layout (item slots + margin bands)
+                    const iW = _pi('panelItemWidth',  null);
+                    const iH = _pi('panelItemHeight', null);
+                    if (iW != null && iH != null && iW > 0 && iH > 0) {
+                        const igX = _pi('panelItemGapX',         0);
+                        const igY = _pi('panelItemGapY',         0);
+                        const mT  = _pi('panelItemMarginTop',    0);
+                        const mB  = _pi('panelItemMarginBottom', 0);
+                        const mL  = _pi('panelItemMarginLeft',   0);
+                        const mR  = _pi('panelItemMarginRight',  0);
+                        // Scale: metres → SVG px
+                        const sX = cellW / panelW, sY = cellH / panelH;
+                        const mT_px = mT * sY, mB_px = mB * sY;
+                        const mL_px = mL * sX, mR_px = mR * sX;
+                        const iW_px = iW * sX, iH_px = iH * sY;
+                        const igX_px = igX * sX, igY_px = igY * sY;
+                        // Count items that fit in the usable area
+                        const usableW = panelW - mL - mR;
+                        const usableH = panelH - mT  - mB;
+                        const cntIX = Math.max(1, Math.floor((usableW + igX) / (iW + igX)));
+                        const cntIY = Math.max(1, Math.floor((usableH + igY) / (iH + igY)));
+                        // Draw item slots (white boxes with primary-coloured border)
+                        if (iW_px >= 2 && iH_px >= 2) {
+                            const ox = rx + mL_px, oy = ry + mT_px;
+                            for (let iy = 0; iy < cntIY; iy++) {
+                                for (let ix = 0; ix < cntIX; ix++) {
+                                    const sx = ox + ix * (iW_px + igX_px);
+                                    const sy = oy + iy * (iH_px + igY_px);
+                                    cells += `<rect x="${f1(sx)}" y="${f1(sy)}" width="${f1(iW_px)}" height="${f1(iH_px)}" fill="#ffffff" stroke="${clrP}88" stroke-width="0.75" rx="1"/>`;
+                                }
+                            }
+                        }
+                        // Margin band overlays (drawn on top of item slots)
+                        const clrMgn = clrP + '30';
+                        if (mT_px > 0.5) cells += `<rect x="${f1(rx)}" y="${f1(ry)}" width="${f1(cellW)}" height="${f1(mT_px)}" fill="${clrMgn}"/>`;
+                        if (mB_px > 0.5) cells += `<rect x="${f1(rx)}" y="${f1(ry + cellH - mB_px)}" width="${f1(cellW)}" height="${f1(mB_px)}" fill="${clrMgn}"/>`;
+                        if (mL_px > 0.5) cells += `<rect x="${f1(rx)}" y="${f1(ry + mT_px)}" width="${f1(mL_px)}" height="${f1(cellH - mT_px - mB_px)}" fill="${clrMgn}"/>`;
+                        if (mR_px > 0.5) cells += `<rect x="${f1(rx + cellW - mR_px)}" y="${f1(ry + mT_px)}" width="${f1(mR_px)}" height="${f1(cellH - mT_px - mB_px)}" fill="${clrMgn}"/>`;
+                    }
+
                     const cx = rx + cellW / 2;
                     const cy = ry + cellH / 2;
                     const showDim = cellW >= 52 && cellH >= 32;
                     const numY = showDim ? cy - 7 : cy;
+                    // White backing behind panel number for legibility over overlays
+                    cells += `<rect x="${f1(cx - 9)}" y="${f1(numY - 10)}" width="18" height="14" fill="white" fill-opacity="0.75" rx="2"/>`;
                     cells += `<text x="${f1(cx)}" y="${f1(numY)}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="700" fill="${clrP}" font-family="sans-serif">${idx}</text>`;
                     if (showDim) {
+                        cells += `<rect x="${f1(cx - 30)}" y="${f1(ry + cellH - 14)}" width="60" height="11" fill="white" fill-opacity="0.65" rx="1"/>`;
                         cells += `<text x="${f1(cx)}" y="${f1(ry + cellH - 7)}" text-anchor="middle" font-size="9" fill="${clrL}" font-family="sans-serif">${fmt(panelW)}×${fmt(panelH)}m</text>`;
                     }
                 }
