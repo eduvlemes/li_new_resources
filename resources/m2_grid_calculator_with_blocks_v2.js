@@ -69,7 +69,8 @@
         onLoad: function(plugin) {
             $('.resumo-flutuante').hide();
             $('.principal .qtde-adicionar-carrinho').addClass('hide');
-            $(`.principal .acoes-produto`).addClass(`notCalculated`)
+            $(`.principal .acoes-produto`).addClass(`notCalculated`);
+            $(`.pagina-produto`).addClass(`removePrices`)
         },
 
         // Mensagem do tooltip exibido no botão de compra enquanto as medidas
@@ -192,6 +193,7 @@
 
     const CSS_STYLES = `
         <style id="m2-calculator-styles">
+        .removePrices .precos-wrap, .removePrices .parcelamento-full{display:none!important}
             .m2calc-container {
                 background: ${CONFIG.colors.background};
                 border: 1px solid ${CONFIG.colors.border};
@@ -202,15 +204,16 @@
                 box-sizing: border-box;
             }
 
-            .m2calc-limits {
-                font-size: 11px;
+            .m2calc-limits span {
+                font-size: 14px;
                 color: ${CONFIG.colors.label};
                 background: ${CONFIG.colors.primary}11;
                 border: 1px solid ${CONFIG.colors.primary}33;
-                border-radius: 4px;
-                padding: 5px 8px;
-                margin-bottom: 8px;
-                line-height: 1.7;
+                    border-radius: 4px;
+    padding: 5px 10px;
+    margin-bottom: 0px;
+    line-height: 1.7;
+    width: 100%;
             }
 
             .m2calc-limits strong {
@@ -220,12 +223,13 @@
 
             .m2calc-limits-row {
                 display: flex;
-                gap: 12px;
+                gap: 6px;
                 flex-wrap: wrap;
+                margin-bottom:1rem;
             }
 
             .m2calc-title {
-                font-size: 13px;
+                font-size: 14px;
                 font-weight: 600;
                 color: ${CONFIG.colors.text};
                 margin: 0 0 8px 0;
@@ -240,7 +244,7 @@
             }
 
             .m2calc-field {
-                flex: 1;
+                flex: 1 1 auto;
                 min-width: 80px;
             }
 
@@ -313,12 +317,12 @@
             }
 
             .m2calc-summary-row.m2calc-row-total {
-                font-size: 13px;
+                font-size: 18px;
                 font-weight: 700;
                 color: ${CONFIG.colors.total};
                 border-top: 1px solid ${CONFIG.colors.border};
                 margin-top: 4px;
-                padding-top: 4px;
+                padding-top: 12px;
             }
 
             .m2calc-summary-val {
@@ -600,10 +604,10 @@
             if (hasW || hasH) {
                 const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
                 let wParts = [], hParts = [];
-                if (pc.minWidth  != null) wParts.push(`mín <strong>${fmt(pc.minWidth)} m</strong>`);
-                if (pc.maxWidth  != null) wParts.push(`máx <strong>${fmt(pc.maxWidth)} m</strong>`);
-                if (pc.minHeight != null) hParts.push(`mín <strong>${fmt(pc.minHeight)} m</strong>`);
-                if (pc.maxHeight != null) hParts.push(`máx <strong>${fmt(pc.maxHeight)} m</strong>`);
+                if (pc.minWidth  != null) wParts.push(`mínima <strong>${fmt(pc.minWidth)} m</strong>`);
+                if (pc.maxWidth  != null) wParts.push(`máxima <strong>${fmt(pc.maxWidth)} m</strong>`);
+                if (pc.minHeight != null) hParts.push(`mínima <strong>${fmt(pc.minHeight)} m</strong>`);
+                if (pc.maxHeight != null) hParts.push(`máxima <strong>${fmt(pc.maxHeight)} m</strong>`);
                 let html = '<div class="m2calc-limits-row">';
                 if (wParts.length) html += `<span>${CONFIG.widthLabel}: ${wParts.join(' · ')}</span>`;
                 if (hParts.length) html += `<span>${CONFIG.heightLabel}: ${hParts.join(' · ')}</span>`;
@@ -959,9 +963,10 @@
 
                 if (unitPrice !== null) {
                     const total = totalQty * unitPrice;
-                    this.panelTotalValue.textContent = `${totalQty} un. — ${this.formatCurrency(total)}`;
+                    // this.panelTotalValue.textContent = `${totalQty} un. — ${this.formatCurrency(total)}`;
+                    this.panelTotalValue.textContent = `${this.formatCurrency(total)}`;
                 } else {
-                    this.panelTotalValue.textContent = `${totalQty} un.`;
+                    // this.panelTotalValue.textContent = `${totalQty} un.`;
                 }
 
                 this.panelSection.style.display = '';
@@ -1138,22 +1143,28 @@
                 var totalH = data.height;
                 html += data.panels.length + ' painel(is):<ul style="margin:0;">';
                 data.panels.forEach(function (p) {
+                    // html += '<li>' + CONFIG.checkoutPanelLabel + ' ' + p.index + ': '
+                    //      + fmt(p.width) + 'm × ' + fmt(p.height) + 'm — ' + p.quantity + ' un.</li>';
                     html += '<li>' + CONFIG.checkoutPanelLabel + ' ' + p.index + ': '
-                         + fmt(p.width) + 'm × ' + fmt(p.height) + 'm — ' + p.quantity + ' un.</li>';
+                         + fmt(p.width) + 'm × ' + fmt(p.height) + 'm</li>';
                 });
                 html += '</ul>';
+                // html += '<span style="' + lblStyle + '">Total:</span> '
+                //      + CONFIG.checkoutWidthLabel  + ': <strong>' + fmt(data.width)  + ' m</strong>'
+                //      + ' &nbsp;|&nbsp; '
+                //      + CONFIG.checkoutHeightLabel + ': <strong>' + fmt(data.height) + ' m</strong>'
+                //      + ' &nbsp;|&nbsp; ' + data.quantity + ' un.';
                 html += '<span style="' + lblStyle + '">Total:</span> '
                      + CONFIG.checkoutWidthLabel  + ': <strong>' + fmt(data.width)  + ' m</strong>'
                      + ' &nbsp;|&nbsp; '
-                     + CONFIG.checkoutHeightLabel + ': <strong>' + fmt(data.height) + ' m</strong>'
-                     + ' &nbsp;|&nbsp; ' + data.quantity + ' un.';
+                     + CONFIG.checkoutHeightLabel + ': <strong>' + fmt(data.height) + ' m</strong>';
             } else {
                 html += CONFIG.checkoutWidthLabel  + ': <strong>' + fmt(data.width)  + ' m</strong>'
                      + ' &nbsp;|&nbsp; '
-                     + CONFIG.checkoutHeightLabel + ': <strong>' + fmt(data.height) + ' m</strong>'
-                     + ' &nbsp;|&nbsp; '
-                     + (data.width * data.height).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) + ' m²'
-                     + ' &nbsp;|&nbsp; ' + data.quantity + ' un.';
+                     + CONFIG.checkoutHeightLabel + ': <strong>' + fmt(data.height) + ' m</strong>';
+                    //  + ' &nbsp;|&nbsp; '
+                    //  + (data.width * data.height).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) + ' m²'
+                    //  + ' &nbsp;|&nbsp; ' + data.quantity + ' un.';
             }
             html += '</div>';
             return html;
@@ -1168,10 +1179,10 @@
                 var info = el.querySelector('.produto-info');
                 if (info) info.insertAdjacentHTML('beforeend', buildHTML(data));
 
-                // Remove controles de quantidade e bloqueia o input
-                el.querySelectorAll('.icon-minus, .icon-plus').forEach(function (btn) { btn.remove(); });
-                var qtyInput = el.querySelector('[name="quantidade"]');
-                if (qtyInput) qtyInput.setAttribute('readonly', 'readonly');
+                $(el).find(`form`).remove();
+                if($(`.carrinho-checkout`).length > 0){
+                    $(el).closest(`tr`).find(`.conteiner-qtd`).html(` `);
+                }
             });
         }
 
@@ -1181,7 +1192,7 @@
 
         function initObsField() {
             if (!document.querySelector('.pagina-carrinho.carrinho-checkout')) return;
-
+            
             var obsField = document.querySelector('[name="nova_obs"]');
             if (!obsField) return;
 
