@@ -787,12 +787,12 @@
             const VH     = MT + DRAW_H + MB;
             const cellW  = (DRAW_W - INNER_L - INNER_R - GAP * Math.max(cntX - 1, 0)) / cntX;
             const cellH  = (DRAW_H - INNER_T - INNER_B - GAP * Math.max(cntY - 1, 0)) / cntY;
-            const clrP   = CONFIG.colors.primary;
+            const clrP   = '#666666';
             const clrB   = CONFIG.colors.border;
             const clrL   = CONFIG.colors.label;
             const fmt    = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
             const f1     = v => v.toFixed(1);
-            const FILLS  = [clrP + '22', clrP + '44'];
+            const FILLS  = ['#ffffff', '#f8faff'];
 
             const pc = this.productConfig;
             // Helper: resolve panelItem* from product config → global config → fallback
@@ -829,14 +829,14 @@
                         const usableH = panelH - mT  - mB;
                         const cntIX = Math.max(1, Math.floor((usableW + igX) / (iW + igX)));
                         const cntIY = Math.max(1, Math.floor((usableH + igY) / (iH + igY)));
-                        // Draw item slots (white boxes with primary-coloured border)
+                        // Draw item slots (solid primary-coloured boxes)
                         if (iW_px >= 2 && iH_px >= 2) {
                             const ox = rx + mL_px, oy = ry + mT_px;
                             for (let iy = 0; iy < cntIY; iy++) {
                                 for (let ix = 0; ix < cntIX; ix++) {
                                     const sx = ox + ix * (iW_px + igX_px);
                                     const sy = oy + iy * (iH_px + igY_px);
-                                    cells += `<rect x="${f1(sx)}" y="${f1(sy)}" width="${f1(iW_px)}" height="${f1(iH_px)}" fill="#ffffff" stroke="${clrP}88" stroke-width="0.75" rx="1"/>`;
+                                    cells += `<rect x="${f1(sx)}" y="${f1(sy)}" width="${f1(iW_px)}" height="${f1(iH_px)}" fill="${clrP}CC" stroke="#cccccc" stroke-width="0.75" rx="1"/>`;
                                 }
                             }
                         }
@@ -961,12 +961,35 @@
 
                 this.panelItems.innerHTML = this.renderPanelDiagram(cntX, cntY, panelW, panelH);
 
+                // Calcula total de itens que cabem em todos os painéis (se dimensões configuradas)
+                const _piR = (key, fb) => {
+                    const pc = this.productConfig;
+                    return pc[key] != null ? pc[key] : (CONFIG[key] != null ? CONFIG[key] : fb);
+                };
+                const iW = _piR('panelItemWidth', null);
+                const iH = _piR('panelItemHeight', null);
+                let totalItemCount = null;
+                if (iW != null && iH != null && iW > 0 && iH > 0) {
+                    const igX = _piR('panelItemGapX', 0);
+                    const igY = _piR('panelItemGapY', 0);
+                    const mT  = _piR('panelItemMarginTop', 0);
+                    const mB  = _piR('panelItemMarginBottom', 0);
+                    const mL  = _piR('panelItemMarginLeft', 0);
+                    const mR  = _piR('panelItemMarginRight', 0);
+                    const usableW = panelW - mL - mR;
+                    const usableH = panelH - mT  - mB;
+                    const cntIX = Math.max(1, Math.floor((usableW + igX) / (iW + igX)));
+                    const cntIY = Math.max(1, Math.floor((usableH + igY) / (iH + igY)));
+                    totalItemCount = cntIX * cntIY * panels.length;
+                }
+
                 if (unitPrice !== null) {
                     const total = totalQty * unitPrice;
-                    // this.panelTotalValue.textContent = `${totalQty} un. — ${this.formatCurrency(total)}`;
-                    this.panelTotalValue.textContent = `${this.formatCurrency(total)}`;
+                    this.panelTotalValue.textContent = totalItemCount !== null
+                        ? `${totalItemCount} peças · ${this.formatCurrency(total)}`
+                        : `${this.formatCurrency(total)}`;
                 } else {
-                    // this.panelTotalValue.textContent = `${totalQty} un.`;
+                    this.panelTotalValue.textContent = totalItemCount !== null ? `${totalItemCount} peças` : '';
                 }
 
                 this.panelSection.style.display = '';
@@ -987,10 +1010,14 @@
 
             let quantity;
             let panels = null;
+            let _submitPanelW = width, _submitPanelH = height, _submitPanelCount = 1;
             if (this.panelMode) {
                 const result = this.calculatePanels(width, height);
                 panels   = result.panels;
                 quantity = panels.reduce((sum, p) => sum + p.quantity, 0);
+                _submitPanelW = result.panelW;
+                _submitPanelH = result.panelH;
+                _submitPanelCount = panels.length;
                 if (typeof CONFIG.onPanelsCalculated === 'function') {
                     CONFIG.onPanelsCalculated(panels);
                 }
@@ -1014,6 +1041,17 @@
                 if (key) {
                     const data = { sku: sku, width, height, quantity };
                     if (panels) data.panels = panels.map(p => ({ index: p.index, width: p.width, height: p.height, quantity: p.quantity }));
+                    // Calcula e salva o total de itens/peças (se dimensões configuradas)
+                    const _piS = (k, fb) => { const pc = this.productConfig; return pc[k] != null ? pc[k] : (CONFIG[k] != null ? CONFIG[k] : fb); };
+                    const _iW = _piS('panelItemWidth', null), _iH = _piS('panelItemHeight', null);
+                    if (_iW != null && _iH != null && _iW > 0 && _iH > 0) {
+                        const _igX = _piS('panelItemGapX', 0), _igY = _piS('panelItemGapY', 0);
+                        const _mT  = _piS('panelItemMarginTop', 0),  _mB  = _piS('panelItemMarginBottom', 0);
+                        const _mL  = _piS('panelItemMarginLeft', 0), _mR  = _piS('panelItemMarginRight', 0);
+                        const _cntIX = Math.max(1, Math.floor((_submitPanelW - _mL - _mR + _igX) / (_iW + _igX)));
+                        const _cntIY = Math.max(1, Math.floor((_submitPanelH - _mT - _mB + _igY) / (_iH + _igY)));
+                        data.itemCount = _cntIX * _cntIY * _submitPanelCount;
+                    }
                     sessionStorage.setItem(key, JSON.stringify(data));
                 }
             } catch (_) {}
@@ -1158,13 +1196,16 @@
                      + CONFIG.checkoutWidthLabel  + ': <strong>' + fmt(data.width)  + ' m</strong>'
                      + ' &nbsp;|&nbsp; '
                      + CONFIG.checkoutHeightLabel + ': <strong>' + fmt(data.height) + ' m</strong>';
+                if (data.itemCount != null) {
+                    html += ' &nbsp;|&nbsp; <strong>' + data.itemCount + ' peças</strong>';
+                }
             } else {
                 html += CONFIG.checkoutWidthLabel  + ': <strong>' + fmt(data.width)  + ' m</strong>'
                      + ' &nbsp;|&nbsp; '
                      + CONFIG.checkoutHeightLabel + ': <strong>' + fmt(data.height) + ' m</strong>';
-                    //  + ' &nbsp;|&nbsp; '
-                    //  + (data.width * data.height).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) + ' m²'
-                    //  + ' &nbsp;|&nbsp; ' + data.quantity + ' un.';
+                if (data.itemCount != null) {
+                    html += ' &nbsp;|&nbsp; <strong>' + data.itemCount + ' peças</strong>';
+                }
             }
             html += '</div>';
             return html;
@@ -1221,8 +1262,10 @@
                             return 'Painel ' + p.index + ': ' + fmt(p.width) + 'm × ' + fmt(p.height) + 'm — ' + p.quantity + ' un.';
                         }).join(' | ');
                         line += ' | Total: Largura: ' + fmt(data.width) + 'm | Altura: ' + fmt(data.height) + 'm | ' + data.quantity + ' un.';
+                        if (data.itemCount != null) line += ' | Peças: ' + data.itemCount;
                     } else {
                         line += 'Largura: ' + fmt(data.width) + 'm | Altura: ' + fmt(data.height) + 'm | ' + data.quantity + ' un.';
+                        if (data.itemCount != null) line += ' | Peças: ' + data.itemCount;
                     }
                     return line;
                 }).join('\n');
