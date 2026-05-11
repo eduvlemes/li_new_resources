@@ -578,7 +578,7 @@
                 align-items: center;
                 gap: 12px;
             }
-            .qr-weight-input {
+            body .qr-weight-input {
                 flex: 1;
                 padding: 14px 18px;
                 border: 1.5px solid ${CONFIG.colors.cardBorder};
@@ -591,6 +591,7 @@
                 transition: border-color 0.2s;
                 text-align: center;
                 -moz-appearance: textfield;
+                height:auto;
             }
             .qr-weight-input::-webkit-outer-spin-button,
             .qr-weight-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
