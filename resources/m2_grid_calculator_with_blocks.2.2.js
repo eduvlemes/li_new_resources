@@ -543,6 +543,14 @@
         setupElements() {
             const pc = this.productConfig;
 
+            // Captura o ID do produto uma única vez, em contexto estável.
+            // Precedência: productId explícito no config > data-produto-id no DOM > window.PRODUTO_ID
+            const _acoesProd = document.querySelector('.principal .acoes-produto');
+            const _domId     = _acoesProd ? (_acoesProd.getAttribute('data-produto-id') || '') : '';
+            this.prodId = pc.productId
+                ? String(pc.productId)
+                : (_domId || (typeof window.PRODUTO_ID !== 'undefined' ? String(window.PRODUTO_ID) : ''));
+
             this.container      = document.getElementById('m2-calculator-container');
             this.titleEl        = document.getElementById('m2calc-title');
             this.widthInput     = document.getElementById('m2calc-width-input');
@@ -1031,13 +1039,11 @@
             const acoes = document.querySelector('.principal .acoes-produto');
             if (acoes) acoes.classList.remove('notCalculated');
 
-            // Salva as medidas no sessionStorage (chave: ID_SKU_measures)
+            // Salva as medidas no sessionStorage (chave: prodId_measures)
             try {
                 const skuEl = document.querySelector('[itemprop="sku"]');
                 const sku   = skuEl ? skuEl.textContent.trim() : '';
-                const acoesProd = document.querySelector('.principal .acoes-produto');
-                const prodId    = acoesProd ? acoesProd.getAttribute('data-produto-id') : '';
-                const key       = [prodId, 'measures'].filter(Boolean).join('_');
+                const key   = [this.prodId, 'measures'].filter(Boolean).join('_');
                 if (key) {
                     const data = { sku: sku, width, height, quantity };
                     if (panels) data.panels = panels.map(p => ({ index: p.index, width: p.width, height: p.height, quantity: p.quantity }));
