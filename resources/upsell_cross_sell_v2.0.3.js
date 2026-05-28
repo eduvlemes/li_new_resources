@@ -1472,7 +1472,7 @@
         });
         sortedSkus.forEach(function (sku) {
             var unavailable = !sku.available;
-            var label = sku.varLabel || (sku.variations[0].value.name);
+            var label = sku.varLabel || (sku.variations[0].value.value);
             var priceHtml = escHtml(formatPrice(sku.price));
             var badgesHtml = unavailable
                 ? '<span class="ucs-sku-option-badge">Indisponível</span>'

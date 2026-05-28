@@ -973,7 +973,7 @@
     }
 
     function fetchCompraJunto(productId) {
-        return fetch('https://api.awsli.com.br/v1/compre_junto/' + encodeURIComponent(productId))
+        return fetch('/compre_junto/' + encodeURIComponent(productId))
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (data) {
                 if (!data || !data.data || !data.data.products) return [];
@@ -1472,7 +1472,7 @@
         });
         sortedSkus.forEach(function (sku) {
             var unavailable = !sku.available;
-            var label = sku.varLabel || (sku.variations[0].value.name);
+            var label = sku.varLabel || (sku.variations[0].value.value);
             var priceHtml = escHtml(formatPrice(sku.price));
             var badgesHtml = unavailable
                 ? '<span class="ucs-sku-option-badge">Indisponível</span>'
