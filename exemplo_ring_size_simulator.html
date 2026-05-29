@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exemplo - Ring Size Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            color: #1f2937;
+        }
+
+        .produto {
+            max-width: 960px;
+            margin: 36px auto;
+            background: #ffffff;
+            border: 1px solid #dddddd;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .nome-produto {
+            font-size: 30px;
+            margin: 0 0 8px;
+        }
+
+        .acoes-produto {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 4px;
+            padding: 10px 14px;
+            background: #1f2937;
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <section class="produto">
+        <h1 class="nome-produto">Anel Solitario Ouro 18k</h1>
+        <p>Exemplo de produto para validar o gatilho do plugin.</p>
+
+        <div class="acoes-produto" id="produto-acoes">
+            <button class="btn" type="button">Comprar agora</button>
+            <button class="btn" type="button">Adicionar ao carrinho</button>
+        </div>
+    </section>
+
+    <script>
+        window.RingSizeSimulatorConfig = {
+            buttonText: 'Guia de Medidas',
+            buttonMountSelector: '#produto-acoes',
+            buttonInsertMode: 'before',
+
+            // Exemplo de gatilho especifico:
+            // renderiza somente se o nome do produto contiver "Anel".
+            triggerCondition: "$('.nome-produto').text().includes('Anel')",
+
+            measurement: {
+                minDiameterMm: 12,
+                maxDiameterMm: 23,
+                stepMm: 0.1,
+                defaultDiameterMm: 19
+            }
+        };
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="resources/ring_size_simulator.js"></script>
+</body>
+</html>
