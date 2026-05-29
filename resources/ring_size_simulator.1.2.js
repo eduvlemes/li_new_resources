@@ -438,7 +438,7 @@
                 border-radius: 0;
                 text-transform: uppercase;
                 letter-spacing: 0.12em;
-                font-size: 1rem;
+                font-size: 14px;
                 font-family: 'Poppins', Arial, sans-serif;
                 font-weight: 700;
                 background: #232323;
@@ -487,7 +487,7 @@
                 top: 50%;
                 transform: translate(-50%, -50%);
                 font-family: 'Poppins', Arial, sans-serif;
-                font-size: 16px;
+                font-size: 10px;
                 font-weight: 600;
                 color: #232323;
                 pointer-events: none;
@@ -538,7 +538,7 @@
                 background: #fff;
                 color: #232323;
                 border-radius: 0;
-                font-size: 1rem;
+                font-size: 14px;
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
                 padding: 11px 16px;
@@ -601,7 +601,7 @@
                     <p style="font-size:14px;margin-bottom:10px;">Descubra o aro de um anel, seguindo as instruções a seguir.</p>
                         <div style="font-size:12px;margin-bottom:10px;">
                             <strong>Você vai precisar de:</strong>
-                            <ul style="margin: 6px 0 0 18px; padding: 0;">
+                            <ul style="margin: 6px 0 0 18px; padding: 0;list-style:circle">
                                 <li>Um anel com o tamanho desejado;</li>
                                 <li>Cartão de crédito ou semelhante (com as mesmas dimensões 85,6 x 53,9 mm );</li>
                             </ul>
