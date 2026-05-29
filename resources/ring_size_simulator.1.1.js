@@ -202,7 +202,7 @@
             .ring-simulator-title {
                 margin: 0;
                 font-family: 'Poppins', serif;
-                font-size: 1.4rem;
+                font-size: 22px;
                 font-weight: 700;
                 line-height: 1.1;
                 color: #232323;
@@ -219,7 +219,7 @@
                 color: #232323;
                 border-radius: 0;
                 padding: 8px;
-                font-size: 1.6rem;
+                font-size: 25.6px;
                 line-height: 1;
                 display: flex;
                 align-items: center;
@@ -241,10 +241,9 @@
                 border-radius: 0;
                 background: #fff;
                 color: #232323;
-                font-size: 1rem;
+                font-size: 16px;
                 font-family: 'Poppins', Arial, sans-serif;
                 font-weight: 700;
-                
                 text-transform: uppercase;
                 cursor: pointer;
                 transition: background 0.2s, color 0.2s, border 0.2s;
@@ -259,7 +258,7 @@
                 margin-bottom: 32px;
             }
             .ring-simulator-orientations p {
-                font-size: 0.85rem;
+                font-size: 14px;
                 margin-bottom: 10px;
                 font-family: 'Poppins', Arial, sans-serif;
             }
@@ -270,7 +269,7 @@
             .ring-simulator-orientations ul {
                 margin: 6px 0 0 18px;
                 padding: 0;
-                font-size: 1rem;
+                font-size: 16px;
                 font-family: 'Poppins', Arial, sans-serif;
             }
             .ring-simulator-orientations li {
@@ -296,7 +295,7 @@
             }
             .ring-simulator-step h2 {
                 font-family: 'Poppins', serif;
-                font-size: 1.1rem;
+                font-size: 18px;
                 font-weight: 700;
                 margin: 0 0 10px;
                 color: #232323;
@@ -305,7 +304,7 @@
             }
             .ring-simulator-step p {
                 margin: 0 0 16px;
-                font-size: .85rem;
+                font-size: 14px;
                 line-height: 1.5;
                 color: #444;
                 max-width: 900px;
@@ -313,7 +312,7 @@
             }
             .ring-simulator-step .muted {
                 color: #888;
-                font-size: 0.85rem;
+                font-size: 14px;
                 font-style: italic;
             }
 
@@ -322,7 +321,7 @@
                 margin: 0 28px 0 10px;
                 text-transform: uppercase;
                 letter-spacing: 0.04em;
-                font-size: 0.88rem;
+                font-size: 14px;
                 font-weight: 600;
                 color: #888;
                 font-family: 'Poppins', Arial, sans-serif;
@@ -336,7 +335,7 @@
                 margin-bottom: 18px;
             }
             .ring-simulator-slider-sign {
-                font-size: 1.5rem;
+                font-size: 24px;
                 font-weight: 700;
                 line-height: 1;
                 color: #bbb;
@@ -483,19 +482,19 @@
             }
 
             .ring-simulator-aro-label {
-                  position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Poppins', Arial, sans-serif;
-    font-size: 12px;
-    font-weight: 400;
-    color: #232323;
-    pointer-events: none;
-    user-select: none;
-    padding: 2px 10px;
-    border-radius: 16px;
-    white-space: nowrap;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                font-family: 'Poppins', Arial, sans-serif;
+                font-size: 16px;
+                font-weight: 600;
+                color: #232323;
+                pointer-events: none;
+                user-select: none;
+                padding: 2px 10px;
+                border-radius: 16px;
+                white-space: nowrap;
             }
             .ring-simulator-ring::before,
             .ring-simulator-ring::after {
@@ -515,7 +514,7 @@
 
             .ring-simulator-result {
                 margin-top: 18px;
-                font-size: 1.05rem;
+                font-size: 17px;
                 font-family: 'Poppins', Arial, sans-serif;
                 font-weight: 700;
                 color: #232323;
@@ -524,7 +523,7 @@
             .ring-simulator-result small {
                 display: block;
                 margin-top: 5px;
-                font-size: 0.92rem;
+                font-size: 15px;
                 font-weight: 400;
                 color: #888;
             }
@@ -562,16 +561,16 @@
                     padding: 0;
                 }
                 .ring-simulator-title {
-                    font-size: 1.2rem;
+                    font-size: 19px;
                 }
                 .ring-simulator-step h2 {
-                    font-size: 1rem;
+                    font-size: 16px;
                 }
                 .ring-simulator-step p {
-                    font-size: 0.85rem;
+                    font-size: 15px;
                 }
                 .ring-simulator-control-label {
-                    font-size: 0.85rem;
+                    font-size: 13px;
                 }
                 .ring-simulator-measure-grid {
                     grid-template-columns: 1fr;
@@ -599,15 +598,15 @@
                         <h1 id="ring-simulator-title" class="ring-simulator-title">${CONFIG.texts.modalTitle}</h1>
                     </div>
                     <section id="ring-simulator-step-1" class="ring-simulator-step is-active" aria-label="Calibragem">
-                    <p style="font-size:.85rem;margin-bottom:10px;">Descubra o aro de um anel, seguindo as instruções a seguir.</p>
-                        <div style="font-size:.75rem;margin-bottom:10px;">
+                    <p style="font-size:14px;margin-bottom:10px;">Descubra o aro de um anel, seguindo as instruções a seguir.</p>
+                        <div style="font-size:12px;margin-bottom:10px;">
                             <strong>Você vai precisar de:</strong>
                             <ul style="margin: 6px 0 0 18px; padding: 0;">
                                 <li>Um anel com o tamanho desejado;</li>
                                 <li>Cartão de crédito ou semelhante (com as mesmas dimensões 85,6 x 53,9 mm );</li>
                             </ul>
                         </div>
-                        <div style="font-size:.75rem;margin-bottom:10px;">
+                        <div style="font-size:12px;margin-bottom:10px;">
                             <strong>Calibragem</strong><br />
                             Posicione o seu cartão de crédito na horizontal, encostando seu topo na <span style="color:#3f8557;font-weight:600">linha verde</span>.<br /><br />
                             <span style="font-weight:600;">Ajuste o desenho do cartão guia abaixo até que ele tenha a mesma altura do seu cartão.</span> O cartão pode passar a largura da tela do seu dispositivo, desde que a sua <strong>altura</strong> esteja encaixada entre as guias de medida.
