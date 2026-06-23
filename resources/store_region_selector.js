@@ -19,6 +19,10 @@
         useLocalStorage: true, // true = persiste entre sessões (recomendado), false = apenas na sessão atual
         storageKey: "store_region_selected",
 
+        // true = sempre exibe o popup no primeiro acesso (mesmo já estando em um domínio
+        // de loja conhecido) para o cliente confirmar a loja. Após escolher, não exibe mais.
+        confirmOnFirstVisit: false,
+
         // Mantém a página atual (caminho + parâmetros) ao redirecionar.
         // false = sempre vai para a home da loja escolhida.
         keepPathOnRedirect: true,
@@ -458,23 +462,24 @@
             const currentStore = this.getCurrentStore();
             const savedStore = this.loadSavedStore();
 
-            // Se já estamos em um domínio de loja conhecido, esta é a loja ativa.
-            // Mantém o storage sincronizado e nunca mostra o popup.
-            if (currentStore) {
-                this.saveStore(currentStore);
-                this.showBanner(currentStore);
-                return;
-            }
-
-            // Fora de um domínio de loja conhecido:
-            // se o cliente já escolheu antes, respeita a escolha (sem popup).
+            // Já escolheu antes: respeita a escolha, sem popup.
+            // (currentStore quando em domínio conhecido; savedStore caso contrário.)
             if (savedStore) {
-                this.showBanner(savedStore);
+                this.showBanner(currentStore || savedStore);
+                if (currentStore) this.saveStore(currentStore);
                 return;
             }
 
-            // Primeira visita sem escolha: mostra o popup de seleção.
-            this.showOverlay();
+            // Sem escolha salva. Se confirmOnFirstVisit, sempre confirma no popup,
+            // mesmo já estando em um domínio de loja conhecido.
+            if (!currentStore || CONFIG.confirmOnFirstVisit) {
+                this.showOverlay();
+                return;
+            }
+
+            // Domínio conhecido e sem confirmação obrigatória: assume a loja atual.
+            this.saveStore(currentStore);
+            this.showBanner(currentStore);
         }
 
         // Seleção de loja a partir do popup ou da troca
