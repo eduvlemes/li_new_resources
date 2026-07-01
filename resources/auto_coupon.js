@@ -63,6 +63,9 @@
 
     // Cupons removidos manualmente pelo usuário — não reaplicar nesta sessão.
     const REMOVED_KEY = 'auto_coupon_removed';
+    // Cupons que já aplicamos — sobrevive ao reload e evita loop de reaplicação
+    // caso o cupom aplicado não apareça em .cupom-codigo após recarregar.
+    const APPLIED_KEY = 'auto_coupon_applied';
 
     // Quantidade somada de um id de PRODUTO no carrinho (lista [{id, qty}]).
     function qtyOf(products, id) {
@@ -156,12 +159,20 @@
             }
         }
 
-        removedSet() {
+        removedSet() { return this._readSet(REMOVED_KEY); }
+        appliedSet() { return this._readSet(APPLIED_KEY); }
+
+        _readSet(key) {
             try {
-                return new Set(JSON.parse(sessionStorage.getItem(REMOVED_KEY) || '[]'));
+                return new Set(JSON.parse(sessionStorage.getItem(key) || '[]'));
             } catch (e) {
                 return new Set();
             }
+        }
+
+        _writeSet(key, set) {
+            try { sessionStorage.setItem(key, JSON.stringify([...set])); }
+            catch (e) { /* storage indisponível */ }
         }
 
         // Registra cupons removidos manualmente pelo usuário para não reaplicá-los.
@@ -173,11 +184,11 @@
                 const codeEl = wrap.querySelector('.cupom-codigo');
                 const code = codeEl ? codeEl.textContent.trim() : '';
                 if (code) {
-                    try {
-                        const set = this.removedSet();
-                        set.add(code);
-                        sessionStorage.setItem(REMOVED_KEY, JSON.stringify([...set]));
-                    } catch (err) { /* storage indisponível */ }
+                    const removed = this.removedSet();
+                    removed.add(code);
+                    this._writeSet(REMOVED_KEY, removed);
+                    const applied = this.appliedSet();
+                    if (applied.delete(code)) this._writeSet(APPLIED_KEY, applied);
                 }
                 // deixa o link seguir seu fluxo normal (remoção + navegação)
             });
@@ -189,6 +200,7 @@
             if (!cart) return;
 
             const removed = this.removedSet();
+            const appliedSession = this.appliedSet();
             const managed = new Set(CONFIG.coupons.map(r => r && r.coupon).filter(Boolean));
             const winner = pickRule(CONFIG.coupons, cart, removed);
             const applied = cart.appliedCoupon;
@@ -203,8 +215,10 @@
                 }
             }
 
-            // 2) Aplica o vencedor, se houver e for diferente do já aplicado.
-            if (winner && winner.coupon !== applied) {
+            // 2) Aplica o vencedor, se houver e ainda não estiver ativo.
+            //    "ativo" = presente no DOM (.cupom-codigo) OU já aplicado nesta sessão
+            //    (evita reaplicar em loop quando o DOM não reflete o cupom após o reload).
+            if (winner && winner.coupon !== applied && !appliedSession.has(winner.coupon)) {
                 this.apply(winner.coupon);
             }
         }
@@ -220,6 +234,9 @@
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
                 .then(() => {
+                    const applied = this.appliedSet();
+                    applied.add(code);
+                    this._writeSet(APPLIED_KEY, applied);
                     if (typeof CONFIG.onApply === 'function') {
                         try { CONFIG.onApply(code); } catch (e) { console.warn('[AutoCoupon] onApply:', e); }
                     }
@@ -237,7 +254,11 @@
                 credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-                .then(() => window.location.reload())
+                .then(() => {
+                    const applied = this.appliedSet();
+                    if (applied.delete(code)) this._writeSet(APPLIED_KEY, applied);
+                    window.location.reload();
+                })
                 .catch(err => {
                     console.warn('[AutoCoupon] falha ao remover cupom:', err);
                     this._busy = false;
