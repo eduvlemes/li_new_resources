@@ -221,11 +221,11 @@
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
                 .then(response => response.text()) // aguarda o retorno completo do servidor
-                .then(() => {
+                .then(html => {
                     if (typeof CONFIG.onApply === 'function') {
                         try { CONFIG.onApply(code); } catch (e) { console.warn('[AutoCoupon] onApply:', e); }
                     }
-                    window.location.reload();
+                    this.finish(html);
                 })
                 .catch(err => {
                     console.warn('[AutoCoupon] falha ao aplicar cupom:', err);
@@ -240,16 +240,35 @@
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
                 .then(response => response.text()) // aguarda o retorno completo do servidor
-                .then(() => {
+                .then(html => {
                     if (typeof CONFIG.onRemove === 'function') {
                         try { CONFIG.onRemove(code); } catch (e) { console.warn('[AutoCoupon] onRemove:', e); }
                     }
-                    window.location.reload();
+                    this.finish(html);
                 })
                 .catch(err => {
                     console.warn('[AutoCoupon] falha ao remover cupom:', err);
                     this._busy = false;
                 });
+        }
+
+        // Na página de carrinho (não checkout), troca só a .tabela-carrinho pelo
+        // HTML retornado, evitando reload. Fora disso, recarrega a página.
+        finish(html) {
+            const current = document.querySelector('.pagina-carrinho:not(.carrinho-checkout) .tabela-carrinho');
+            let incoming = null;
+            if (current && html) {
+                try {
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    incoming = doc.querySelector('.tabela-carrinho');
+                } catch (e) { /* fallback pro reload */ }
+            }
+            if (current && incoming) {
+                current.innerHTML = incoming.innerHTML; // MutationObserver reavalia o novo carrinho
+                this._busy = false;
+                return;
+            }
+            setTimeout(() => window.location.reload(), 500);
         }
 
         // ========================================
