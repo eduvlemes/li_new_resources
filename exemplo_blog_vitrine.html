@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Vitrine - Exemplo de Uso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+
+        /* ---- Página de exemplo ---- */
+        .page-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.75;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        .demo-area {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .demo-area h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #111;
+        }
+
+        .demo-area p {
+            color: #555;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #1e1e2e;
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.82rem;
+            line-height: 1.65;
+            color: #cdd6f4;
+            white-space: pre;
+        }
+
+        .code-block .comment { color: #6c7086; }
+        .code-block .key     { color: #89b4fa; }
+        .code-block .string  { color: #a6e3a1; }
+        .code-block .number  { color: #fab387; }
+        .code-block .bool    { color: #f38ba8; }
+
+        .badge {
+            display: inline-block;
+            background: #f0f4ff;
+            color: #3b5bdb;
+            border: 1px solid #c5d0fc;
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 60px 0;
+        }
+
+        .page-footer {
+            background: #f5f5f5;
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        /* ---- Área que simula uma página real da loja ---- */
+        .page-mock {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-mock .conteudo > h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .page-mock .conteudo > div > div {
+            color: #555;
+            max-width: 640px;
+        }
+
+        /* ---- Rodapé real do tema, igual ao da loja ---- */
+        .footer-mock {
+            background: #f7f7f5;
+            padding: 32px 20px 48px;
+        }
+
+        .footer-mock h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-mock ul {
+            list-style: none;
+        }
+
+        .footer-mock li {
+            margin-bottom: 10px;
+        }
+
+        .footer-mock a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-mock a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho da página de demonstração -->
+    <div class="page-header">
+        <h1>Blog Vitrine</h1>
+        <p>Escaneia o rodapé por um link "Blog", remove ele e as postagens seguintes do menu, e adapta o que mostra de acordo com a página: vitrine na home, compartilhamento + relacionados na postagem, listagem completa na página "Blog".</p>
+    </div>
+
+    <div class="demo-area">
+
+        <h2>Como usar</h2>
+        <p>
+            Inclua o script no layout global do tema (roda em toda página, então a limpeza do rodapé
+            e a detecção de contexto funcionam em qualquer lugar). Nenhuma configuração é obrigatória —
+            o comportamento é decidido automaticamente pela URL atual:
+        </p>
+        <div class="code-block">
+<pre><span class="comment">&lt;!-- Incluir no layout global do tema --&gt;</span>
+&lt;script src="resources/blog_vitrine.js"&gt;&lt;/script&gt;</pre>
+        </div>
+
+        <ul style="margin: 0 0 24px 20px; color:#555; font-size:0.95rem; line-height:1.8">
+            <li><strong>Página inicial ("/")</strong> — vitrine com as últimas <code>homeLimit</code> postagens, com título</li>
+            <li><strong>Página de uma postagem</strong> (uma das que estavam depois de "Blog" no rodapé) — compartilhamento + outras postagens (exceto a atual)</li>
+            <li><strong>Página "Blog"</strong> (a do link marcador) — todas as postagens, sem título, em grade de 2 colunas</li>
+            <li><strong>Qualquer outra página</strong> — só limpa o rodapé, não mostra nada</li>
+        </ul>
+
+        <hr class="divider">
+
+        <h2>Referência completa de opções</h2>
+        <p>Defina <code>window.BlogVitrineConfig</code> <strong>antes</strong> do script. Só é preciso sobrescrever o que quiser mudar.</p>
+        <div class="code-block">
+<pre>window.BlogVitrineConfig = {
+    <span class="key">active</span>: <span class="bool">true</span>,                    <span class="comment">// false desativa o plugin completamente</span>
+
+    <span class="key">blogMarkerText</span>: <span class="string">"Blog"</span>,          <span class="comment">// texto do link que marca o início do blog, no rodapé</span>
+    <span class="key">footerSelector</span>: <span class="string">"footer"</span>,        <span class="comment">// onde procurar o rodapé (cai pro documento todo se não achar)</span>
+    <span class="key">footerPagesHTML</span>: <span class="key">null</span>,             <span class="comment">// override manual (string HTML), sobrepõe o scan do rodapé real</span>
+
+    <span class="key">contentSelector</span>: <span class="string">".conteudo"</span>,    <span class="comment">// container de conteúdo de cada página de post</span>
+    <span class="key">excerptLength</span>: <span class="number">150</span>,              <span class="comment">// caracteres do resumo antes do "..."</span>
+    <span class="key">insertSelector</span>: <span class="string">".conteudo .caixa-sombreada"</span>, <span class="comment">// onde a vitrine/listagem/compartilhamento é inserido</span>
+    <span class="key">insertMethod</span>: <span class="string">"beforeend"</span>,       <span class="comment">// beforeend | afterbegin | beforebegin | afterend</span>
+    <span class="key">storageKey</span>: <span class="string">"blog_vitrine_posts_cache"</span>, <span class="comment">// chave no sessionStorage</span>
+
+    <span class="comment">// Página inicial</span>
+    <span class="key">homeLimit</span>: <span class="number">3</span>,                    <span class="comment">// quantas das últimas postagens aparecem na home</span>
+    <span class="key">homeSectionTitle</span>: <span class="string">"Blog"</span>,
+
+    <span class="comment">// Página de uma postagem</span>
+    <span class="key">relatedLimit</span>: <span class="number">3</span>,                 <span class="comment">// quantas "outras postagens" aparecem, excluindo a atual</span>
+    <span class="key">relatedSectionTitle</span>: <span class="string">"Outras postagens"</span>,
+    <span class="key">shareText</span>: <span class="string">"Compartilhe:"</span>,
+
+    <span class="comment">// Página "Blog" (listagem completa)</span>
+    <span class="key">listingColumns</span>: { <span class="key">desktop</span>: <span class="number">2</span>, <span class="key">tablet</span>: <span class="number">2</span>, <span class="key">mobile</span>: <span class="number">1</span> },
+
+    <span class="comment">// Colunas da vitrine da home e das "outras postagens"</span>
+    <span class="key">columns</span>: { <span class="key">desktop</span>: <span class="number">3</span>, <span class="key">tablet</span>: <span class="number">2</span>, <span class="key">mobile</span>: <span class="number">1</span> },
+
+    <span class="key">colors</span>: {
+        <span class="key">titleColor</span>: <span class="string">"#111111"</span>,
+        <span class="key">cardBackground</span>: <span class="string">"#ffffff"</span>,
+        <span class="key">cardBorder</span>: <span class="string">"#e5e5e5"</span>,
+        <span class="key">excerptColor</span>: <span class="string">"#555555"</span>,
+        <span class="key">shareText</span>: <span class="string">"#333333"</span>
+    }
+};</pre>
+        </div>
+
+        <hr class="divider">
+
+        <h2>API pública</h2>
+        <p>O plugin fica disponível em <code>window.BlogVitrine</code> após inicialização.</p>
+        <div class="code-block">
+<pre><span class="comment">// Reinicializar (usa o cache de sessão, refaz fetch só do que faltar)</span>
+window.BlogVitrine.reinit();
+
+<span class="comment">// Alterar configuração em runtime</span>
+window.BlogVitrine.updateConfig({ <span class="key">homeSectionTitle</span>: <span class="string">"Novidades do blog"</span> });
+
+<span class="comment">// Remover a vitrine/listagem/compartilhamento da página</span>
+window.BlogVitrine.destroy();</pre>
+        </div>
+
+    </div>
+
+    <hr class="divider" style="max-width:900px;margin:60px auto">
+
+    <!-- =============================================
+         DEMO AO VIVO
+         Simula as 3 páginas reais da loja, cada uma com o MESMO
+         rodapé (Institucional: Fale Conosco, Meios de pagamento,
+         Política..., Quem somos, Blog, Postagem de Blog 1-4).
+
+         Como as 3 simulações vivem no mesmo arquivo, usamos
+         BlogVitrineConfig.testPathname (só existe pra testes) pra
+         fingir que cada bloco está numa URL diferente — na loja de
+         verdade isso não é necessário, o plugin já lê
+         window.location.pathname sozinho.
+
+         O fetch() das páginas de post também é mockado só pra esse
+         demo funcionar offline; na loja de verdade o fetch acessa
+         as páginas reais, que estão no mesmo domínio.
+    ============================================= -->
+    <div class="demo-area" style="margin-top:0">
+        <span class="badge">Demo ao vivo</span>
+        <p>
+            Cada bloco abaixo tem o mesmo rodapé real da loja. Repare que "Blog" e as 4 postagens
+            somem do menu em todos eles, e o que é mostrado muda de acordo com a página simulada.
+        </p>
+    </div>
+
+    <script>
+        // Conteúdo fake das 4 páginas de post, no formato real de uma página da Loja Integrada
+        // (.conteudo com h1, imagem e o texto do resumo em ".conteudo > div > div")
+        function mockPostHTML(titulo, corFundo, corTexto, resumo) {
+            const svg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='100%25' height='100%25' fill='%23${corFundo}'/><text x='50%25' y='50%25' font-size='26' fill='%23${corTexto}' text-anchor='middle' dy='.3em'>${titulo}</text></svg>`;
+            return `
+                <div class="conteudo">
+                    <h1>${titulo}</h1>
+                    <img src="${svg}" alt="capa">
+                    <div><div>${resumo}</div></div>
+                </div>`;
+        }
+
+        const MOCK_PAGES = {
+            'https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-1.html':
+                mockPostHTML('Postagem de Blog 1', 'e8ddd0', 'a68a64',
+                    'Escolher a cama certa envolve considerar o tamanho, a idade e as preferências do seu pet. Camas ortopédicas ajudam animais idosos, enquanto ninhos aconchegantes agradam os mais jovens.'),
+            'https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-2.html':
+                mockPostHTML('Postagem de Blog 2', 'd9e8dd', '5f8a6d',
+                    'Móveis resistentes a arranhões, tecidos fáceis de limpar e cantinhos exclusivos para o pet tornam a casa mais funcional para todos. Pequenos ajustes evitam acidentes.'),
+            'https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-3.html':
+                mockPostHTML('Postagem de Blog 3', 'e8d9d9', 'a15c5c',
+                    'A alimentação natural pode trazer benefícios, mas exige orientação de um veterinário para garantir o equilíbrio nutricional. O ideal é avaliar caso a caso.'),
+            'https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-4.html':
+                mockPostHTML('Postagem de Blog 4', 'dde3ea', '5a6d85',
+                    'Prefira brinquedos de material atóxico, sem partes pequenas soltas e proporcionais ao tamanho do animal. Substitua assim que aparecerem rachaduras.')
+        };
+
+        const _realFetch = window.fetch ? window.fetch.bind(window) : null;
+        window.fetch = function (url, opts) {
+            if (Object.prototype.hasOwnProperty.call(MOCK_PAGES, url)) {
+                return Promise.resolve({
+                    ok: true,
+                    text: () => Promise.resolve(MOCK_PAGES[url])
+                });
+            }
+            return _realFetch ? _realFetch(url, opts) : Promise.resolve({ ok: false });
+        };
+    </script>
+
+    <!-- ── Simulação 1: página inicial ("/") ── -->
+    <div class="page-mock" id="page-home">
+        <div class="badge">Simulação: página inicial ("/")</div>
+        <div class="conteudo">
+            <h1>Bem-vindo à loja</h1>
+        </div>
+    </div>
+    <footer id="footer-home" class="footer-mock">
+        <h3>Institucional</h3>
+        <ul>
+            <li><a href="#modalContato" data-toggle="modal" data-target="#modalContato">Fale Conosco</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/meios-de-pagamento-e-de-frete.html">Meios de pagamento e de frete</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/politica-de-privacidade.html">Política de privacidade</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/politica-de-trocas-e-devolucoes.html">Política de Trocas e Devoluções</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/quem-somos.html">Quem somos</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/blog.html">Blog</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-1.html">Postagem de Blog 1</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-2.html">Postagem de Blog 2</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-3.html">Postagem de Blog 3</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-4.html">Postagem de Blog 4</a></li>
+        </ul>
+    </footer>
+    <script>
+        window.BlogVitrineConfig = {
+            testPathname: '/', // só pra este demo — na loja real não é necessário
+            footerSelector: '#footer-home',
+            insertSelector: '#page-home .conteudo'
+        };
+    </script>
+    <script src="resources/blog_vitrine.js"></script>
+
+    <!-- ── Simulação 2: página de uma postagem ── -->
+    <div class="page-mock" id="page-postagem-2">
+        <div class="badge">Simulação: página da "Postagem de Blog 2"</div>
+        <div class="conteudo">
+            <h1>Postagem de Blog 2</h1>
+            <div><div>Conteúdo completo da postagem 2 iria aqui.</div></div>
+        </div>
+    </div>
+    <footer id="footer-postagem" class="footer-mock">
+        <h3>Institucional</h3>
+        <ul>
+            <li><a href="#modalContato" data-toggle="modal" data-target="#modalContato">Fale Conosco</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/meios-de-pagamento-e-de-frete.html">Meios de pagamento e de frete</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/politica-de-privacidade.html">Política de privacidade</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/politica-de-trocas-e-devolucoes.html">Política de Trocas e Devoluções</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/quem-somos.html">Quem somos</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/blog.html">Blog</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-1.html">Postagem de Blog 1</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-2.html">Postagem de Blog 2</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-3.html">Postagem de Blog 3</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-4.html">Postagem de Blog 4</a></li>
+        </ul>
+    </footer>
+    <script>
+        window.BlogVitrineConfig = {
+            testPathname: '/pagina/postagem-de-blog-2.html', // só pra este demo
+            footerSelector: '#footer-postagem',
+            insertSelector: '#page-postagem-2 .conteudo'
+        };
+    </script>
+    <script src="resources/blog_vitrine.js"></script>
+
+    <!-- ── Simulação 3: página "Blog" (listagem completa) ── -->
+    <div class="page-mock" id="page-blog">
+        <div class="badge">Simulação: página "Blog"</div>
+        <div class="conteudo">
+            <h1>Blog</h1>
+        </div>
+    </div>
+    <footer id="footer-blog" class="footer-mock">
+        <h3>Institucional</h3>
+        <ul>
+            <li><a href="#modalContato" data-toggle="modal" data-target="#modalContato">Fale Conosco</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/meios-de-pagamento-e-de-frete.html">Meios de pagamento e de frete</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/politica-de-privacidade.html">Política de privacidade</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/politica-de-trocas-e-devolucoes.html">Política de Trocas e Devoluções</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/quem-somos.html">Quem somos</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/blog.html">Blog</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-1.html">Postagem de Blog 1</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-2.html">Postagem de Blog 2</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-3.html">Postagem de Blog 3</a></li>
+            <li><a href="https://delicarehome.lojaintegrada.com.br/pagina/postagem-de-blog-4.html">Postagem de Blog 4</a></li>
+        </ul>
+    </footer>
+    <script>
+        window.BlogVitrineConfig = {
+            testPathname: '/pagina/blog.html', // só pra este demo
+            footerSelector: '#footer-blog',
+            insertSelector: '#page-blog .conteudo'
+        };
+    </script>
+    <script src="resources/blog_vitrine.js"></script>
+
+    <footer class="page-footer">
+        <p>Blog Vitrine Plugin &mdash; Vanilla JS, zero dependências.</p>
+    </footer>
+
+</body>
+</html>

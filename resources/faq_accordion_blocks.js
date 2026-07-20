@@ -13,6 +13,7 @@
     // para sobrescrever estas configurações
     const DEFAULT_CONFIG = {
         active: true,
+        injectStyles: true,          // false = injeta o CSS do plugin sem forçar fonte, cores e border-radius (herda do site)
 
         // Onde inserir a seção na página
         insertSelector: 'body',
@@ -90,12 +91,35 @@
     // NÃO ALTERAR DAQUI PRA BAIXO
     // ======
 
+    // injectStyles: false = mantém o layout do plugin, mas não força fonte, cores nem border-radius (herda do site)
+    const THEME = CONFIG.injectStyles !== false;
+
+    const THEME_COLORS = THEME ? CONFIG.colors : {
+        sectionBackground: 'transparent',
+        titleColor: 'inherit',
+        dotColor: 'currentColor',
+        descriptionColor: 'inherit',
+        itemBorderColor: 'currentColor',
+        questionColor: 'inherit',
+        answerColor: 'inherit',
+        buttonBackground: 'currentColor',
+        buttonHoverBackground: 'currentColor'
+    };
+
+    const FONT_FAMILY_DECLARATION = THEME
+        ? `font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;`
+        : '';
+
+    const RADIUS = THEME
+        ? { dot: '50%', item: '50px', itemOpen: '20px', btn: '50%' }
+        : { dot: '0', item: '0', itemOpen: '0', btn: '0' };
+
     const CSS_STYLES = `
         <style id="faq-accordion-styles">
             .faq-accordion-section {
-                background: ${CONFIG.colors.sectionBackground};
+                background: ${THEME_COLORS.sectionBackground};
                 padding: 60px 40px;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+                ${FONT_FAMILY_DECLARATION}
                 box-sizing: border-box;
             }
 
@@ -122,7 +146,7 @@
             .faq-accordion-title {
                 font-size: 2rem;
                 font-weight: 700;
-                color: ${CONFIG.colors.titleColor};
+                color: ${THEME_COLORS.titleColor};
                 line-height: 1.2;
                 margin: 0 0 20px 0;
             }
@@ -131,8 +155,8 @@
                 display: inline-block;
                 width: 10px;
                 height: 10px;
-                background: ${CONFIG.colors.dotColor};
-                border-radius: 50%;
+                background: ${THEME_COLORS.dotColor};
+                border-radius: ${RADIUS.dot};
                 margin-left: 4px;
                 vertical-align: middle;
                 position: relative;
@@ -141,7 +165,7 @@
 
             .faq-accordion-description {
                 font-size: 0.95rem;
-                color: ${CONFIG.colors.descriptionColor};
+                color: ${THEME_COLORS.descriptionColor};
                 line-height: 1.7;
                 margin: 0;
             }
@@ -154,15 +178,15 @@
 
             /* Itens */
             .faq-accordion-item {
-                border: 1.5px solid ${CONFIG.colors.itemBorderColor};
-                border-radius: 50px;
+                border: 1.5px solid ${THEME_COLORS.itemBorderColor};
+                border-radius: ${RADIUS.item};
                 margin-bottom: 12px;
                 overflow: hidden;
                 transition: border-color 0.25s ease, border-radius 0.32s ease;
             }
 
             .faq-accordion-item.faq-open {
-                border-radius: 20px;
+                border-radius: ${RADIUS.itemOpen};
             }
 
             .faq-accordion-header {
@@ -182,7 +206,7 @@
             .faq-accordion-question {
                 font-size: 0.95rem;
                 font-weight: 500;
-                color: ${CONFIG.colors.questionColor};
+                color: ${THEME_COLORS.questionColor};
                 line-height: 1.4;
                 flex: 1;
             }
@@ -192,8 +216,8 @@
                 flex-shrink: 0;
                 width: 36px;
                 height: 36px;
-                border-radius: 50%;
-                background: ${CONFIG.colors.buttonBackground};
+                border-radius: ${RADIUS.btn};
+                background: ${THEME_COLORS.buttonBackground};
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -206,7 +230,7 @@
             }
 
             .faq-accordion-item.faq-open .faq-accordion-btn {
-                background: ${CONFIG.colors.buttonHoverBackground};
+                background: ${THEME_COLORS.buttonHoverBackground};
             }
 
             .faq-accordion-item.faq-open .faq-accordion-btn svg {
@@ -227,7 +251,7 @@
 
             .faq-accordion-answer {
                 font-size: 0.9rem;
-                color: ${CONFIG.colors.answerColor};
+                color: ${THEME_COLORS.answerColor};
                 line-height: 1.7;
                 margin: 0;
             }
