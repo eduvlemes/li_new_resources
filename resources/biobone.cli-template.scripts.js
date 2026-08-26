@@ -1,13 +1,16 @@
 console.log(`==============================`);
-console.log(`== ALPIX - BIOBONE - LOADED ==`);
+console.log(`== ALPIX - BIOBONE - START  ==`);
 console.log(`==============================`);
 
 
 (function () {
-  const params = new URLSearchParams(window.location.search);
+ 
+  if (window.location.href.includes(`https://bio-bone-preview.lojas.li/checkout`)) {
+      var css___ = document.createElement('link');
+      css___.rel = 'stylesheet';
+      css___.href = 'http://127.0.0.1:5501/resources/biobone.cli-template.styles.css';
+      document.head.appendChild(css___);
 
-  if (params.get('apx') === '1') {
-      
       window.UpsellCrossSellConfig = {
          
           checkout: {
@@ -61,6 +64,7 @@ console.log(`==============================`);
       var script___ = document.createElement('script');
       script___.src = 'https://cdn.jsdelivr.net/gh/eduvlemes/li_new_resources/resources/upsell_cross_sell_v2.js?v=1.1';
       document.body.appendChild(script___);
+
 
   }
 })();
