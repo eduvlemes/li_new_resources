@@ -58,9 +58,9 @@ console.log(`==============================`);
           }
       };
       
-      var script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/gh/eduvlemes/li_new_resources/resources/upsell_cross_sell_v2.js?v=1.1';
-      document.body.appendChild(script);
+      var script___ = document.createElement('script');
+      script___.src = 'https://cdn.jsdelivr.net/gh/eduvlemes/li_new_resources/resources/upsell_cross_sell_v2.js?v=1.1';
+      document.body.appendChild(script___);
 
   }
 })();
