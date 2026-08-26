@@ -9,19 +9,7 @@ console.log(`==============================`);
   if (params.get('apx') === '1') {
       
       window.UpsellCrossSellConfig = {
-          productPage: {
-              active: true,
-              title: 'Leve esses aqui também',
-              source: 'keywords',
-              parameter: "chaveiro",
-              sort: 'most_sold',            // 'most_sold' | 'price_asc' | 'price_desc'
-              layout: 'list',              // 'list' | 'grid' | 'slider'
-              maxProducts: 3,
-              cardsPerRow: 1,              // usado quando layout = 'grid'
-              insertSelector: '.principal #DelimiterFloat',
-              insertMethod: 'afterend'
-              
-          },
+         
           checkout: {
               id: 'ucs-cart-cj-petisco',
               title: 'APROVEITE O FRETE, E LEVE:',
@@ -40,27 +28,7 @@ console.log(`==============================`);
                   window.location.reload();
               }
           },
-          cart: {
-              sections: [
-                  {
-                      id: 'ucs-cart-cj',
-                      title: 'Leve um chaveiro exclusivo!',
-                      source: 'keywords',
-                      parameter: "chaveiro",
-                      // source: 'compre_junto',
-                      // sort: 'most_sold',       // 'most_sold' | 'price_asc' | 'price_desc'
-                      layout: 'slider',        // 'list' | 'grid' | 'slider'
-                      maxProducts: 30,
-                      slidesPerView: 5,
-                      insertSelector: '.finalizar-compra .caixa-sombreada',
-                      insertMethod: 'afterend',
-                      onAddToCart: function(response, skuId) {
-                          console.log('[Carrinho CJ] adicionado:', skuId);
-                          window.location.reload();
-                      }
-                  }
-              ]
-          },
+          
           
           colors: {
               sectionBackground:  '#f9fafb',
@@ -90,23 +58,6 @@ console.log(`==============================`);
           }
       };
       
-      if (window.PRODUTO_ID == "401877167") {
-          window.UpsellCrossSellConfig.productPage = {
-              title: 'Leve um mordedor também!',
-              source: 'keywords',
-              parameter: "mordedor",
-              sort: 'most_sold',           // 'most_sold' | 'price_asc' | 'price_desc'
-              layout: 'list',              // 'list' | 'grid' | 'slider'
-              maxProducts: 5,
-              cardsPerRow: 1,              // usado quando layout = 'grid'
-              insertSelector: '.principal #DelimiterFloat',
-              insertMethod: 'afterend',
-              onAddToCart: function(response, skuId) {
-                  console.log('[Produto] SKU adicionado:', skuId);
-                  
-              }     
-          }
-      }
       var script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/gh/eduvlemes/li_new_resources/resources/upsell_cross_sell_v2.js?v=1.1';
       document.body.appendChild(script);
