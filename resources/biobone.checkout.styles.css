@@ -1,0 +1,899 @@
+/* ==========================================================================
+   BIO BONE — Checkout (tema legado da Loja Integrada)
+   Só CSS. Nenhum HTML alterado.
+   Escopo: body — não vaza para o resto da loja.
+
+   REGRA DESTE ARQUIVO: só pinta, nunca reestrutura.
+   O checkout roda num grid de floats do Bootstrap 2 e troca de etapa
+   ligando/desligando .hide. Portanto aqui NÃO existe:
+     - display / float / position em container estrutural
+     - width / margin lateral em .spanN, .row-fluid, .clearfix, .control-group
+     - !important em .hide (o JS da plataforma usa show()/hide() com style
+       inline; um !important nosso travaria a etapa e quebraria a compra)
+   Mexer nisso foi o que quebrou o formulário de cartão na versão anterior.
+   ========================================================================== */
+
+@import url("https://use.typekit.net/cpd1qjk.css");
+
+body {
+  --bb-preto: #191716;
+  --bb-osso: #f2f2f2;
+  --bb-cana: #e4ddd2;
+  --bb-cana-esc: #cec4b5;
+  --bb-bagaco: #918462;
+  --bb-limao: #c5f21f;
+  --bb-vermelho: #ff7398;
+  --bb-branco: #fff;
+
+  --bb-display: pacaembu, Figtree, system-ui, sans-serif;
+  --bb-sans: carbona-variable, "IBM Plex Mono", ui-monospace, system-ui, sans-serif;
+
+  --bb-r-box: 20px;
+  --bb-r-field: 999px;
+}
+
+/* --------------------------------------------------------------------------
+   1. Base
+   -------------------------------------------------------------------------- */
+
+body,
+body *,
+body *::before,
+body *::after { box-sizing: border-box; }
+
+body {
+  background: var(--bb-osso);
+  color: var(--bb-preto);
+  font-family: var(--bb-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body .conteiner-principal,
+body #corpo { background: transparent; }
+
+body a { color: var(--bb-preto); }
+body a:hover { color: var(--bb-bagaco); }
+
+body .muted,
+body small.muted { color: var(--bb-bagaco); }
+
+/* barra do tema legado que não pertence ao checkout (busca/carrinho duplicados) */
+body #barraTopo { display: none; }
+
+/* --------------------------------------------------------------------------
+   2. Tipografia
+   -------------------------------------------------------------------------- */
+
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6,
+body .titulo,
+body legend {
+  font-family: var(--bb-display);
+  color: var(--bb-preto);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+/* o legado pinta títulos com as cores configuradas no painel; a marca vence */
+body .cor-principal,
+body .cor-secundaria { color: var(--bb-preto); }
+
+/* --------------------------------------------------------------------------
+   3. Cabeçalho — a barra já é flex na plataforma, só ganha pele
+   -------------------------------------------------------------------------- */
+
+body #cabecalho {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding-top: 18px;
+}
+
+body .cabecalho-conteudo {
+  align-items: center;
+  gap: 16px;
+  background: var(--bb-limao);
+  border-radius: var(--bb-r-box);
+  padding: 12px 26px;
+  min-height: 64px;
+}
+
+body .cabecalho-logo,
+body .cabecalho-logo h1 { width: auto; height: auto; }
+
+body .cabecalho-logo img {
+  max-height: 60px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+}
+
+body .cabecalho-safety { color: var(--bb-preto); }
+
+body .cabecalho-safety p {
+  margin: 0;
+  font-family: var(--bb-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--bb-preto);
+}
+
+body .cabecalho-safety .icon-lock { color: var(--bb-preto); }
+
+/* --------------------------------------------------------------------------
+   4. Caixas: cadastro / entrega / pagamento / resumo
+   -------------------------------------------------------------------------- */
+
+body .caixa-sombreada,
+body .resumo-compra {
+  background: var(--bb-branco);
+  border: 1px solid var(--bb-preto);
+  border-radius: var(--bb-r-box);
+  box-shadow: none;
+}
+
+body .resumo-compra { overflow: hidden; }
+
+body .caixa-sombreada legend {
+  border: 0;
+  border-bottom: 1px solid var(--bb-cana);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: .04em;
+  color: var(--bb-preto);
+}
+
+body .caixa-sombreada legend [class^="icon-"] { color: var(--bb-bagaco); }
+
+body .caixa-sombreada legend a {
+  font-family: var(--bb-sans);
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--bb-bagaco);
+}
+
+body hr,
+body hr.sem-margem { border-top-color: var(--bb-cana); border-bottom: 0; }
+
+/* Pessoa Física / Jurídica como toggle segmentado.
+ * ÚNICA exceção à regra "não reestruturar": é um componente fechado (ul + 2 li)
+ * e nada fora dele depende do seu layout. O clearfix de .row-fluid tem que
+ * morrer aqui, senão vira item de flex e desalinha os dois lados. */
+body #tipoCadastro {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 4px;
+  background: var(--bb-cana);
+  border: 0;
+  border-radius: var(--bb-r-field);
+}
+
+body #tipoCadastro::before,
+body #tipoCadastro::after { display: none; }
+
+body #tipoCadastro > li {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  float: none;
+  border: 0;
+}
+
+body #tipoCadastro > li > a {
+  display: block;
+  border: 0;
+  margin: 0;
+  padding: 10px 6px;
+  border-radius: var(--bb-r-field);
+  background: transparent;
+  text-align: center;
+  font-family: var(--bb-display);
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--bb-bagaco);
+  transition: background .15s, color .15s;
+}
+
+body #tipoCadastro > li > a:hover { color: var(--bb-preto); }
+
+body #tipoCadastro > li.active > a {
+  background: var(--bb-preto);
+  color: var(--bb-osso);
+}
+
+/* os ícones de check viram ruído dentro de um toggle */
+body #tipoCadastro [class^="icon-"] { display: none; }
+body #tipoCadastro b { font-weight: inherit; }
+
+/* --------------------------------------------------------------------------
+   5. Campos
+   O width fica por conta do Bootstrap (.spanN / .input-*). Aqui só a pele.
+   -------------------------------------------------------------------------- */
+
+body .control-label,
+body label.control-label {
+  font-family: var(--bb-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--bb-bagaco);
+}
+
+body .control-label small {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--bb-bagaco);
+}
+
+/* .nowrap não pode quebrar linha e "CÓD. DE SEGURANÇA" é o rótulo mais longo do
+ * checkout: sem apertar tracking e corpo ele vinha com reticências. */
+body .control-label.nowrap { font-size: 9.5px; letter-spacing: 0; }
+
+body input[type="text"],
+body input[type="tel"],
+body input[type="email"],
+body input[type="number"],
+body input[type="password"],
+body select,
+body textarea {
+  /* border-box mantém a largura declarada pelo Bootstrap mesmo mudando o padding */
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--bb-branco);
+  border: 1px solid var(--bb-cana-esc);
+  border-radius: var(--bb-r-field);
+  box-shadow: none;
+  font-family: var(--bb-sans);
+  font-size: 14px;
+  color: var(--bb-preto);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+body textarea {
+  height: auto;
+  min-height: 88px;
+  padding: 12px 16px;
+  border-radius: var(--bb-r-box);
+}
+
+body select {
+  padding-right: 38px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23191716' stroke-width='1.6' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+}
+
+body input::placeholder,
+body textarea::placeholder { color: var(--bb-bagaco); opacity: .7; }
+
+body input:focus,
+body select:focus,
+body textarea:focus {
+  outline: 0;
+  border-color: var(--bb-preto);
+  box-shadow: 0 0 0 3px rgba(197, 242, 31, .55);
+}
+
+body .control-group.error input,
+body .control-group.error select,
+body .control-group.erro input,
+body .control-group.erro select { border-color: var(--bb-vermelho); }
+
+body .help-block,
+body .help-block.erro { font-size: 11px; color: var(--bb-vermelho); }
+
+body .help-block.font-bold { color: var(--bb-bagaco); }
+
+/* CEP: o legado prende em 90px (.input-small) e o campo fica minúsculo ao lado
+ * dos outros. width em input é folha — não mexe em irmão nenhum. */
+body #id_cep { width: 100%; }
+
+/* Radio e checkbox nativos não têm a cara da marca. appearance:none em input é
+ * folha; mantenho 16px para não estourar o .radio-conteiner (13px + padding). */
+body input[type="radio"],
+body input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--bb-bagaco);
+  background: var(--bb-branco);
+  vertical-align: middle;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+
+/* NÃO zerar a margem aqui: o Bootstrap usa margin-left:-20px junto com o
+ * padding-left:20px do label como recuo pendurado. Zerando, a marca cola no
+ * texto. Só o radio dentro do .radio-conteiner precisa de margem limpa. */
+body .radio-conteiner input[type="radio"] { margin: 0; }
+
+body input[type="radio"] { border-radius: 50%; }
+body input[type="checkbox"] { border-radius: 4px; }
+
+body input[type="radio"]:checked {
+  border-color: var(--bb-preto);
+  background: radial-gradient(circle at center, var(--bb-preto) 0 42%, var(--bb-branco) 47%);
+}
+
+body input[type="checkbox"]:checked {
+  border-color: var(--bb-preto);
+  background: var(--bb-preto)
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath fill='none' stroke='%23f2f2f2' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 4.2 3.6 6.8 9 1.4'/%3E%3C/svg%3E")
+    center / 10px 8px no-repeat;
+}
+
+body input[type="radio"]:focus-visible,
+body input[type="checkbox"]:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(197, 242, 31, .6);
+}
+
+body label.checkbox { font-size: 13px; color: var(--bb-preto); }
+
+/* o campo de e-mail da etapa 1 é maior e divide a linha com o botão absoluto */
+body #id_email_login,
+body #id_senha_login { height: 52px; }
+
+/* --------------------------------------------------------------------------
+   6. Botões — pílula preta, sem mexer em display/position
+   -------------------------------------------------------------------------- */
+
+body .botao,
+body .botao.principal,
+body button.botao,
+body a.botao,
+body input.botao {
+  background: var(--bb-preto);
+  background-image: none;
+  border: 1px solid var(--bb-preto);
+  border-radius: var(--bb-r-field);
+  box-shadow: none;
+  color: var(--bb-osso);
+  font-family: var(--bb-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-shadow: none;
+  text-decoration: none;
+}
+
+body .botao:hover,
+body .botao.principal:hover {
+  background: var(--bb-bagaco);
+  border-color: var(--bb-bagaco);
+  color: var(--bb-osso);
+}
+
+body .botao.disabled,
+body .botao[disabled] {
+  background: var(--bb-preto);
+  border-color: var(--bb-preto);
+  color: var(--bb-osso);
+  opacity: .3;
+}
+
+/* botão sem .principal vira contorno */
+body a.botao:not(.principal),
+body #continueShopping {
+  background: transparent;
+  color: var(--bb-preto);
+}
+
+body a.botao:not(.principal):hover,
+body #continueShopping:hover {
+  background: var(--bb-preto);
+  color: var(--bb-osso);
+}
+
+body .btn,
+body .btn-small {
+  background: transparent;
+  background-image: none;
+  border: 1px solid var(--bb-cana-esc);
+  border-radius: var(--bb-r-field);
+  box-shadow: none;
+  text-shadow: none;
+  font-family: var(--bb-sans);
+  font-size: 11px;
+  color: var(--bb-bagaco);
+}
+
+body .btn:hover { border-color: var(--bb-preto); color: var(--bb-preto); }
+
+/* Este botão é position:absolute com left E right fixados pelo legado — com os
+ * dois presos, width:auto preenche o vão em vez de encolher, e "CONTINUAR" em
+ * pacaembu maiúsculo vazava para fora da pílula. left:auto devolve o
+ * shrink-to-fit ancorado à direita; a fonte menor garante folga até o campo.
+ * Ele é absoluto, então nada disso mexe em irmão nenhum. */
+body .submit-email {
+  left: auto !important;
+  width: auto !important;
+  padding: 13px 16px !important;
+  font-size: 11px !important;
+  letter-spacing: .06em !important;
+  line-height: 1.2 !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. Etapa 1 — identificação
+   -------------------------------------------------------------------------- */
+
+body .identificacao-inner {
+  background: var(--bb-branco);
+  border: 1px solid var(--bb-preto);
+  border-radius: var(--bb-r-box);
+  padding: 32px 28px 26px;
+}
+
+body .identificacao-title {
+  font-family: var(--bb-display);
+  font-size: 24px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--bb-preto);
+  margin-bottom: 20px;
+}
+
+body .esqueci-senha,
+body .fazer-cadastro {
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--bb-bagaco);
+}
+
+/* --------------------------------------------------------------------------
+   8. Caixa "usamos seu e-mail de forma segura"
+   -------------------------------------------------------------------------- */
+
+body .checkout-alerta-seguro {
+  background: var(--bb-cana);
+  border: 0;
+  border-radius: var(--bb-r-box);
+}
+
+body .checkout-alerta-seguro-tit {
+  font-family: var(--bb-display);
+  font-size: 14px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--bb-preto);
+}
+
+body .checkout-alerta-seguro-text { font-size: 13px; color: var(--bb-preto); }
+body .checkout-alerta-seguro-item .icon-ok { color: var(--bb-preto); }
+body .checkout-alerta-seguro-icon { color: rgba(25, 23, 22, .08); }
+
+/* --------------------------------------------------------------------------
+   9. Resumo do pedido
+   -------------------------------------------------------------------------- */
+
+body .tabela-carrinho { border: 0; }
+
+body .tabela-carrinho thead th {
+  background: var(--bb-cana);
+  border: 0;
+  vertical-align: middle;
+}
+
+body .tabela-carrinho thead h6 {
+  font-family: var(--bb-display);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--bb-preto);
+}
+
+body .tabela-carrinho td {
+  border-top: 1px solid var(--bb-cana);
+  border-left: 0;
+  border-right: 0;
+  vertical-align: middle;
+}
+
+body .produto-info {
+  font-family: var(--bb-display);
+  font-size: 14px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--bb-preto);
+}
+
+body .produto-info ul,
+body .produto-info ul strong {
+  font-family: var(--bb-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--bb-bagaco);
+}
+
+body .tabela-carrinho tr.bg-dark td { background: #faf9f7; }
+body .tr-checkout-total td { background: var(--bb-cana); }
+
+body .tabela-carrinho .text-right span {
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--bb-bagaco);
+}
+
+body .tr-checkout-total .text-right span {
+  font-family: var(--bb-display);
+  font-size: 13px;
+  color: var(--bb-preto);
+}
+
+body .preco-produto strong,
+body .subtotal strong,
+body .frete-preco strong,
+body .desconto-preco strong {
+  font-family: var(--bb-display);
+  font-size: 15px;
+  color: var(--bb-preto);
+}
+
+body .total strong,
+body .preco-carrinho-total {
+  font-family: var(--bb-display);
+  font-size: 21px;
+  color: var(--bb-preto);
+}
+
+/* --------------------------------------------------------------------------
+   10. Entrega e pagamento — cartões de opção
+   .accordion-heading é layout de float (.radio-conteiner float:left):
+   nada de flex aqui, só pele.
+   -------------------------------------------------------------------------- */
+
+body .formas.envio,
+body .formas.pagamento,
+body #formas-envio-wrapper,
+body #formasPagamento {
+  border: 0;
+  background: transparent;
+}
+
+body .accordion-group,
+body .pagamento_selecao_conteiner {
+  background: var(--bb-branco);
+  border: 1px solid var(--bb-cana-esc);
+  border-radius: 14px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+body .pagamento_selecao_conteiner:hover { border-color: var(--bb-bagaco); }
+
+body .accordion-group.active,
+body .pagamento_selecao_conteiner.active,
+body .pagamento_selecao_conteiner.selecionado { border-color: var(--bb-preto); }
+
+body .accordion-heading { border: 0; }
+
+body .forma-conteiner { font-size: 13px; color: var(--bb-preto); }
+
+body .forma-conteiner b.cor-principal {
+  font-family: var(--bb-display);
+  color: var(--bb-preto);
+}
+
+/* O .radio-conteiner do legado tem background rgba(0,0,0,.1) e line-height:38px
+ * — desenhava um bloco cinza atrás do radio em cada opção de frete/pagamento. */
+body .radio-conteiner {
+  background: transparent;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Selo de desconto do Pix. O .forma-conteiner impõe line-height:38px, que a
+ * pílula herdava e virava um bloco alto demais; line-height:1 a deixa compacta. */
+body .forma-conteiner.with-discount > span.cor-secundaria {
+  background: var(--bb-limao);
+  border-radius: var(--bb-r-field);
+  padding: 5px 11px;
+  font-family: var(--bb-display);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--bb-preto);
+  white-space: nowrap;
+  margin-top: 9px;
+}
+
+body .accordion-inner {
+  border-top: 1px solid var(--bb-cana);
+  background: #fbfaf8;
+}
+
+body .accordion-inner .text-right span {
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--bb-bagaco);
+}
+
+body .pagamento-valor {
+  font-family: var(--bb-display);
+  font-size: 19px;
+  color: var(--bb-preto);
+}
+
+body .warning-text { font-size: 11px; color: var(--bb-bagaco); }
+
+/* o bloco de frete encostava no rótulo "Endereço" logo abaixo */
+body #formasEnvio { margin-bottom: 18px; }
+
+/* "Alterar entrega" ancorado no canto superior direito da caixa.
+ * O position:relative no pai é obrigatório — sem ele o absolute escaparia
+ * para o primeiro ancestral posicionado e sairia do card. */
+body #formularioEndereco { position: relative; }
+
+body #exibirFormasEnvio > a {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+body .cartao-salvo-box {
+  background: var(--bb-branco);
+  border: 1px solid var(--bb-cana-esc);
+  border-radius: 14px;
+}
+
+/* o "?" do CVV: mesma altura do campo e colado nele, sem borda dupla */
+body .input-append .add-on {
+  height: 44px;
+  padding: 0 10px;
+  line-height: 42px;
+  margin-left: -1px;
+  background: var(--bb-cana);
+  border: 1px solid var(--bb-cana-esc);
+  border-radius: 0 var(--bb-r-field) var(--bb-r-field) 0;
+  color: var(--bb-bagaco);
+  text-shadow: none;
+  vertical-align: top;
+}
+
+/* o campo antes do add-on perde o arredondamento da direita */
+body .input-append input { border-radius: var(--bb-r-field) 0 0 var(--bb-r-field); }
+
+body .tipo-cartao-options .btn.active {
+  background: var(--bb-preto);
+  border-color: var(--bb-preto);
+  color: var(--bb-osso);
+}
+
+/* --------------------------------------------------------------------------
+   11. Ação final e alertas
+   -------------------------------------------------------------------------- */
+
+body .acao-editar { border-top: 1px solid var(--bb-cana); padding-top: 16px; }
+
+body #continueShopping { width: 100%; }
+
+/* CTA principal: limão com texto preto, maior que todo o resto da página.
+ * Vem depois das regras de .botao para vencer o preto padrão e o .disabled. */
+body #finalizarCompra,
+body #finalizarCompra.botao.principal {
+  width: 100%;
+  padding: 20px 24px;
+  background: var(--bb-limao);
+  border-color: var(--bb-limao);
+  color: var(--bb-preto);
+  font-size: 15px;
+  line-height: 1.1;
+  letter-spacing: .1em;
+}
+
+body #finalizarCompra:hover:not(.disabled):not([disabled]) {
+  background: var(--bb-preto);
+  border-color: var(--bb-preto);
+  color: var(--bb-limao);
+}
+
+body #finalizarCompra .icon-ok { color: inherit; }
+
+body #finalizarCompra.disabled,
+body #finalizarCompra[disabled] {
+  background: var(--bb-limao);
+  border-color: var(--bb-limao);
+  color: var(--bb-preto);
+  opacity: .4;
+}
+
+body .alert {
+  background: var(--bb-cana);
+  border: 0;
+  border-radius: 14px;
+  font-size: 12px;
+  color: var(--bb-preto);
+  text-shadow: none;
+}
+
+body .alert-error,
+body .alert-errors {
+  background: rgba(255, 115, 152, .18);
+  color: var(--bb-preto);
+}
+
+/* --------------------------------------------------------------------------
+   12. Rodapé — já é flex na plataforma
+   -------------------------------------------------------------------------- */
+
+body #rodape {
+  background: var(--bb-cana);
+  border: 0;
+  margin-top: 40px;
+}
+
+body .rodape-copyright p { font-size: 11px; color: var(--bb-bagaco); }
+body .rodape-logo img { opacity: .55; }
+
+/* --------------------------------------------------------------------------
+   13. Mobile — só ajustes de pele, sem mudar o fluxo
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  body .cabecalho-conteudo {
+    padding: 10px 14px;
+    border-radius: 16px;
+  }
+
+  body .cabecalho-logo img { max-height: 46px; }
+
+  body .caixa-sombreada,
+  body .resumo-compra,
+  body .identificacao-inner,
+  body .checkout-alerta-seguro { border-radius: 16px; }
+
+  body .identificacao-inner { padding: 24px 16px 20px; }
+  body .identificacao-title { font-size: 20px; }
+
+  /* ----- Resumo do pedido no mobile -----
+   * A plataforma explode a tabela em blocos (cada <td> vira uma faixa de
+   * largura inteira, com !important), e os <td> vazios de espaçador viravam
+   * faixas em branco de ~40px. Além disso .conteiner-qtd e .conteiner-preco se
+   * sobrepunham e cortavam o preço.
+   * Aqui a linha vira flex: produto em cima, qtd e preço embaixo.
+   *
+   * :not(.esconder-mobile) é essencial — são as linhas que a própria
+   * plataforma esconde no mobile (Subtotal, Desconto). Sem isso eu as traria
+   * de volta à tela.
+   *
+   * A linha de desconto é mostrada pelo JS com style="display: table-row"
+   * INLINE, mantendo a classe .hide. Por isso o seletor é [style*="table-row"]
+   * e não :not(.hide): é o único sinal confiável de "esta linha está visível".
+   * Serve para qualquer linha que a plataforma revele desse jeito; enquanto
+   * estiver escondida o seletor não casa e ela continua fora da tela.
+   * O !important é para vencer o display:block !important do tema; note que
+   * NÃO existe display:none aqui em cima de linha nenhuma, então nada some. */
+  body .resumo-compra thead { display: none; }
+
+
+  body .resumo-compra tbody tr:not(.esconder-mobile),
+  body .resumo-compra tbody tr[style*="table-row"] {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    /* style-responsive.css põe `margin: 0 0 20px; border: 1px solid #ccc` em
+     * todo <tr> — era isso que abria as faixas de 20px entre as linhas. */
+    margin: 0;
+    padding: 10px 14px;
+    border: 0;
+    border-top: 1px solid var(--bb-cana);
+  }
+
+  body .resumo-compra tbody tr:first-child { border-top: 0; }
+
+  /* A plataforma teve a MESMA ideia de mirar o style inline, e ganha:
+   *   .resumo-compra .tabela-carrinho .desconto-tr[style*="display: table-row"]
+   *     { display: block !important }   ← style-responsive.css:217
+   * São 4 classes (0,4,0) contra os meus (0,3,3) — 4 classes vencem 3, e a
+   * linha continuava empilhando rótulo e valor. Subo para 5 classes. */
+  body .resumo-compra .tabela-carrinho tr.desconto-tr[style*="table-row"] {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    padding: 10px 14px;
+    border: 0;
+    border-top: 1px solid var(--bb-cana);
+  }
+
+  body .resumo-compra td {
+    display: block !important;
+    width: auto !important;
+    float: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  body .resumo-compra td.phone-pullleft { flex: 1 1 100%; }
+
+  body .resumo-compra td.conteiner-qtd {
+    margin: 5px 0 0;
+    color: var(--bb-bagaco);
+    font-size: 12px;
+  }
+
+  /* o selo de quantidade vem com fundo rgba(0,0,0,.1) do legado */
+  body .resumo-compra .tabela-carrinho .conteiner-qtd div {
+    padding: 3px 12px;
+    background: var(--bb-cana);
+    border-radius: var(--bb-r-field);
+    font-size: 12px;
+    color: var(--bb-preto);
+  }
+
+  body .resumo-compra td.conteiner-preco {
+    margin: 5px 0 0 auto;
+    text-align: right;
+  }
+
+  /* Linhas de valor: rótulo à esquerda, número à direita.
+   * O rótulo NÃO pode crescer (flex:0 0 auto) — esticando, ele comprimia a
+   * célula do valor e "(defina abaixo)" quebrava em duas linhas. */
+  body .resumo-compra td.text-right { flex: 0 0 auto; text-align: left; }
+
+  body .resumo-compra td.padding-preco {
+    flex: 1 1 auto;
+    margin-left: auto;
+    text-align: right;
+  }
+
+  /* os divs internos do legado trazem margem/entrelinha de tabela larga */
+  body .resumo-compra .preco-produto,
+  body .resumo-compra .frete-preco,
+  body .resumo-compra .desconto-preco,
+  body .resumo-compra .subtotal,
+  body .resumo-compra .total {
+    margin: 0;
+    padding: 0;
+    line-height: 1.35;
+  }
+
+  /* espaçadores vazios — a causa das faixas em branco. Por último, para vencer
+   * o display:block !important acima. */
+  body .resumo-compra td:empty,
+  body .resumo-compra tr.bg-dark > td:first-child:not(.padding-preco) { display: none !important; }
+
+  /* o legado corta o nome com reticências; agora há largura para mostrá-lo
+   * inteiro, e o cliente precisa ver o que está comprando */
+  body .resumo-compra .produto-info {
+    font-size: 13px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  body .preco-produto strong { font-size: 14px; }
+  body .total strong,
+  body .preco-carrinho-total { font-size: 18px; }
+}
